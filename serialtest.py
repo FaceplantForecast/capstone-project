@@ -20,3 +20,6 @@ def ReadRadarData():
     while True:
         data = data_port.read(1024)  # read 1024 bytes
         print(data)  # raw binary stream
+
+def main():
+    print("filler")
