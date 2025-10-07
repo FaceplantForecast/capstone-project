@@ -7,3 +7,11 @@
 
 import multiprocessing
 import numpy
+import serial_connection.serialtest as ST
+import sys
+
+def main():
+    ST.main()
+
+if __name__ == "__main__":
+    sys.exit(main())
