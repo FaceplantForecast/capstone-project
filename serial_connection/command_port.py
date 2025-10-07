@@ -1,6 +1,5 @@
 import serial
 import time
-import sys
 
 # Adjust device names and baud rates
 #config_port = serial.Serial('/dev/ttyUSB0', 115200)   # for CLI commands
