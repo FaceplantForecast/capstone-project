@@ -24,14 +24,7 @@ def ReadRadarData():
         data = data_port.read(1024)  # read 1024 bytes
         print(data)  # raw binary stream
 
-def CLIController():
-    while True:
-        user_input = input("command:") + "\r\n"
-
-        #exit loop
-        if user_input.lower() == "exit":
-            break
-        
+def CLIController(user_input):
         #send command
         config_port.write(user_input.encode('utf-8'))
         time.sleep(0.1)
@@ -40,13 +33,28 @@ def CLIController():
         data = config_port.readline()
 
         #read until the terminal goes back to ready state
+        output = ""
         while data.decode() != "R5F0> \n":
             if user_input.replace('\r\n', '') not in data.decode():
-                print(data.decode().replace('\n', ''))
+                output = output + data.decode()
             data = config_port.readline()
         
         #read one more line to prep for next cycle
-        data = config_port.readline()
+        config_port.readline()
+
+        return output
+
+def UserCLI():
+    while True:
+        user_input = input("command:") + "\r\n"
+
+        #exit loop
+        if user_input.lower() == "exit\r\n":
+            break
+        
+        #call CLI Controller function
+        print(CLIController(user_input))
+        
 
 def main():
-    CLIController()
+    UserCLI()

@@ -7,7 +7,7 @@
 
 import multiprocessing
 import numpy
-import serial_connection.serialtest as ST
+import serial_connection.command_port as ST
 import sys
 
 def main():
