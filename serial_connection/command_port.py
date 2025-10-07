@@ -1,12 +1,14 @@
 import serial
 import time
 
-# Adjust device names and baud rates
+# Adjust device names and baud rates (deployment on Raspberry Pi)
 #config_port = serial.Serial('/dev/ttyUSB0', 115200)   # for CLI commands
-#data_port   = serial.Serial('/dev/ttyUSB1', 115200)   # for binary point cloud data
 
-#debugging on windows
+#debugging on laptop
 config_port = serial.Serial('COM6', 115200)   # for CLI commands
+
+#debugging on desktop
+#config_port = serial.Serial('COM3', 115200)   # for CLI commands
 
 def InitiateRadar():
     # Send a config file line by line
@@ -17,11 +19,6 @@ def InitiateRadar():
                 time.sleep(0.01)  # small delay between commands
 
     print("Configuration sent. Radar should be running.")
-
-def ReadRadarData():
-    while True:
-        data = data_port.read(1024)  # read 1024 bytes
-        print(data)  # raw binary stream
 
 def CLIController(user_input):
         #send command
