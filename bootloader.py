@@ -13,7 +13,7 @@ import test_process as TestProc
 import sys
 
 #import enums
-from enums import BUFF_SIZES, CMD_INDEX
+from enums import BUFF_SIZES, CMD_INDEX, MAIN_STATUS, CMD_PORT_STATUS, AI_STATUS
 
 #global variables so that all functions modify the same instances
 global cmd_buffer
@@ -51,6 +51,9 @@ def set_cmd_defaults():
     global cmd_data
 
     cmd_data[CMD_INDEX.FRAMERATE] = 10 #set default framerate to 10
+    cmd_data[CMD_INDEX.AI_STATUS] = AI_STATUS.OFFLINE
+    cmd_data[CMD_INDEX.MAIN_STATUS] = MAIN_STATUS.RUNNING
+    cmd_data[CMD_INDEX.CMD_PORT_STATUS] = CMD_PORT_STATUS.OFFLINE
 
 def start_test_process():
     """
