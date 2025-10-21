@@ -5,7 +5,7 @@ import time
 #config_port = serial.Serial('/dev/ttyUSB0', 115200)   # for CLI commands
 
 #debugging on laptop
-config_port = serial.Serial('COM6', 115200)   # for CLI commands
+#config_port = serial.Serial('COM6', 115200)   # for CLI commands
 
 #debugging on desktop
 #config_port = serial.Serial('COM3', 115200)   # for CLI commands
@@ -41,15 +41,16 @@ def CLIController(user_input):
         return output
 
 def UserCLI():
-    while True:
-        user_input = input("command:") + "\r\n"
+    if 'config_port' in globals(): #make sure to only run this if the port is actually defined
+        while True:
+            user_input = input("command:") + "\r\n"
 
-        #exit loop
-        if user_input.lower() == "exit\r\n":
-            break
-        
-        #call CLI Controller function
-        print(CLIController(user_input))
+            #exit loop
+            if user_input.lower() == "exit\r\n":
+                break
+            
+            #call CLI Controller function
+            print(CLIController(user_input))
         
 
 def main():
