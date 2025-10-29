@@ -12,12 +12,13 @@ class DEBUG_LEVEL(IntEnum):
 
 class BUFF_SIZES(IntEnum):
     CMD_BUFF    = 8 #in bytes
+    FRAME_BUFF  = 4096
 
 class CMD_INDEX(IntEnum):
     MAIN_STATUS         = 0
     CMD_PORT_STATUS     = 1
     AI_STATUS           = 2
-    DESERIALIZER_STATUS = 3
+    DAT_PORT_STATUS     = 3
     APP_STATUS          = 4
     FRAMERATE           = 5
     APP_CMD             = 6
@@ -41,7 +42,7 @@ class AI_STATUS(IntEnum):
     NOTICE      = 3
     PAUSED      = 4
 
-class DESERIALIZER_STATUS(IntEnum):
+class DAT_PORT_STATUS(IntEnum):
     RUNNING     = 0
     ERROR       = 1
     OFFLINE     = 2

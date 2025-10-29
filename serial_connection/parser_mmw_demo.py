@@ -36,6 +36,14 @@ import math
 import binascii
 import codecs
 import numpy as np
+import sys, os
+
+#set parent directory so enums can be imported
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
+
+from enums import PACKET_DATA, DEBUG_LEVEL as DEBUG, BUFF_SIZES
 
 # definations for parser pass/fail
 TC_PASS = 0
@@ -156,7 +164,7 @@ def parser_helper(data, readNumBytes, debug=False):
     return (headerStartIndex, totalPacketNumBytes, numDetObj, numTlv, subFrameNumber)
 
 
-def parser_one_mmw_demo_output_packet(data, readNumBytes, debug=False):
+def parser_one_mmw_demo_output_packet(data, readNumBytes, debug=False, debug_level=DEBUG.NONE):
     """!
     This function is called by application. Firstly it calls parser_helper() function to find the start location of the mmw demo output packet, then extract the contents from the output packet.
     Each invocation of this function handles only one frame at a time and user needs to manage looping around to parse data for multiple frames.
@@ -208,13 +216,15 @@ def parser_one_mmw_demo_output_packet(data, readNumBytes, debug=False):
 
     if headerStartIndex == -1:
         result = TC_FAIL
-        print("************ Frame Fail, cannot find the magic words *****************")
+        if debug_level != DEBUG.NONE:
+            print("************ Frame Fail, cannot find the magic words *****************")
     else:
         nextHeaderStartIndex = headerStartIndex + totalPacketNumBytes
 
         if headerStartIndex + totalPacketNumBytes > readNumBytes:
             result = TC_FAIL
-            print("********** Frame Fail, readNumBytes may not long enough ***********")
+            if debug_level != DEBUG.NONE:
+                print("********** Frame Fail, readNumBytes may not long enough ***********")
         elif (
             nextHeaderStartIndex + 8 < readNumBytes
             and checkMagicPattern(
@@ -223,19 +233,22 @@ def parser_one_mmw_demo_output_packet(data, readNumBytes, debug=False):
             == 0
         ):
             result = TC_FAIL
-            print("********** Frame Fail, incomplete packet **********")
+            if debug_level != DEBUG.NONE:
+                print("********** Frame Fail, incomplete packet **********")
         elif numDetObj <= 0:
             result = TC_FAIL
-            print(
-                "************ Frame Fail, numDetObj = %d *****************"
-                % (numDetObj)
-            )
+            if debug_level != DEBUG.NONE:
+                print(
+                    "************ Frame Fail, numDetObj = %d *****************"
+                    % (numDetObj)
+                )
         elif subFrameNumber > 3:
             result = TC_FAIL
-            print(
-                "************ Frame Fail, subFrameNumber = %d *****************"
-                % (subFrameNumber)
-            )
+            if debug_level != DEBUG.NONE:
+                print(
+                    "************ Frame Fail, subFrameNumber = %d *****************"
+                    % (subFrameNumber)
+                )
         else:
             # process the 1st TLV
             tlvStart = headerStartIndex + headerNumBytes

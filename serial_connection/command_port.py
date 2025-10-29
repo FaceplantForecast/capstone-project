@@ -1,20 +1,46 @@
+# ==================================================================================
+# This code handles connecting to the command port and controlling the radar either
+# with a CLI for debugging or by other python scripts
+# ==================================================================================
+
 import serial
 import time
+import os
+import sys
+import numpy as np
+import multiprocessing.shared_memory as sm
 
+#set parent directory so enums can be imported
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
+
+from enums import PACKET_DATA, DEBUG_LEVEL as DEBUG, BUFF_SIZES
+
+#global variables so that all functions modify the same instances
+global cmd_buffer
+global cmd_data
 global config_port
 
-#Adjust device names and baud rates (deployment on Raspberry Pi)
-#config_port = serial.Serial('/dev/ttyUSB0', 115200)   # for CLI commands
 
-#debugging on laptop
-#config_port = serial.Serial('COM6', 115200)   # for CLI commands
+def bootstrapper():
+    """
+    This function handles the startup sequence for the process
+    """
+    global cmd_buffer
+    global cmd_data
 
-#debugging on desktop
-#config_port = serial.Serial('COM3', 115200)   # for CLI commands
+    #create the buffer, give it a name, set create to False, and give the size in bytes
+    cmd_buffer = sm.SharedMemory("cmd_buffer", create=False)
+    # Create the data, which is the array that is accessed by this script.
+    # By setting the buffer, it can be accessed by other scripts as well
+    cmd_data = np.ndarray(  shape=(BUFF_SIZES.CMD_BUFF,),
+                            dtype=np.int8,
+                            buffer=cmd_buffer.buf)
 
 def InitiateRadar():
     # Send a config file line by line
-    with open('profile_2025_09_26T22_19_26_970.cfg', 'r') as f:
+    with open('radar_profile.cfg', 'r') as f:
         for line in f:
             if line.strip() and not line.startswith('%'):  # skip comments
                 config_port.write((line.strip() + '\n').encode())
@@ -51,7 +77,7 @@ def CLIController(user_input):
 
 def UserCLI():
     global config_port
-    config_port = serial.Serial('COM3', 115200)   # for CLI commands
+
     if 'config_port' in globals(): #make sure to only run this if the port is actually defined
         while True:
             user_input = input("command:") + "\r\n"
@@ -65,4 +91,16 @@ def UserCLI():
         
 
 def main():
-    UserCLI()
+    global config_port
+
+    #Adjust device names and baud rates (deployment on Raspberry Pi)
+    #config_port = serial.Serial('/dev/ttyUSB0', 115200)   # for CLI commands
+
+    #debugging on laptop
+    #config_port = serial.Serial('COM6', 115200)   # for CLI commands
+
+    #debugging on desktop
+    config_port = serial.Serial('COM3', 115200)   # for CLI commands
+
+    #call bootstrapper
+    bootstrapper()

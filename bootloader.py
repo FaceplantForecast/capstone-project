@@ -9,8 +9,9 @@ import multiprocessing as mp
 from multiprocessing import shared_memory as sm
 import numpy as np
 import serial_connection.command_port as CmdPrt
+import serial_connection.data_port as DatPrt
 import test_process as TestProc
-import sys
+import sys, time
 
 #import enums
 from enums import BUFF_SIZES, CMD_INDEX, MAIN_STATUS, CMD_PORT_STATUS, AI_STATUS
@@ -18,9 +19,13 @@ from enums import BUFF_SIZES, CMD_INDEX, MAIN_STATUS, CMD_PORT_STATUS, AI_STATUS
 #global variables so that all functions modify the same instances
 global cmd_buffer
 global cmd_data
+global frame_buffer
+global frame_data
 
 #processes
 global test_proc
+global command_proc
+global data_proc
 
 def create_buffers():
     """
@@ -28,6 +33,8 @@ def create_buffers():
     """
     global cmd_buffer
     global cmd_data
+    global frame_buffer
+    global frame_data
 
     #================================================================
     #SHARED MEMORY BUFFER EXAMPLE
@@ -42,6 +49,9 @@ def create_buffers():
     #populate the array with data. In this case, zeros.
     cmd_data[:] = np.zeros(BUFF_SIZES.CMD_BUFF) #populate the array with zeros
     #================================================================
+
+    #create the rest of the shared memory buffers
+    #TODO: figure out how to handle the frame buffer
 
 def set_cmd_defaults():
     """
@@ -63,6 +73,22 @@ def start_test_process():
 
     TestProc.main()
 
+def start_command_process():
+    """
+    This function starts the data port process. A wrapper function is
+    needed to allow calling from another script.
+    """
+
+    CmdPrt.main()
+
+def start_data_process():
+    """
+    This function starts the data port process. A wrapper function is
+    needed to allow calling from another script.
+    """
+
+    DatPrt.main()
+
 def shutdown():
     """
     This function handles shutting down the system. That means killing
@@ -70,9 +96,20 @@ def shutdown():
     """
     global cmd_buffer
     global test_proc
+    global command_proc
+    global data_proc
 
-    #close processes first
-    test_proc.close()
+    #terminate processed first
+    #test_proc.terminate()
+    command_proc.terminate()
+    data_proc.terminate()
+
+    time.sleep(0.25) #delay to give data_proc time to terminate
+
+    #then close processes
+    #test_proc.close()
+    command_proc.close()
+    data_proc.close()
 
     #close and unlink shared memory buffers
     cmd_buffer.close()
@@ -83,19 +120,33 @@ def main():
     global cmd_buffer
     global cmd_data
     global test_proc
+    global command_proc
+    global data_proc
+
     create_buffers()
     set_cmd_defaults()
 
     #create the daemon process and target the wrapper function
+    """
     test_proc = mp.Process(target=start_test_process,
                            daemon=True,
                            name="TestProc")
     #start the daemon process
     test_proc.start()
+    """
+    #create and start daemon processes for all components
+    command_proc = mp.Process(target=start_command_process,
+                              daemon=True,
+                              name="CommandProc")
+    command_proc.start()
 
-    CmdPrt.main()
+    data_proc = mp.Process(target=start_data_process,
+                           daemon=True,
+                           name="DataProc")
+    data_proc.start()
 
     input("press Enter to end...\n")
+
     shutdown()
 
 if __name__ == "__main__":
