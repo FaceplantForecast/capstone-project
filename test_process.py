@@ -23,4 +23,4 @@ def bootstrapper():
 
 def main():
     bootstrapper()
-    print(cmd_data)
+    #print(cmd_data)

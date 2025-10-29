@@ -49,3 +49,19 @@ class APP_STATUS(IntEnum):
     NOTICE      = 3
     PAUSED      = 4
 
+class PACKET_DATA(IntEnum):
+    RESULT              = 0
+    HEADER_START_IDX    = 1
+    NUM_BYTES           = 2
+    NUM_DET_OBJ         = 3
+    NUM_TLV             = 4
+    SUB_FRAME_NUM       = 5
+    DET_X               = 6
+    DET_Y               = 7
+    DET_Z               = 8
+    DET_V               = 9
+    RANGE               = 10
+    AZIMUTH             = 11
+    ELEV_ANGLE          = 12
+    SNR                 = 13
+    NOISE               = 14

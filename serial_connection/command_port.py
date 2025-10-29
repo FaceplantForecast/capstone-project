@@ -1,7 +1,9 @@
 import serial
 import time
 
-# Adjust device names and baud rates (deployment on Raspberry Pi)
+global config_port
+
+#Adjust device names and baud rates (deployment on Raspberry Pi)
 #config_port = serial.Serial('/dev/ttyUSB0', 115200)   # for CLI commands
 
 #debugging on laptop
@@ -25,15 +27,22 @@ def CLIController(user_input):
         config_port.write(user_input.encode('utf-8'))
         time.sleep(0.1)
 
-        #read once to get to the "meat"
+        #read twice to get to the "meat"
+        data = config_port.readline()
+        print(data.decode())
         data = config_port.readline()
 
         #read until the terminal goes back to ready state
         output = ""
-        while data.decode() != "R5F0> \n":
+        i = 0
+        while data.decode() != "mmwDemo:/>\n":
             if user_input.replace('\r\n', '') not in data.decode():
                 output = output + data.decode()
             data = config_port.readline()
+            i += 1
+            if i > 10:
+                print("ERROR")
+                break
         
         #read one more line to prep for next cycle
         config_port.readline()
@@ -41,6 +50,8 @@ def CLIController(user_input):
         return output
 
 def UserCLI():
+    global config_port
+    config_port = serial.Serial('COM3', 115200)   # for CLI commands
     if 'config_port' in globals(): #make sure to only run this if the port is actually defined
         while True:
             user_input = input("command:") + "\r\n"
