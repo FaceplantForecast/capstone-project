@@ -5,6 +5,11 @@
 
 from enum import IntEnum
 
+class DEBUG_LEVEL(IntEnum):
+    NONE    = 0
+    INFO    = 1
+    VERBOSE = 2
+
 class BUFF_SIZES(IntEnum):
     CMD_BUFF    = 8 #in bytes
 

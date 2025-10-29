@@ -13,9 +13,9 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
-from enums import PACKET_DATA
+from enums import PACKET_DATA, DEBUG_LEVEL as DEBUG
 
-def stream_frames(con):
+def stream_frames(con, debug=DEBUG.NONE):
     frame_buffer = bytearray()
 
     while True:
@@ -42,9 +42,12 @@ def stream_frames(con):
                 det_v = parsed_data[PACKET_DATA.DET_V]
                 det_range = parsed_data[PACKET_DATA.RANGE]
 
-                print(f"received frame with {num_det_obj} objects")
-                for guy in range(num_det_obj):
-                    print(f"    Obj {guy+1}: x={det_x[guy]:.2f}, y={det_y[guy]:.2f}, z={det_z[guy]:.2f}, v={det_v[guy]:.2f}, range={det_range[guy]:.2f}")
+                #print info to console if debug mode is set
+                if debug != DEBUG.NONE:
+                    print(f"received frame with {num_det_obj} objects")
+                    if debug == DEBUG.VERBOSE:
+                        for guy in range(num_det_obj):
+                            print(f"    Obj {guy+1}: x={det_x[guy]:.2f}, y={det_y[guy]:.2f}, z={det_z[guy]:.2f}, v={det_v[guy]:.2f}, range={det_range[guy]:.2f}")
 
                 #remove frame from buffer
                 frame_buffer = frame_buffer[num_bytes:]
