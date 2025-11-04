@@ -86,7 +86,7 @@ def stream_frames(con, debug=DEBUG.NONE):
                 break
 
         #delay to not consume more resources than necessary
-        time.sleep(0.25)
+        time.sleep(0.1)
 
 def main():
     global cmd_data
@@ -98,13 +98,13 @@ def main():
 
     try:
         #Adjust device names and baud rates (deployment on Raspberry Pi)
-        #data_port = serial.Serial('/dev/ttyUSB1', 3125000)   # for data streaming
+        #data_port = serial.Serial('/dev/ttyUSB1', 3125000, timeout=0.1)   # for data streaming
 
         #debugging on laptop
-        #data_port = serial.Serial('COM3', 3125000)   # for data streaming
+        #data_port = serial.Serial('COM3', 3125000, timeout=0.1)   # for data streaming
 
         #debugging on desktop
-        data_port = serial.Serial('COM4', 3125000, timeout=0.25)   # for data streaming
+        data_port = serial.Serial('COM4', 3125000, timeout=0.1)   # for data streaming
 
         cmd_data[CMD_INDEX.DAT_PORT_STATUS] = DAT_PORT_STATUS.RUNNING
     except:
