@@ -101,10 +101,10 @@ def main():
         #data_port = serial.Serial('/dev/ttyUSB1', 3125000, timeout=0.1)   # for data streaming
 
         #debugging on laptop
-        #data_port = serial.Serial('COM3', 3125000, timeout=0.1)   # for data streaming
+        data_port = serial.Serial('COM3', 3125000, timeout=0.1)   # for data streaming
 
         #debugging on desktop
-        data_port = serial.Serial('COM4', 3125000, timeout=0.1)   # for data streaming
+        #data_port = serial.Serial('COM4', 3125000, timeout=0.1)   # for data streaming
 
         cmd_data[CMD_INDEX.DAT_PORT_STATUS] = DAT_PORT_STATUS.RUNNING
     except:

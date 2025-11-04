@@ -1,0 +1,35 @@
+=====FROM GITHUB DATA SET=====
+forward fall 15x
+backward fall 15x
+left fall 10x
+right fall 10x
+sitting on the floor 50x
+crouching 50x
+bending 50x
+jump 50x
+
+=====I'M GOING ROGUE=====
+dramatic fall x15
+dancing x25
+walking x25
+trip and fall x15
+fall forward out of chair x15
+fall left out of chair x10
+fall right out of chair x10
+fall off couch x25
+empty bedroom x15
+empty living room x15
+group walking x15
+
+=====SPECIALTY=====
+falling out of bed x25
+falling off couch (laying down) x25
+fall forward in the bathroom x15
+fall backward in the bathroom x15
+fall left in the bathroom x10
+fall right in the bathroom x10
+
+=====LONG TERM SAMPLES=====
+2 hours of normal activity (living room)
+2 hours of normal activity (bedroom)
+2 hours of normal activity (bathroom)
