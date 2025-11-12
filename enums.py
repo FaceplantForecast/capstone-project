@@ -22,6 +22,7 @@ class CMD_INDEX(IntEnum):
     APP_STATUS          = 4
     FRAMERATE           = 5
     APP_CMD             = 6
+    BOOT_MODE           = 7
 
 class MAIN_STATUS(IntEnum):
     RUNNING     = 0
@@ -71,3 +72,9 @@ class PACKET_DATA(IntEnum):
     ELEV_ANGLE          = 12
     SNR                 = 13
     NOISE               = 14
+
+class BOOT_MODE(IntEnum):
+    STANDARD            = 0
+    DEMO_VISUALIZER     = 1
+    DEMO_DROPPED_FRAMES = 2
+    DEMO_PARSER         = 3

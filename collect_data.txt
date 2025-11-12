@@ -9,21 +9,22 @@ bending 50x
 jump 50x
 
 =====I'M GOING ROGUE=====
+crumple fall x15
 dramatic fall x15
 dancing x25
 walking x25
 trip and fall x15
-fall forward out of chair x15
-fall left out of chair x10
-fall right out of chair x10
-fall off couch x25
+fall forward out of chair x15 (maybe)
+fall left out of chair x10 (maybe)
+fall right out of chair x10 (maybe)
+fall off couch x25 (maybe)
 empty bedroom x15
 empty living room x15
 group walking x15
 
 =====SPECIALTY=====
-falling out of bed x25
-falling off couch (laying down) x25
+falling out of bed x25 (maybe)
+falling off couch (laying down) x25 (maybe)
 fall forward in the bathroom x15
 fall backward in the bathroom x15
 fall left in the bathroom x10

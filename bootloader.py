@@ -12,9 +12,10 @@ import serial_connection.command_port as CmdPrt
 import serial_connection.data_port as DatPrt
 import test_process as TestProc
 import sys, time
+import argparse
 
 #import enums
-from enums import BUFF_SIZES, CMD_INDEX, MAIN_STATUS, CMD_PORT_STATUS, AI_STATUS
+from enums import BUFF_SIZES, CMD_INDEX, MAIN_STATUS, CMD_PORT_STATUS, AI_STATUS, BOOT_MODE
 
 #global variables so that all functions modify the same instances
 global cmd_buffer
@@ -123,8 +124,24 @@ def main():
     global command_proc
     global data_proc
 
+    #optional arguments to allow for launching in specific modes
+    parser = argparse.ArgumentParser(
+        description="Start radar with optional settings"
+    )
+    parser.add_argument(
+        "--demo-visualizer", action="store_true",
+        help="Start in demo visualizer mode"
+    )
+
+    args = parser.parse_args()
+
     create_buffers()
     set_cmd_defaults()
+
+    #launch in the demo visualizer mode
+    if args.demo_visualizer:
+        print("Launching in DEMO VISUALIZER mode\n")
+        cmd_data[CMD_INDEX.BOOT_MODE] = BOOT_MODE.DEMO_VISUALIZER
 
     #create the daemon process and target the wrapper function
     """

@@ -1,0 +1,48 @@
+=====ENVY DATA=====
+ff01 - 40
+ff02 - 20
+ff03 - 60
+ff04 - 90
+ff05 - 80
+
+lf01 - 70
+lf02 - 70
+lf03 - 30
+lf04 - 60
+lf05 - 90
+
+rf01 - 50
+rf02 - 70
+rf03 - 70
+rf04 - 50
+rf05 - 100
+
+bf01 - 90
+bf02 - 40
+bf03 - 100
+bf04 - 80
+bf05 - 70
+
+sit01 - 110
+sit02 - 130
+sit03 - 70
+sit04 - 60
+sit05 - 70
+
+jump01 - full
+jump02 - full
+jump03 - full
+jump04 - full
+jump05 - full
+
+crouch01 - 50
+crouch02 - 60
+crouch03 - 60
+crouch04 - 50
+crouch05 - 70
+
+bend01 - 30
+bend02 - 60
+bend03 - 90
+bend04 - 50
+bend05 - 80
