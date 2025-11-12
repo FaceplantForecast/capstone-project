@@ -272,7 +272,7 @@ def save_recording(rows, output_dir):
         print("[WARN] No data to save.")
         return None, None
     
-    base_name = "empty_01"
+    base_name = "bend_20"
     csv_path = os.path.join(output_dir, base_name + ".csv")
     npy_path = os.path.join(output_dir, base_name + ".npy")
 
