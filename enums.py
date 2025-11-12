@@ -72,9 +72,14 @@ class PACKET_DATA(IntEnum):
     ELEV_ANGLE          = 12
     SNR                 = 13
     NOISE               = 14
+    FRAME_NUM           = 15
 
 class BOOT_MODE(IntEnum):
     STANDARD            = 0
     DEMO_VISUALIZER     = 1
     DEMO_DROPPED_FRAMES = 2
     DEMO_PARSER         = 3
+
+class DEMO_VIS_DATA(IntEnum):
+    RANGE               = 0
+    DOPPLER_V           = 1

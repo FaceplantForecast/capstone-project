@@ -161,7 +161,7 @@ def parser_helper(data, readNumBytes, debug=False):
         print("numTlv              = %d" % (numTlv))
         print("subFrameNumber      = %d" % (subFrameNumber))
 
-    return (headerStartIndex, totalPacketNumBytes, numDetObj, numTlv, subFrameNumber)
+    return (headerStartIndex, totalPacketNumBytes, numDetObj, numTlv, subFrameNumber, frameNumber)
 
 
 def parser_one_mmw_demo_output_packet(data, readNumBytes, debug=False, debug_level=DEBUG.NONE):
@@ -212,6 +212,7 @@ def parser_one_mmw_demo_output_packet(data, readNumBytes, debug=False, debug_lev
         numDetObj,
         numTlv,
         subFrameNumber,
+        frameNumber
     ) = parser_helper(data, readNumBytes, debug)
 
     if headerStartIndex == -1:
@@ -423,4 +424,5 @@ def parser_one_mmw_demo_output_packet(data, readNumBytes, debug=False, debug_lev
         detectedElevAngle_array,
         detectedSNR_array,
         detectedNoise_array,
+        frameNumber,
     )

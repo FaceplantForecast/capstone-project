@@ -97,10 +97,10 @@ def main():
     #config_port = serial.Serial('/dev/ttyUSB0', 115200)   # for CLI commands
 
     #debugging on laptop
-    config_port = serial.Serial('COM6', 115200)   # for CLI commands
+    #config_port = serial.Serial('COM6', 115200)   # for CLI commands
 
     #debugging on desktop
-    #config_port = serial.Serial('COM3', 115200)   # for CLI commands
+    config_port = serial.Serial('COM3', 115200)   # for CLI commands
 
     #call bootstrapper and initiate the radar
     InitiateRadar()

@@ -40,6 +40,13 @@ def bootstrapper():
                         dtype=np.int8,
                         buffer=cmd_buffer.buf)
     
+def live_visualizer():
+    from test_process import live_visualizer as demo_vis
+
+    #debugging on desktop
+    data_port = serial.Serial('COM4', 3125000, timeout=0.1)   # for data streaming
+
+    demo_vis(data_port)
 
 def stream_frames(con, debug=DEBUG.NONE):
     global frame_data
@@ -55,6 +62,10 @@ def stream_frames(con, debug=DEBUG.NONE):
         #append to buffer
         local_frame_buffer.extend(data)
 
+        #create profiling variables
+        last_frame = 0
+        dropped_frames = 0
+
         #parse frame
         while True:
             parsed_data = parse_guy(local_frame_buffer, len(local_frame_buffer))
@@ -69,10 +80,20 @@ def stream_frames(con, debug=DEBUG.NONE):
                 det_z = parsed_data[PACKET_DATA.DET_Z]
                 det_v = parsed_data[PACKET_DATA.DET_V]
                 det_range = parsed_data[PACKET_DATA.RANGE]
+                frame_num = parsed_data[PACKET_DATA.FRAME_NUM]
+
+                #check if frame was dropped
+                if last_frame == 0:
+                    last_frame = frame_num
+                elif last_frame == frame_num - 1:
+                    last_frame += 1
+                else:
+                    dropped_frames += 1
+                    last_frame = frame_num
 
                 #print info to console if debug mode is set
                 if debug != DEBUG.NONE:
-                    print(f"received frame with {num_det_obj} objects and length {num_bytes} bytes")
+                    print(f"received frame number {frame_num} with {num_det_obj} objects and length {num_bytes} bytes ({dropped_frames} dropped frames)")
                     if debug == DEBUG.VERBOSE:
                         for guy in range(num_det_obj):
                             print(f"    Obj {guy+1}: x={det_x[guy]:.2f}, y={det_y[guy]:.2f}, z={det_z[guy]:.2f}, v={det_v[guy]:.2f}, range={det_range[guy]:.2f}")
@@ -97,7 +118,6 @@ def main():
 
     #launch in demo mode if needed
     if cmd_data[CMD_INDEX.BOOT_MODE] == BOOT_MODE.DEMO_VISUALIZER:
-        from live_visualizer import live_visualizer
         live_visualizer()
     else:
         try:
@@ -105,10 +125,10 @@ def main():
             #data_port = serial.Serial('/dev/ttyUSB1', 3125000, timeout=0.1)   # for data streaming
 
             #debugging on laptop
-            data_port = serial.Serial('COM3', 3125000, timeout=0.1)   # for data streaming
+            #data_port = serial.Serial('COM3', 3125000, timeout=0.1)   # for data streaming
 
             #debugging on desktop
-            #data_port = serial.Serial('COM4', 3125000, timeout=0.1)   # for data streaming
+            data_port = serial.Serial('COM4', 3125000, timeout=0.1)   # for data streaming
 
             cmd_data[CMD_INDEX.DAT_PORT_STATUS] = DAT_PORT_STATUS.RUNNING
         except:
