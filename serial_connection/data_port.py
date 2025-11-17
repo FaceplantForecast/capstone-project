@@ -60,7 +60,7 @@ def stream_frames(con, debug=DEBUG.NONE, mode=BOOT_MODE.STANDARD):
     local_frame_buffer = bytearray()
 
     #create profiling variables
-    run_time_sec = 600
+    run_time_sec = 10800
     last_frame = 0
     dropped_frames = 0
     frame_count = 0
@@ -120,7 +120,7 @@ def stream_frames(con, debug=DEBUG.NONE, mode=BOOT_MODE.STANDARD):
         #check if enough time has passed to end profiling
         elapsed_time = time.time() - start_time
         if mode == BOOT_MODE.DEMO_DROPPED_FRAMES and (elapsed_time >= run_time_sec):
-            print(f"TIME RUNNING (SEC): {elapsed_time}\nFRAMES PROCESSED: {frame_count}\nDROPPED FRAMES: {dropped_frames}")
+            print(f"ELAPSED TIME (SEC): {elapsed_time}\nFRAMES PROCESSED: {frame_count}\nDROPPED FRAMES: {dropped_frames}")
             print(f"DROPPED FRAMES PER MIN: {dropped_frames / (elapsed_time/60)}")
             print(f"PERCENTAGE OF FRAMES DROPPED: {(dropped_frames / (dropped_frames + frame_count)) * 100}%")
             break
