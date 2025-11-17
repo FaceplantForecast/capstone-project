@@ -48,10 +48,23 @@ def live_visualizer():
 
     demo_vis(data_port)
 
-def stream_frames(con, debug=DEBUG.NONE):
+def check_dropped_frames():
+    #debugging on desktop
+    data_port = serial.Serial('COM4', 3125000, timeout=0.1)   # for data streaming
+
+    stream_frames(data_port, mode=BOOT_MODE.DEMO_DROPPED_FRAMES)
+
+def stream_frames(con, debug=DEBUG.NONE, mode=BOOT_MODE.STANDARD):
     global frame_data
 
     local_frame_buffer = bytearray()
+
+    #create profiling variables
+    last_frame = 0
+    dropped_frames = 0
+    frame_count = 0
+    start_time = time.time()
+    print(start_time)
 
     while True:
         #read any available data
@@ -61,10 +74,6 @@ def stream_frames(con, debug=DEBUG.NONE):
 
         #append to buffer
         local_frame_buffer.extend(data)
-
-        #create profiling variables
-        last_frame = 0
-        dropped_frames = 0
 
         #parse frame
         while True:
@@ -83,7 +92,7 @@ def stream_frames(con, debug=DEBUG.NONE):
                 frame_num = parsed_data[PACKET_DATA.FRAME_NUM]
 
                 #check if frame was dropped
-                if last_frame == 0:
+                if last_frame == 0 or last_frame > frame_num:
                     last_frame = frame_num
                 elif last_frame == frame_num - 1:
                     last_frame += 1
@@ -101,9 +110,20 @@ def stream_frames(con, debug=DEBUG.NONE):
                 #remove frame from local buffer
                 local_frame_buffer = local_frame_buffer[num_bytes:]
             
+                #increase frame count
+                frame_count += 1
+            
             else:
                 #not a full frame
                 break
+
+        #check if enough time has passed to end profiling
+        elapsed_time = time.time() - start_time
+        if mode == BOOT_MODE.DEMO_DROPPED_FRAMES and (elapsed_time >= 60):
+            print(f"TIME RUNNING: {elapsed_time}\nFRAMES PROCESSED: {frame_count}\nDROPPED FRAMES: {dropped_frames}")
+            print(f"DROPPED FRAMES PER MIN: {dropped_frames / (elapsed_time/60)}")
+            print(f"PERCENTAGE OF FRAMES DROPPED: {(dropped_frames / (dropped_frames + frame_count)) * 100}%")
+            break
 
         #delay to not consume more resources than necessary
         time.sleep(0.1)
@@ -119,6 +139,8 @@ def main():
     #launch in demo mode if needed
     if cmd_data[CMD_INDEX.BOOT_MODE] == BOOT_MODE.DEMO_VISUALIZER:
         live_visualizer()
+    elif cmd_data[CMD_INDEX.BOOT_MODE] == BOOT_MODE.DEMO_DROPPED_FRAMES:
+        check_dropped_frames()
     else:
         try:
             #Adjust device names and baud rates (deployment on Raspberry Pi)

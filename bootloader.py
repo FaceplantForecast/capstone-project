@@ -132,6 +132,10 @@ def main():
         "--demo-visualizer", action="store_true",
         help="Start in demo visualizer mode"
     )
+    parser.add_argument(
+        "--demo-profiler", action="store_true",
+        help="Start in demo profiler mode"
+    )
 
     args = parser.parse_args()
 
@@ -142,6 +146,9 @@ def main():
     if args.demo_visualizer:
         print("Launching in DEMO VISUALIZER mode\n")
         cmd_data[CMD_INDEX.BOOT_MODE] = BOOT_MODE.DEMO_VISUALIZER
+    elif args.demo_profiler:
+        print("Launching in DEMO PROFILER mode\n")
+        cmd_data[CMD_INDEX.BOOT_MODE] = BOOT_MODE.DEMO_DROPPED_FRAMES
 
     #create the daemon process and target the wrapper function
     """
