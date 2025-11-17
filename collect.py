@@ -35,10 +35,10 @@ from serial_connection.parser_mmw_demo import (
 # Default ports / baudrates
 # -------------------------------
 
-CFG_PORT_DEFAULT = "COM6"   # Config / CLI UART
+CFG_PORT_DEFAULT = "COM3"   # Config / CLI UART
 CFG_BAUD_DEFAULT = 115200
 
-DATA_PORT_DEFAULT = "COM3"  # Data UART
+DATA_PORT_DEFAULT = "COM4"  # Data UART
 DATA_BAUD_DEFAULT = 3125000
 
 OUTPUT_DIR_DEFAULT = "./recordings"
@@ -157,7 +157,7 @@ def collect_data_with_ti_parser(
                     break
 
                 # Use TI helper to find header and packet length
-                headerStartIndex, totalPacketNumBytes, numDetObj, numTlv, subFrameNumber = \
+                headerStartIndex, totalPacketNumBytes, numDetObj, numTlv, subFrameNumber, frameNumber = \
                     parser_helper(buf, len(buf), debug=False)
 
                 if headerStartIndex == -1 or totalPacketNumBytes <= 0:
@@ -193,7 +193,8 @@ def collect_data_with_ti_parser(
                  detectedAzimuth_array,
                  detectedElevAngle_array,
                  detectedSNR_array,
-                 detectedNoise_array) = parser_one_mmw_demo_output_packet(
+                 detectedNoise_array,
+                 frameNumber_array) = parser_one_mmw_demo_output_packet(
                     frame_bytes,
                     len(frame_bytes),
                     debug=False,
@@ -272,7 +273,7 @@ def save_recording(rows, output_dir):
         print("[WARN] No data to save.")
         return None, None
     
-    base_name = "bend_20"
+    base_name = "bedroom_chores_01"
     csv_path = os.path.join(output_dir, base_name + ".csv")
     npy_path = os.path.join(output_dir, base_name + ".npy")
 
