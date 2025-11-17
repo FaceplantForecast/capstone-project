@@ -111,7 +111,7 @@ def live_visualizer(con):
             f"Live Radar Doppler-Range Plot"
         )
 
-        scat = ax.scatter(det_range, det_v)
+        scat = ax.scatter(det_range, det_v, s=8)
         return scat,
 
     ani = FuncAnimation(
