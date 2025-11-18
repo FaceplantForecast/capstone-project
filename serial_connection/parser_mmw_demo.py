@@ -38,6 +38,8 @@ import codecs
 import numpy as np
 import sys, os
 
+#this is a TI script that has been heavily modified for our use case
+
 #set parent directory so enums can be imported
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)

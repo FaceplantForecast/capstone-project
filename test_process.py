@@ -92,9 +92,9 @@ def live_visualizer(con):
 
         pts = get_next_frame(con)
         if pts is not None and len(pts[DEMO_VIS_DATA.RANGE]) > 0:
-            det_range = pts[DEMO_VIS_DATA.RANGE]
-            det_v     = pts[DEMO_VIS_DATA.DOPPLER_V]
-            last_pts = pts
+            det_range   = pts[DEMO_VIS_DATA.RANGE]
+            det_v       = pts[DEMO_VIS_DATA.DOPPLER_V]
+            last_pts    = pts
 
         ax.cla()
         ax.set_xlim(0, 5)
