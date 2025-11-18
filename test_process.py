@@ -51,10 +51,6 @@ def get_next_frame(con):
 
         if result == 0 and num_bytes > 0:
             #frame parse was successful
-            num_det_obj = parsed_data[PACKET_DATA.NUM_DET_OBJ]
-            det_x = parsed_data[PACKET_DATA.DET_X]
-            det_y = parsed_data[PACKET_DATA.DET_Y]
-            det_z = parsed_data[PACKET_DATA.DET_Z]
             det_v = parsed_data[PACKET_DATA.DET_V]
             det_range = parsed_data[PACKET_DATA.RANGE]
 
@@ -86,9 +82,13 @@ def live_visualizer(con):
     ax.set_title(f"Live Radar Doppler-Range Plot")
 
     last_pts = None  # last non-empty filtered frame
+    det_range = None
+    det_v = None
 
     def update(_):
         nonlocal last_pts
+        nonlocal det_range
+        nonlocal det_v
 
         pts = get_next_frame(con)
         if pts is not None and len(pts[DEMO_VIS_DATA.RANGE]) > 0:
@@ -126,4 +126,3 @@ def live_visualizer(con):
 
 def main():
     bootstrapper()
-    #print(cmd_data)

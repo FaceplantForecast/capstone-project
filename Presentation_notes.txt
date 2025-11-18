@@ -1,0 +1,13 @@
+1.  For showing the doppler-range plot, mark distances with tape and step at those
+    points and wiggle a little bit to make the point cluster more visible.
+
+2.  Also show the print text output from the terminal
+
+3.  Show successful validation results and explain methodology
+    a.  <1 dropped frame per hour: place radar in an area with lots of objects
+        (more objects means more data meaning the parsing takes longer). Then
+        run the profiler for 2 hours while being active in the space. Also record
+        video for a timelapse and show the results.
+    b.  5 meter range: place radar in a room with markings at every half meter, and
+        then start moving. Record video and screen capture of the visualizer, showing
+        that the detection range is as specified

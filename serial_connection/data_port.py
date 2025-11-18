@@ -44,13 +44,19 @@ def live_visualizer():
     from test_process import live_visualizer as demo_vis
 
     #debugging on desktop
-    data_port = serial.Serial('COM4', 3125000, timeout=0.1)   # for data streaming
+    #data_port = serial.Serial('COM4', 3125000, timeout=0.1)   # for data streaming
+
+    #debugging on laptop
+    data_port = serial.Serial('COM3', 3125000, timeout=0.1)   # for data streaming
 
     demo_vis(data_port)
 
 def check_dropped_frames():
     #debugging on desktop
-    data_port = serial.Serial('COM4', 3125000, timeout=0.1)   # for data streaming
+    #data_port = serial.Serial('COM4', 3125000, timeout=0.1)   # for data streaming
+
+    #debugging on laptop
+    data_port = serial.Serial('COM3', 3125000, timeout=0.1)   # for data streaming
 
     stream_frames(data_port, mode=BOOT_MODE.DEMO_DROPPED_FRAMES)
 
@@ -60,7 +66,7 @@ def stream_frames(con, debug=DEBUG.NONE, mode=BOOT_MODE.STANDARD):
     local_frame_buffer = bytearray()
 
     #create profiling variables
-    run_time_sec = 10800
+    run_time_sec = 30
     last_frame = 0
     dropped_frames = 0
     frame_count = 0
@@ -77,6 +83,7 @@ def stream_frames(con, debug=DEBUG.NONE, mode=BOOT_MODE.STANDARD):
 
         #parse frame
         while True:
+            dropped_frame = False
             parsed_data = parse_guy(local_frame_buffer, len(local_frame_buffer))
             result = parsed_data[PACKET_DATA.RESULT] #TC_PASS or TC_FAIL
             num_bytes = parsed_data[PACKET_DATA.NUM_BYTES]
@@ -99,6 +106,7 @@ def stream_frames(con, debug=DEBUG.NONE, mode=BOOT_MODE.STANDARD):
                 else:
                     dropped_frames += 1
                     last_frame = frame_num
+                    dropped_frame = True
 
                 #print info to console if debug mode is set
                 if debug != DEBUG.NONE:
@@ -119,11 +127,15 @@ def stream_frames(con, debug=DEBUG.NONE, mode=BOOT_MODE.STANDARD):
 
         #check if enough time has passed to end profiling
         elapsed_time = time.time() - start_time
-        if mode == BOOT_MODE.DEMO_DROPPED_FRAMES and (elapsed_time >= run_time_sec):
-            print(f"ELAPSED TIME (SEC): {elapsed_time}\nFRAMES PROCESSED: {frame_count}\nDROPPED FRAMES: {dropped_frames}")
-            print(f"DROPPED FRAMES PER MIN: {dropped_frames / (elapsed_time/60)}")
-            print(f"PERCENTAGE OF FRAMES DROPPED: {(dropped_frames / (dropped_frames + frame_count)) * 100}%")
-            break
+        if mode == BOOT_MODE.DEMO_DROPPED_FRAMES:
+            if (elapsed_time >= run_time_sec):
+                print(f"ELAPSED TIME (SEC): {elapsed_time}\nFRAMES PROCESSED: {frame_count}\nDROPPED FRAMES: {dropped_frames}")
+                print(f"DROPPED FRAMES PER MIN: {dropped_frames / (elapsed_time/60)}")
+                print(f"DROPPED FRAMES PER HOUR: {dropped_frames / (elapsed_time/3600)}")
+                print(f"PERCENTAGE OF FRAMES DROPPED: {(dropped_frames / (dropped_frames + frame_count)) * 100}%")
+                break
+            elif dropped_frame == True:
+                print(f"DROPPED FRAME AT RUN TIME (SEC): {elapsed_time}\n")
 
         #delay to not consume more resources than necessary
         time.sleep(0.1)
@@ -147,10 +159,10 @@ def main():
             #data_port = serial.Serial('/dev/ttyUSB1', 3125000, timeout=0.1)   # for data streaming
 
             #debugging on laptop
-            #data_port = serial.Serial('COM3', 3125000, timeout=0.1)   # for data streaming
+            data_port = serial.Serial('COM3', 3125000, timeout=0.1)   # for data streaming
 
             #debugging on desktop
-            data_port = serial.Serial('COM4', 3125000, timeout=0.1)   # for data streaming
+            #data_port = serial.Serial('COM4', 3125000, timeout=0.1)   # for data streaming
 
             cmd_data[CMD_INDEX.DAT_PORT_STATUS] = DAT_PORT_STATUS.RUNNING
         except:

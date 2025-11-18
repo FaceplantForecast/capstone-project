@@ -10,7 +10,6 @@ from multiprocessing import shared_memory as sm
 import numpy as np
 import serial_connection.command_port as CmdPrt
 import serial_connection.data_port as DatPrt
-import test_process as TestProc
 import sys, time
 import argparse
 
@@ -24,7 +23,6 @@ global frame_buffer
 global frame_data
 
 #processes
-global test_proc
 global command_proc
 global data_proc
 
@@ -66,13 +64,6 @@ def set_cmd_defaults():
     cmd_data[CMD_INDEX.MAIN_STATUS] = MAIN_STATUS.RUNNING
     cmd_data[CMD_INDEX.CMD_PORT_STATUS] = CMD_PORT_STATUS.OFFLINE
 
-def start_test_process():
-    """
-    This function starts the test process. A wrapper function is needed
-    to allow calling from another script.
-    """
-
-    TestProc.main()
 
 def start_command_process():
     """
@@ -96,7 +87,6 @@ def shutdown():
     daemon processes and closing/unlinking shared memory pools
     """
     global cmd_buffer
-    global test_proc
     global command_proc
     global data_proc
 
@@ -120,7 +110,6 @@ def shutdown():
 def main():
     global cmd_buffer
     global cmd_data
-    global test_proc
     global command_proc
     global data_proc
 
@@ -150,19 +139,14 @@ def main():
         print("Launching in DEMO PROFILER mode\n")
         cmd_data[CMD_INDEX.BOOT_MODE] = BOOT_MODE.DEMO_DROPPED_FRAMES
 
-    #create the daemon process and target the wrapper function
-    """
-    test_proc = mp.Process(target=start_test_process,
-                           daemon=True,
-                           name="TestProc")
-    #start the daemon process
-    test_proc.start()
-    """
     #create and start daemon processes for all components
     command_proc = mp.Process(target=start_command_process,
                               daemon=True,
                               name="CommandProc")
     command_proc.start()
+
+    #wait to allow config file time to be sent
+    time.sleep(1)
 
     data_proc = mp.Process(target=start_data_process,
                            daemon=True,
