@@ -66,7 +66,7 @@ def stream_frames(con, debug=DEBUG.NONE, mode=BOOT_MODE.STANDARD):
     local_frame_buffer = bytearray()
 
     #create profiling variables
-    run_time_sec = 30
+    run_time_sec = 7200
     last_frame = 0
     dropped_frames = 0
     frame_count = 0

@@ -55,6 +55,11 @@ ff12 - 60
 ff13 - 80
 ff14 - 70
 ff15 - 50
+ff16 - 40
+ff17 - 20
+ff18 - 40
+ff19 - 50
+ff20 - 50
 
 lf06 - 40
 lf07 - 100
@@ -66,6 +71,11 @@ lf12 - 80
 lf13 - 80
 lf14 - 70
 lf15 - 50
+lf16 - 30
+lf17 - 50
+lf18 - 30
+lf19 - 40
+lf20 - 40
 
 rf06 - 60
 rf07 - 60
@@ -77,6 +87,11 @@ rf12 - 110
 rf13 - 40
 rf14 - 90
 rf15 - 70
+rf16 - 30
+rf17 - 50
+rf18 - 30
+rf19 - 30
+rf20 - 40
 
 bf06 - 60
 bf07 - 70
@@ -88,6 +103,11 @@ bf12 - 70
 bf13 - 100
 bf14 - 90
 bf15 - 90
+bf16 - 40
+bf17 - 40
+bf18 - 50
+bf19 - 20
+bf20 - 50
 
 crumple01 - 50
 crumple02 - 70
@@ -104,6 +124,11 @@ crumple12 - 50
 crumple13 - 60
 crumple14 - 70
 crumple15 - 60
+crumple16 - 50
+crumple17 - 30
+crumple18 - 60
+crumple19 - 50
+crumple20 - 50
 
 sit06 - 40
 sit07 - 30
@@ -168,3 +193,25 @@ bend17 - 60
 bend18 - 50
 bend19 - 50
 bend20 - 30
+
+armswing01 - full
+armswing02 - full
+armswing03 - full
+armswing04 - full
+armswing05 - full
+armswing06 - full
+armswing07 - full
+armswing08 - full
+armswing09 - full
+armswing10 - full
+
+legswing01 - full
+legswing02 - full
+legswing03 - full
+legswing04 - full
+legswing05 - full
+legswing06 - full
+legswing07 - full
+legswing08 - full
+legswing09 - full
+legswing10 - full

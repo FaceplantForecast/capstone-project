@@ -35,10 +35,10 @@ from serial_connection.parser_mmw_demo import (
 # Default ports / baudrates
 # -------------------------------
 
-CFG_PORT_DEFAULT = "COM3"   # Config / CLI UART
+CFG_PORT_DEFAULT = "COM6"   # Config / CLI UART
 CFG_BAUD_DEFAULT = 115200
 
-DATA_PORT_DEFAULT = "COM4"  # Data UART
+DATA_PORT_DEFAULT = "COM3"  # Data UART
 DATA_BAUD_DEFAULT = 3125000
 
 OUTPUT_DIR_DEFAULT = "./recordings"
@@ -273,7 +273,7 @@ def save_recording(rows, output_dir):
         print("[WARN] No data to save.")
         return None, None
     
-    base_name = "bedroom_chores_01"
+    base_name = "leg_swing_10"
     csv_path = os.path.join(output_dir, base_name + ".csv")
     npy_path = os.path.join(output_dir, base_name + ".npy")
 
