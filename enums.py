@@ -75,10 +75,11 @@ class PACKET_DATA(IntEnum):
     FRAME_NUM           = 15
 
 class BOOT_MODE(IntEnum):
-    STANDARD            = 0
-    DEMO_VISUALIZER     = 1
-    DEMO_DROPPED_FRAMES = 2
-    DEMO_PARSER         = 3
+    STANDARD                = 0
+    DEMO_VISUALIZER         = 1
+    DEMO_DROPPED_FRAMES     = 2
+    DEMO_PARSER             = 3
+    DEMO_CONNECTION_TEST    = 4
 
 class DEMO_VIS_DATA(IntEnum):
     RANGE               = 0

@@ -10,6 +10,7 @@ from multiprocessing import shared_memory as sm
 import numpy as np
 import serial_connection.command_port as CmdPrt
 import serial_connection.data_port as DatPrt
+import server as Server
 import sys, time
 import argparse
 
@@ -19,8 +20,7 @@ from enums import BUFF_SIZES, CMD_INDEX, MAIN_STATUS, CMD_PORT_STATUS, AI_STATUS
 #global variables so that all functions modify the same instances
 global cmd_buffer
 global cmd_data
-global frame_buffer
-global frame_data
+
 
 #processes
 global command_proc
@@ -32,8 +32,6 @@ def create_buffers():
     """
     global cmd_buffer
     global cmd_data
-    global frame_buffer
-    global frame_data
 
     #================================================================
     #SHARED MEMORY BUFFER EXAMPLE
@@ -64,6 +62,12 @@ def set_cmd_defaults():
     cmd_data[CMD_INDEX.MAIN_STATUS] = MAIN_STATUS.RUNNING
     cmd_data[CMD_INDEX.CMD_PORT_STATUS] = CMD_PORT_STATUS.OFFLINE
 
+def start_server_process():
+    """
+    This function starts the server process. A wrapper function is
+    needed to allow calling from another script.
+    """
+    Server.main()
 
 def start_command_process():
     """
@@ -126,8 +130,8 @@ def main():
         help="Start in demo profiler mode"
     )
     parser.add_argument(
-        "--test-connection", action="store_true",
-        help="Test server connection"
+        "--demo-connection", action="store_true",
+        help="Start in connection test mode"
     )
 
     args = parser.parse_args()
@@ -142,10 +146,16 @@ def main():
     elif args.demo_profiler:
         print("Launching in DEMO PROFILER mode\n")
         cmd_data[CMD_INDEX.BOOT_MODE] = BOOT_MODE.DEMO_DROPPED_FRAMES
-    elif args.test_connection:
-        print("Testing server connection\n")
+    elif args.demo_connection:
+        print("Launcing in CONNECTION TEST mode\n")
+        cmd_data[CMD_INDEX.BOOT_MODE] = BOOT_MODE.DEMO_CONNECTION_TEST
 
     #create and start daemon processes for all components
+    server_proc = mp.Process(target=start_server_process,
+                             daemon=True,
+                             name="ServerProc")
+    server_proc.start()
+
     command_proc = mp.Process(target=start_command_process,
                               daemon=True,
                               name="CommandProc")

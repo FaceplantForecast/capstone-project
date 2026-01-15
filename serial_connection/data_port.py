@@ -20,8 +20,6 @@ from enums import PACKET_DATA, DEBUG_LEVEL as DEBUG, BUFF_SIZES, CMD_INDEX, DAT_
 #global variables so that all functions modify the same instances
 global cmd_buffer
 global cmd_data
-global frame_buffer
-global frame_data
 
 def bootstrapper():
     """
@@ -29,8 +27,6 @@ def bootstrapper():
     """
     global cmd_buffer
     global cmd_data
-    global frame_buffer
-    global frame_data
 
     #create the buffer, give it a name, set create to False, and give the size in bytes
     cmd_buffer = sm.SharedMemory("cmd_buffer", create=False)
@@ -61,8 +57,6 @@ def check_dropped_frames():
     stream_frames(data_port, mode=BOOT_MODE.DEMO_DROPPED_FRAMES)
 
 def stream_frames(con, debug=DEBUG.NONE, mode=BOOT_MODE.STANDARD):
-    global frame_data
-
     local_frame_buffer = bytearray()
 
     #create profiling variables
@@ -156,6 +150,8 @@ def main():
         live_visualizer()
     elif cmd_data[CMD_INDEX.BOOT_MODE] == BOOT_MODE.DEMO_DROPPED_FRAMES:
         check_dropped_frames()
+    elif cmd_data[CMD_INDEX.BOOT_MODE] == BOOT_MODE.DEMO_CONNECTION_TEST:
+        print("Not connecting to radar")
     else:
         try:
             #Adjust device names and baud rates (deployment on Raspberry Pi)
