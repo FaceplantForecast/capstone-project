@@ -1,4 +1,5 @@
 # ==================================================================================
+# Faceplant Forecast, 2025-2026
 # This code handles connecting to the command port and controlling the radar either
 # with a CLI for debugging or by other python scripts
 # ==================================================================================

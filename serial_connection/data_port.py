@@ -1,5 +1,8 @@
 # ==================================================================================
-# This code handles collecting data from the data port and parsing it
+# Faceplant Forecast, 2025-2026
+# This code handles collecting data from the data port and parsing it.
+# It is also responsible for running the ML model and determining if a fall has
+# occured or not.
 # ==================================================================================
 
 from serial_connection.parser_mmw_demo import parser_one_mmw_demo_output_packet as parse_guy
@@ -20,6 +23,8 @@ from enums import PACKET_DATA, DEBUG_LEVEL as DEBUG, BUFF_SIZES, CMD_INDEX, DAT_
 #global variables so that all functions modify the same instances
 global cmd_buffer
 global cmd_data
+global radar_buffer
+global radar_data
 
 def bootstrapper():
     """
@@ -27,14 +32,21 @@ def bootstrapper():
     """
     global cmd_buffer
     global cmd_data
+    global radar_buffer
+    global radar_data
 
     #create the buffer, give it a name, set create to False, and give the size in bytes
     cmd_buffer = sm.SharedMemory("cmd_buffer", create=False)
     # Create the data, which is the array that is accessed by this script.
     # By setting the buffer, it can be accessed by other scripts as well
-    cmd_data = np.ndarray(shape=(BUFF_SIZES.CMD_BUFF,),
-                        dtype=np.int8,
-                        buffer=cmd_buffer.buf)
+    cmd_data = np.ndarray(  shape=(BUFF_SIZES.CMD_BUFF,),
+                            dtype=np.int8,
+                            buffer=cmd_buffer.buf)
+    
+    radar_buffer = sm.SharedMemory("radar_buffer", create=False)
+    radar_data = np.ndarray(shape=(BUFF_SIZES.RADAR_BUFF,),
+                            dtype=np.int8,
+                            buffer=radar_buffer.buf)
     
 def live_visualizer():
     from test_process import live_visualizer as demo_vis
@@ -131,7 +143,7 @@ def stream_frames(con, debug=DEBUG.NONE, mode=BOOT_MODE.STANDARD):
             elif dropped_frame == True:
                 print(f"DROPPED FRAME AT RUN TIME (SEC): {elapsed_time}\n")
 
-        #INSERT ML MODEL CODE HERE (courtesy of Charles Marks aka Mr. Machine Learning)
+        #INSERT ML MODEL CODE HERE (courtesy of Charles Marks [they called him Mr. Machine Learning back in college])
         
 
         #delay to not consume more resources than necessary

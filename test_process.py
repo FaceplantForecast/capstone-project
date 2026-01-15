@@ -1,3 +1,9 @@
+# ==================================================================================
+# Faceplant Forecast, 2025
+# This script contains functions for running tests and demoing functionality. It
+# does not feature code that would normally be run when the product is deployed.
+# ==================================================================================
+
 from multiprocessing import shared_memory as sm
 import numpy as np
 from enums import BUFF_SIZES, CMD_INDEX, PACKET_DATA, DEMO_VIS_DATA

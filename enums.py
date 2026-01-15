@@ -1,4 +1,5 @@
 # ========================================================================
+# Faceplant Forecast, 2025-2026
 # This is a set of global enums that allow for better readability and more
 # efficient changing of the code. This needs to be accessed by everything.
 # ========================================================================
@@ -13,6 +14,7 @@ class DEBUG_LEVEL(IntEnum):
 class BUFF_SIZES(IntEnum):
     CMD_BUFF    = 8 #in bytes
     FRAME_BUFF  = 4096
+    RADAR_BUFF  = 1
 
 class CMD_INDEX(IntEnum):
     MAIN_STATUS         = 0
