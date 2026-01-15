@@ -137,6 +137,9 @@ def stream_frames(con, debug=DEBUG.NONE, mode=BOOT_MODE.STANDARD):
             elif dropped_frame == True:
                 print(f"DROPPED FRAME AT RUN TIME (SEC): {elapsed_time}\n")
 
+        #INSERT ML MODEL CODE HERE (courtesy of Charles Marks aka Mr. Machine Learning)
+        
+
         #delay to not consume more resources than necessary
         time.sleep(0.1)
 

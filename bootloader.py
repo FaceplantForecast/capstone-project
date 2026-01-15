@@ -125,6 +125,10 @@ def main():
         "--demo-profiler", action="store_true",
         help="Start in demo profiler mode"
     )
+    parser.add_argument(
+        "--test-connection", action="store_true",
+        help="Test server connection"
+    )
 
     args = parser.parse_args()
 
@@ -138,6 +142,8 @@ def main():
     elif args.demo_profiler:
         print("Launching in DEMO PROFILER mode\n")
         cmd_data[CMD_INDEX.BOOT_MODE] = BOOT_MODE.DEMO_DROPPED_FRAMES
+    elif args.test_connection:
+        print("Testing server connection\n")
 
     #create and start daemon processes for all components
     command_proc = mp.Process(target=start_command_process,
