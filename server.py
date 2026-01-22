@@ -6,13 +6,26 @@
 
 import numpy as np
 import multiprocessing.shared_memory as sm
+import time
 from enums import BUFF_SIZES
+import websockets
 
 #global variables
 global cmd_buffer
 global cmd_data
 global radar_buffer
 global radar_data
+
+# ===============================================================
+# SERVER SETUP
+# GCP endpoint + auth token (WebSocket)
+BASE_GCP_URL = "gcr-ws-482782751069.us-central1.run.app/ws"
+# Original token you gave earlier (without the stray dash)
+AUTH_TOKEN = "M8b4eFJHq2pI3V9nW5r0dE-PLZpQyX7uB1cTa9kN4mE"
+
+# Full WSS URL with auth_token as query param
+GCP_WSS_URL = f"wss://{BASE_GCP_URL}?role=pi&token={AUTH_TOKEN}"
+# ===============================================================
 
 def bootstrapper():
     """
@@ -39,4 +52,5 @@ def bootstrapper():
 
 
 def main():
+    bootstrapper()
     print("FILLER BAYBEEEEEEEEEE\n")

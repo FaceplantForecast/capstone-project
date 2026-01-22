@@ -106,6 +106,8 @@ def shutdown():
     global data_proc
     global server_proc
 
+    print("Shutting down...\n")
+
     #terminate processed first
     server_proc.terminate()
     command_proc.terminate()
@@ -123,6 +125,8 @@ def shutdown():
     cmd_buffer.unlink()
     radar_buffer.close()
     radar_buffer.close()
+
+    print("Done!")
 
 
 def main():

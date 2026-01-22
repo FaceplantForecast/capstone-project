@@ -21,7 +21,7 @@ class CMD_INDEX(IntEnum):
     CMD_PORT_STATUS     = 1
     AI_STATUS           = 2
     DAT_PORT_STATUS     = 3
-    APP_STATUS          = 4
+    SERVER_STATUS       = 4
     FRAMERATE           = 5
     APP_CMD             = 6
     BOOT_MODE           = 7

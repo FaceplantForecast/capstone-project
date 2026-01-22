@@ -12,6 +12,9 @@ import serial
 import time
 import numpy as np
 import multiprocessing.shared_memory as sm
+from sklearn.cluster import DBSCAN
+import tensorflow as tf
+import collections
 
 #set parent directory so enums can be imported
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -25,6 +28,96 @@ global cmd_buffer
 global cmd_data
 global radar_buffer
 global radar_data
+
+# ===============================================================
+# WITHIN THESE EQUALS SIGNS, THE AI MODEL IS BORN! FUS RO DAH!
+# Also it was all written by Charles "They Called Him Mr. AI Back In College" Marks
+
+#AI config
+WINDOW_SIZE = 48
+FEATURE_KEYS = [
+    "cx", "cy", "cz", "height", "spread_xy",
+    "mean_doppler", "num_points", "vz", "speed",
+]
+
+TFLITE_MODEL_PATH = "./model/model.tflite"
+SCALER_PATH = "./model/scaler.npz"     # from training script
+FALL_THRESHOLD = 0.95
+
+#AI model + scaler setup (TFLite)
+def load_tflite_model(path: str):
+    interpreter = tf.lite.Interpreter(model_path=path)
+    interpreter.allocate_tensors()
+    in_info = interpreter.get_input_details()[0]
+    out_info = interpreter.get_output_details()[0]
+    return interpreter, in_info["index"], out_info["index"]
+
+def load_scaler(path: str):
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"Scaler file not found: {path}")
+    data = np.load(path, allow_pickle=True)
+    mean = data["mean"].astype(np.float32)   # shape (num_features,)
+    scale = data["scale"].astype(np.float32) # shape (num_features,)
+    return mean, scale
+
+interpreter, input_index, output_index = load_tflite_model(TFLITE_MODEL_PATH)
+SCALER_MEAN, SCALER_SCALE = load_scaler(SCALER_PATH)
+
+
+def run_inference(window_array: np.ndarray) -> float:
+    """
+    window_array: shape (WINDOW_SIZE, num_features), raw features
+
+    We apply the same scaling as in training:
+      X_scaled = (X - mean) / scale
+    then run TFLite.
+    """
+    # Ensure float32
+    arr = window_array.astype(np.float32)
+
+    # Broadcast mean/scale: (T, F) - (F,) -> (T, F)
+    arr = (arr - SCALER_MEAN) / SCALER_SCALE
+
+    X = arr[np.newaxis, ...]  # (1, T, F)
+    interpreter.set_tensor(input_index, X)
+    interpreter.invoke()
+    return float(interpreter.get_tensor(output_index)[0][0])
+
+# Feature computation
+def cluster_frame_points(points_xyz, eps=0.30, min_samples=8):
+    if len(points_xyz) == 0:
+        return np.array([], dtype=int)
+    db = DBSCAN(eps=eps, min_samples=min_samples)
+    return db.fit_predict(points_xyz)
+
+
+def pick_person_cluster(points_xyz, labels):
+    if len(points_xyz) == 0:
+        return np.zeros(len(points_xyz), dtype=bool)
+    unique_labels, counts = np.unique(labels, return_counts=True)
+    mask_valid = unique_labels != -1
+    unique_labels = unique_labels[mask_valid]
+    counts = counts[mask_valid]
+    if len(unique_labels) == 0:
+        return np.zeros(len(points_xyz), dtype=bool)
+    best_label = unique_labels[np.argmax(counts)]
+    return labels == best_label
+
+def compute_frame_features(frame, prev_feat=None):
+    """
+    Compute the same features as in training:
+
+      cx, cy, cz, height, spread_xy, mean_doppler, num_points, vz, speed
+
+    We compute vx, vy, vz from centroid differences between *valid* frames,
+    just like the training pipeline that uses df_feat rows only where a
+    person cluster was found.
+    """
+    x, y, z, doppler, snr, t = (
+        frame["x"], frame["y"], frame["z"],
+        frame["doppler"], frame["snr"], frame["timestamp"]
+    )
+# ===============================================================
 
 def bootstrapper():
     """
@@ -77,6 +170,11 @@ def stream_frames(con, debug=DEBUG.NONE, mode=BOOT_MODE.STANDARD):
     dropped_frames = 0
     frame_count = 0
     start_time = time.time()
+    
+    #setting up for inferencing
+    output = None
+    window = collections.deque(maxlen=WINDOW_SIZE)
+    prev = None
 
     while True:
         #read any available data
@@ -103,6 +201,9 @@ def stream_frames(con, debug=DEBUG.NONE, mode=BOOT_MODE.STANDARD):
                 det_v = parsed_data[PACKET_DATA.DET_V]
                 det_range = parsed_data[PACKET_DATA.RANGE]
                 frame_num = parsed_data[PACKET_DATA.FRAME_NUM]
+                ts = time.time()
+                snr = parsed_data[PACKET_DATA.SNR]
+                dop = parsed_data[PACKET_DATA.RANGE]
 
                 #check if frame was dropped
                 if last_frame == 0 or last_frame > frame_num:
@@ -114,6 +215,13 @@ def stream_frames(con, debug=DEBUG.NONE, mode=BOOT_MODE.STANDARD):
                     last_frame = frame_num
                     dropped_frame = True
 
+                #add relevant data to a dictionary
+                output = dict(frame_id=frame_num, timestamp=ts, x=det_x, y=det_y, z=det_z,
+                              doppler=dop, snr=snr)
+                
+                #remove frame from local buffer
+                local_frame_buffer = local_frame_buffer[num_bytes:]
+
                 #print info to console if debug mode is set
                 if debug != DEBUG.NONE:
                     print(f"received frame number {frame_num} with {num_det_obj} objects and length {num_bytes} bytes ({dropped_frames} dropped frames)")
@@ -121,8 +229,37 @@ def stream_frames(con, debug=DEBUG.NONE, mode=BOOT_MODE.STANDARD):
                         for guy in range(num_det_obj):
                             print(f"    Obj {guy+1}: x={det_x[guy]:.2f}, y={det_y[guy]:.2f}, z={det_z[guy]:.2f}, v={det_v[guy]:.2f}, range={det_range[guy]:.2f}")
 
-                #remove frame from local buffer
-                local_frame_buffer = local_frame_buffer[num_bytes:]
+                #process frame
+                feat = compute_frame_features(output, prev)
+                if feat is None:
+                    print("        (no valid person cluster in this frame)")
+
+                    continue
+
+                prev = feat
+                vec = np.array([feat[k] for k in FEATURE_KEYS], np.float32)
+                window.append(vec)
+                if len(window) < WINDOW_SIZE:
+                    print(f"        (filling window {len(window)}/{WINDOW_SIZE})")
+                    continue
+
+                arr = np.stack(window)  # shape (WINDOW_SIZE, num_features)
+                p = run_inference(arr)
+
+                # reset fall flag if model outputs 0.00 ---
+                if p <= 0.2:
+                    FALL_DETECTED = 0
+
+                if p > FALL_THRESHOLD:
+                    print(f"[ALERT] Fall detected! p={p:.2f}")
+                    if FALL_DETECTED == 0:
+                        # Only send once (first detection)
+                        """send_fall_flag(probability=p,
+                                    frame_id=output["frame_id"],
+                                    ts=output["timestamp"])
+                    FALL_DETECTED = 1"""
+                else:
+                    print(f"[INFO] p_fall={p:.2f}")
             
                 #increase frame count
                 frame_count += 1
@@ -143,11 +280,10 @@ def stream_frames(con, debug=DEBUG.NONE, mode=BOOT_MODE.STANDARD):
             elif dropped_frame == True:
                 print(f"DROPPED FRAME AT RUN TIME (SEC): {elapsed_time}\n")
 
-        #INSERT ML MODEL CODE HERE (courtesy of Charles Marks [they called him Mr. Machine Learning back in college])
         
 
         #delay to not consume more resources than necessary
-        time.sleep(0.1)
+        #time.sleep(0.1)
 
 def main():
     global cmd_data
@@ -178,6 +314,7 @@ def main():
             cmd_data[CMD_INDEX.DAT_PORT_STATUS] = DAT_PORT_STATUS.RUNNING
         except:
             cmd_data[CMD_INDEX.DAT_PORT_STATUS] = DAT_PORT_STATUS.ERROR
+            print("uh oh")
 
         #stream the frames
         stream_frames(data_port, DEBUG.VERBOSE)
