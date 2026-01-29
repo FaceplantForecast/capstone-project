@@ -295,6 +295,7 @@ def stream_frames(con, debug=DEBUG.NONE, mode=BOOT_MODE.STANDARD):
                 if p > FALL_THRESHOLD:
                     print(f"[ALERT] Fall detected! p={p:.2f}")
                     radar_data[RADAR_DATA.FALL_DETECTED] = 1
+                    radar_data[RADAR_DATA.PROBABILITY] = int(p*100)
                 else:
                     print(f"[INFO] p_fall={p:.2f}")
             
