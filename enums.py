@@ -14,7 +14,8 @@ class DEBUG_LEVEL(IntEnum):
 class BUFF_SIZES(IntEnum):
     CMD_BUFF    = 8 #in bytes
     FRAME_BUFF  = 4096
-    RADAR_BUFF  = 1
+    RADAR_BUFF  = 192 #3*64
+    RADAR_LEN   = 3
 
 class CMD_INDEX(IntEnum):
     MAIN_STATUS         = 0
@@ -86,3 +87,8 @@ class BOOT_MODE(IntEnum):
 class DEMO_VIS_DATA(IntEnum):
     RANGE               = 0
     DOPPLER_V           = 1
+
+class RADAR_DATA(IntEnum):
+    FALL_DETECTED       = 0
+    FRAME_ID            = 1
+    TIMESTAMP           = 2

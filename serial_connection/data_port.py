@@ -21,7 +21,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
-from enums import PACKET_DATA, DEBUG_LEVEL as DEBUG, BUFF_SIZES, CMD_INDEX, DAT_PORT_STATUS, BOOT_MODE
+from enums import PACKET_DATA, DEBUG_LEVEL as DEBUG, BUFF_SIZES, CMD_INDEX, DAT_PORT_STATUS, BOOT_MODE, RADAR_DATA
 
 #global variables so that all functions modify the same instances
 global cmd_buffer
@@ -114,9 +114,47 @@ def compute_frame_features(frame, prev_feat=None):
     person cluster was found.
     """
     x, y, z, doppler, snr, t = (
-        frame["x"], frame["y"], frame["z"],
-        frame["doppler"], frame["snr"], frame["timestamp"]
+        np.array(frame["x"]), np.array(frame["y"]), np.array(frame["z"]),
+        np.array(frame["doppler"]), np.array(frame["snr"]), np.array(frame["timestamp"])
     )
+
+    # SNR filter: same numeric threshold as training (SNR_THRESHOLD = 5.0)
+    mask = np.array(snr) > 5.0
+    if not np.any(mask):
+        return None
+
+    x, y, z, doppler = x[mask], y[mask], z[mask], doppler[mask]
+    points_xyz = np.stack([x, y, z], axis=1)
+    labels = cluster_frame_points(points_xyz)
+    person_mask = pick_person_cluster(points_xyz, labels)
+    if not np.any(person_mask):
+        return None
+
+    pts = points_xyz[person_mask]
+    dop = doppler[person_mask]
+    cx, cy, cz = pts.mean(axis=0)
+    height = pts[:, 2].max() - pts[:, 2].min()
+    spread_xy = max(pts[:, 0].max() - pts[:, 0].min(),
+                    pts[:, 1].max() - pts[:, 1].min())
+    mean_doppler = np.mean(dop)
+    num_points = pts.shape[0]
+
+    feat = dict(cx=cx, cy=cy, cz=cz, height=height,
+                spread_xy=spread_xy, mean_doppler=mean_doppler,
+                num_points=num_points, timestamp=t)
+
+    if prev_feat:
+        dt = max(t - prev_feat["timestamp"], 1e-3)
+        vx = (feat["cx"] - prev_feat["cx"]) / dt
+        vy = (feat["cy"] - prev_feat["cy"]) / dt
+        vz = (feat["cz"] - prev_feat["cz"]) / dt
+    else:
+        vx = vy = vz = 0.0
+
+    speed = float(np.sqrt(vx**2 + vy**2 + vz**2))
+
+    feat.update(vx=vx, vy=vy, vz=vz, speed=speed)
+    return feat
 # ===============================================================
 
 def bootstrapper():
@@ -137,8 +175,8 @@ def bootstrapper():
                             buffer=cmd_buffer.buf)
     
     radar_buffer = sm.SharedMemory("radar_buffer", create=False)
-    radar_data = np.ndarray(shape=(BUFF_SIZES.RADAR_BUFF,),
-                            dtype=np.int8,
+    radar_data = np.ndarray(shape=(BUFF_SIZES.RADAR_LEN,),
+                            dtype=np.int64,
                             buffer=radar_buffer.buf)
     
 def live_visualizer():
@@ -205,6 +243,10 @@ def stream_frames(con, debug=DEBUG.NONE, mode=BOOT_MODE.STANDARD):
                 snr = parsed_data[PACKET_DATA.SNR]
                 dop = parsed_data[PACKET_DATA.RANGE]
 
+                #place data into shared buffer
+                radar_data[RADAR_DATA.FRAME_ID] = frame_num
+                radar_data[RADAR_DATA.TIMESTAMP] = ts
+
                 #check if frame was dropped
                 if last_frame == 0 or last_frame > frame_num:
                     last_frame = frame_num
@@ -248,16 +290,11 @@ def stream_frames(con, debug=DEBUG.NONE, mode=BOOT_MODE.STANDARD):
 
                 # reset fall flag if model outputs 0.00 ---
                 if p <= 0.2:
-                    FALL_DETECTED = 0
+                    radar_data[RADAR_DATA.FALL_DETECTED] = 0
 
                 if p > FALL_THRESHOLD:
                     print(f"[ALERT] Fall detected! p={p:.2f}")
-                    if FALL_DETECTED == 0:
-                        # Only send once (first detection)
-                        """send_fall_flag(probability=p,
-                                    frame_id=output["frame_id"],
-                                    ts=output["timestamp"])
-                    FALL_DETECTED = 1"""
+                    radar_data[RADAR_DATA.FALL_DETECTED] = 1
                 else:
                     print(f"[INFO] p_fall={p:.2f}")
             

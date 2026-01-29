@@ -27,7 +27,7 @@ import websockets  # pip install websockets
 
 # CONFIG
 
-CFG_PORT = "COM4"              # CLI UART (Change for PI)
+CFG_PORT = "COM6"              # CLI UART (Change for PI)
 CFG_BAUD = 115200
 CFG_FILE = "radar_profile.cfg"
 

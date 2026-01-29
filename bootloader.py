@@ -55,10 +55,10 @@ def create_buffers():
     #create the rest of the shared memory buffers
     
     radar_buffer = sm.SharedMemory("radar_buffer", create=True, size=BUFF_SIZES.RADAR_BUFF)
-    radar_data = np.ndarray(shape=(BUFF_SIZES.RADAR_BUFF,),
-                            dtype=np.int8,
+    radar_data = np.ndarray(shape=(BUFF_SIZES.RADAR_LEN,),
+                            dtype=np.int64,
                             buffer=radar_buffer.buf)
-    radar_data[:] = np.zeros(BUFF_SIZES.RADAR_BUFF) #populate the array with zeros
+    radar_data[:] = np.zeros(BUFF_SIZES.RADAR_LEN) #populate the array with zeros
 
 def set_cmd_defaults():
     """
