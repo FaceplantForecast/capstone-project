@@ -63,7 +63,6 @@ def load_scaler(path: str):
 interpreter, input_index, output_index = load_tflite_model(TFLITE_MODEL_PATH)
 SCALER_MEAN, SCALER_SCALE = load_scaler(SCALER_PATH)
 
-
 def run_inference(window_array: np.ndarray) -> float:
     """
     window_array: shape (WINDOW_SIZE, num_features), raw features
@@ -89,7 +88,6 @@ def cluster_frame_points(points_xyz, eps=0.30, min_samples=8):
         return np.array([], dtype=int)
     db = DBSCAN(eps=eps, min_samples=min_samples)
     return db.fit_predict(points_xyz)
-
 
 def pick_person_cluster(points_xyz, labels):
     if len(points_xyz) == 0:
