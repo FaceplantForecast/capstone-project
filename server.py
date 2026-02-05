@@ -61,6 +61,7 @@ def control_loop():
         if radar_data[RADAR_DATA.FALL_DETECTED] == 1:
             #Only send once (first detection)
             if FALL_DETECTED == 0:
+                print("Sending notification to server")
                 send_fall_flag(probability=float(radar_data[RADAR_DATA.PROBABILITY])/100.0,
                                frame_id=radar_data[RADAR_DATA.FRAME_ID],
                                ts=radar_data[RADAR_DATA.TIMESTAMP])
@@ -106,4 +107,4 @@ async def _send_fall_flag_ws(probability: float, frame_id: int, ts: float):
 
 def main():
     bootstrapper()
-    print("FILLER BAYBEEEEEEEEEE\n")
+    control_loop()

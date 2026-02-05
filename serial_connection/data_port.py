@@ -353,7 +353,7 @@ def main():
             print("uh oh")
 
         #stream the frames
-        stream_frames(data_port, DEBUG.VERBOSE)
+        stream_frames(data_port, DEBUG.NONE)
 
 if __name__ == "__main__":
     sys.exit(main())
