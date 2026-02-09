@@ -3,8 +3,8 @@ This is the Github repository for the code running on the Raspberry Pi 5 in Team
 
 # Group Members
 
- **Team Lead/Radar Subsystem:** Fritz Hesse
- **AI and Power Subsystems:** Charles Marks
+ **Team Lead/Radar Subsystem:** Fritz Hesse<br>
+ **AI and Power Subsystems:** Charles Marks<br>
  **App and Communication Subsystems:** Henry Moyes
 
 ## Operation
