@@ -76,8 +76,8 @@ def set_cmd_defaults():
     #check for current platform to change serial port settings
     if platform.node() == "raspberrypi":
         cmd_data[CMD_INDEX.PLATFORM] = PLATFORM.RASPBERRY_PI
-    elif platform.node() == "DESKTOP-A8R7298": #TODO: update with laptop node name
-        cmd_data[CMD_INDEX.PLATFORM] = PLATFORM.FRITZ_DESKTOP
+    elif platform.node() == "DESKTOP-QL18C7K": #TODO: update with laptop node name
+        cmd_data[CMD_INDEX.PLATFORM] = PLATFORM.FRITZ_LAPTOP
     elif platform.node() == "DESKTOP-A8R7298":
         cmd_data[CMD_INDEX.PLATFORM] = PLATFORM.FRITZ_DESKTOP
 

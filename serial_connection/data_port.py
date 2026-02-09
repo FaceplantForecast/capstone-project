@@ -343,6 +343,7 @@ def main():
                     #Adjust device names and baud rates (deployment on Raspberry Pi)
                     data_port = serial.Serial('/dev/ttyUSB1', 3125000, timeout=0.1)   # for data streaming
                 case PLATFORM.FRITZ_LAPTOP:
+                    print("Running on laptop")
                     #debugging on laptop
                     data_port = serial.Serial('COM3', 3125000, timeout=0.1)   # for data streaming
                 case PLATFORM.FRITZ_DESKTOP:

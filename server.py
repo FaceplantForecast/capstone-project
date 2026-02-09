@@ -18,16 +18,16 @@ global cmd_data
 global radar_buffer
 global radar_data
 
-# ===============================================================
-# SERVER SETUP
-# GCP endpoint + auth token (WebSocket)
+#===============================================================
+#SERVER SETUP
+#GCP endpoint + auth token (WebSocket)
 BASE_GCP_URL = "gcr-ws-482782751069.us-central1.run.app/ws"
-# Original token you gave earlier (without the stray dash)
+#Original token
 AUTH_TOKEN = "M8b4eFJHq2pI3V9nW5r0dE-PLZpQyX7uB1cTa9kN4mE"
 
-# Full WSS URL with auth_token as query param
+#Full WSS URL with auth_token as query param
 GCP_WSS_URL = f"wss://{BASE_GCP_URL}?role=pi&token={AUTH_TOKEN}"
-# ===============================================================
+#===============================================================
 
 def bootstrapper():
     """
@@ -61,7 +61,6 @@ def control_loop():
         if radar_data[RADAR_DATA.FALL_DETECTED] == 1:
             #Only send once (first detection)
             if FALL_DETECTED == 0:
-                print("Sending notification to server")
                 send_fall_flag(probability=float(radar_data[RADAR_DATA.PROBABILITY])/100.0,
                                frame_id=radar_data[RADAR_DATA.FRAME_ID],
                                ts=radar_data[RADAR_DATA.TIMESTAMP])
