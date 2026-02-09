@@ -341,7 +341,10 @@ def main():
             match cmd_data[CMD_INDEX.PLATFORM]:
                 case PLATFORM.RASPBERRY_PI:
                     #Adjust device names and baud rates (deployment on Raspberry Pi)
-                    data_port = serial.Serial('/dev/ttyUSB1', 3125000, timeout=0.1)   # for data streaming
+                    try:
+                        data_port = serial.Serial('/dev/ttyACM1', 3125000, timeout=0.1)   # for data streaming
+                    except:
+                        data_port = serial.Serial('/dev/ttyUSB1', 3125000, timeout=0.1)   # sometimes switches, I don't know why
                 case PLATFORM.FRITZ_LAPTOP:
                     print("Running on laptop")
                     #debugging on laptop
@@ -351,7 +354,10 @@ def main():
                     data_port = serial.Serial('COM4', 3125000, timeout=0.1)   # for data streaming
                 case _:
                     #default to raspberry pi
-                    data_port = serial.Serial('/dev/ttyUSB1', 3125000, timeout=0.1)   # for data streaming
+                    try:
+                        data_port = serial.Serial('/dev/ttyACM1', 3125000, timeout=0.1)   # for data streaming
+                    except:
+                        data_port = serial.Serial('/dev/ttyUSB1', 3125000, timeout=0.1)   # sometimes switches, I don't know why
 
             cmd_data[CMD_INDEX.DAT_PORT_STATUS] = DAT_PORT_STATUS.RUNNING
         except:

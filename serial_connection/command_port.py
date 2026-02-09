@@ -102,7 +102,10 @@ def main():
         match cmd_data[CMD_INDEX.PLATFORM]:
             case PLATFORM.RASPBERRY_PI:
                 #Adjust device names and baud rates (deployment on Raspberry Pi)
-                config_port = serial.Serial('/dev/ttyUSB0', 115200)   # for CLI commands
+                try:
+                    config_port = serial.Serial('/dev/ttyACM0', 115200)   # for CLI commands
+                except:
+                    config_port = serial.Serial('/dev/ttyUSB0', 115200)   #sometimes switches, I don't know why
             case PLATFORM.FRITZ_LAPTOP:
                 #debugging on laptop
                 config_port = serial.Serial('COM6', 115200)   # for CLI commands
@@ -111,7 +114,10 @@ def main():
                 config_port = serial.Serial('COM3', 115200)   # for CLI commands
             case _:
                 #default to raspberry pi
-                config_port = serial.Serial('/dev/ttyUSB0', 115200)   # for CLI commands
+                try:
+                    config_port = serial.Serial('/dev/ttyACM0', 115200)   # for CLI commands
+                except:
+                    config_port = serial.Serial('/dev/ttyUSB0', 115200)   #sometimes switches, I don't know why
 
         #call bootstrapper and initiate the radar
         InitiateRadar()
