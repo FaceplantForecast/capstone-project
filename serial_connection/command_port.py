@@ -16,7 +16,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
-from enums import PACKET_DATA, DEBUG_LEVEL as DEBUG, BUFF_SIZES, CMD_INDEX, BOOT_MODE
+from enums import PACKET_DATA, DEBUG_LEVEL as DEBUG, BUFF_SIZES, CMD_INDEX, BOOT_MODE, PLATFORM
 
 #global variables so that all functions modify the same instances
 global cmd_buffer
@@ -99,14 +99,19 @@ def main():
     #don't start connection in the server test
     if cmd_data[CMD_INDEX.BOOT_MODE] != BOOT_MODE.DEMO_CONNECTION_TEST:
 
-        #Adjust device names and baud rates (deployment on Raspberry Pi)
-        #config_port = serial.Serial('/dev/ttyUSB0', 115200)   # for CLI commands
-
-        #debugging on laptop
-        config_port = serial.Serial('COM6', 115200)   # for CLI commands
-
-        #debugging on desktop
-        #config_port = serial.Serial('COM3', 115200)   # for CLI commands
+        match cmd_data[CMD_INDEX.PLATFORM]:
+            case PLATFORM.RASPBERRY_PI:
+                #Adjust device names and baud rates (deployment on Raspberry Pi)
+                config_port = serial.Serial('/dev/ttyUSB0', 115200)   # for CLI commands
+            case PLATFORM.FRITZ_LAPTOP:
+                #debugging on laptop
+                config_port = serial.Serial('COM6', 115200)   # for CLI commands
+            case PLATFORM.FRITZ_DESKTOP:
+                #debugging on desktop
+                config_port = serial.Serial('COM3', 115200)   # for CLI commands
+            case _:
+                #default to raspberry pi
+                config_port = serial.Serial('/dev/ttyUSB0', 115200)   # for CLI commands
 
         #call bootstrapper and initiate the radar
         InitiateRadar()

@@ -21,7 +21,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
-from enums import PACKET_DATA, DEBUG_LEVEL as DEBUG, BUFF_SIZES, CMD_INDEX, DAT_PORT_STATUS, BOOT_MODE, RADAR_DATA
+from enums import PACKET_DATA, DEBUG_LEVEL as DEBUG, BUFF_SIZES, CMD_INDEX, DAT_PORT_STATUS, BOOT_MODE, RADAR_DATA, PLATFORM
 
 #global variables so that all functions modify the same instances
 global cmd_buffer
@@ -338,14 +338,19 @@ def main():
         print("Not connecting to radar")
     else:
         try:
-            #Adjust device names and baud rates (deployment on Raspberry Pi)
-            #data_port = serial.Serial('/dev/ttyUSB1', 3125000, timeout=0.1)   # for data streaming
-
-            #debugging on laptop
-            data_port = serial.Serial('COM3', 3125000, timeout=0.1)   # for data streaming
-
-            #debugging on desktop
-            #data_port = serial.Serial('COM4', 3125000, timeout=0.1)   # for data streaming
+            match cmd_data[CMD_INDEX.PLATFORM]:
+                case PLATFORM.RASPBERRY_PI:
+                    #Adjust device names and baud rates (deployment on Raspberry Pi)
+                    data_port = serial.Serial('/dev/ttyUSB1', 3125000, timeout=0.1)   # for data streaming
+                case PLATFORM.FRITZ_LAPTOP:
+                    #debugging on laptop
+                    data_port = serial.Serial('COM3', 3125000, timeout=0.1)   # for data streaming
+                case PLATFORM.FRITZ_DESKTOP:
+                    #debugging on desktop
+                    data_port = serial.Serial('COM4', 3125000, timeout=0.1)   # for data streaming
+                case _:
+                    #default to raspberry pi
+                    data_port = serial.Serial('/dev/ttyUSB1', 3125000, timeout=0.1)   # for data streaming
 
             cmd_data[CMD_INDEX.DAT_PORT_STATUS] = DAT_PORT_STATUS.RUNNING
         except:

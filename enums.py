@@ -12,7 +12,7 @@ class DEBUG_LEVEL(IntEnum):
     VERBOSE = 2
 
 class BUFF_SIZES(IntEnum):
-    CMD_BUFF    = 8 #in bytes
+    CMD_BUFF    = 9 #in bytes
     FRAME_BUFF  = 4096
     RADAR_BUFF  = 256 #4*64
     RADAR_LEN   = 4
@@ -26,6 +26,7 @@ class CMD_INDEX(IntEnum):
     FRAMERATE           = 5
     APP_CMD             = 6
     BOOT_MODE           = 7
+    PLATFORM            = 8
 
 class MAIN_STATUS(IntEnum):
     RUNNING     = 0
@@ -93,3 +94,8 @@ class RADAR_DATA(IntEnum):
     FRAME_ID            = 1
     TIMESTAMP           = 2
     PROBABILITY         = 3
+
+class PLATFORM(IntEnum):
+    RASPBERRY_PI        = 0 #deployment on raspberry pi
+    FRITZ_LAPTOP        = 1 #development on Fritz's laptop (DESKTOP-QL18C7K)
+    FRITZ_DESKTOP       = 2 #development on Fritz's desktop (DESKTOP-A8R7298)

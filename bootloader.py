@@ -13,9 +13,10 @@ import serial_connection.data_port as DatPrt
 import server as Server
 import sys, time
 import argparse
+import platform
 
 #import enums
-from enums import BUFF_SIZES, CMD_INDEX, MAIN_STATUS, CMD_PORT_STATUS, AI_STATUS, BOOT_MODE
+from enums import BUFF_SIZES, CMD_INDEX, MAIN_STATUS, CMD_PORT_STATUS, AI_STATUS, BOOT_MODE, PLATFORM
 
 #global variables so that all functions modify the same instances
 global cmd_buffer
@@ -71,6 +72,14 @@ def set_cmd_defaults():
     cmd_data[CMD_INDEX.AI_STATUS] = AI_STATUS.OFFLINE
     cmd_data[CMD_INDEX.MAIN_STATUS] = MAIN_STATUS.RUNNING
     cmd_data[CMD_INDEX.CMD_PORT_STATUS] = CMD_PORT_STATUS.OFFLINE
+
+    #check for current platform to change serial port settings
+    if platform.node() == "raspberrypi":
+        cmd_data[CMD_INDEX.PLATFORM] = PLATFORM.RASPBERRY_PI
+    elif platform.node() == "DESKTOP-A8R7298": #TODO: update with laptop node name
+        cmd_data[CMD_INDEX.PLATFORM] = PLATFORM.FRITZ_DESKTOP
+    elif platform.node() == "DESKTOP-A8R7298":
+        cmd_data[CMD_INDEX.PLATFORM] = PLATFORM.FRITZ_DESKTOP
 
 def start_server_process():
     """
