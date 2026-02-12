@@ -65,6 +65,7 @@ def control_loop():
                                frame_id=radar_data[RADAR_DATA.FRAME_ID],
                                ts=radar_data[RADAR_DATA.TIMESTAMP])
             FALL_DETECTED = 1
+            radar_data[RADAR_DATA.FALL_DETECTED] == 0 #reset buffer flag
         else:
             FALL_DETECTED = 0
 def send_fall_flag(probability: float, frame_id: int, ts: float):
