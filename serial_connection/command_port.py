@@ -49,6 +49,31 @@ def InitiateRadar():
 
     print("Configuration sent. Radar should be running.")
 
+def send_cfg(ser, cfg_file):
+
+
+    if not os.path.exists(cfg_file):
+        raise FileNotFoundError(cfg_file)
+
+    with open(cfg_file, "r") as f:
+        lines = [l.strip() for l in f if l.strip() and not l.startswith('%')]
+
+    print(f"[CFG] Sending {len(lines)} commands from {cfg_file}...")
+    for line in lines:
+        ser.write((line + "\n").encode())
+        ser.flush()
+        time.sleep(0.05)
+        resp = ser.read(ser.in_waiting or 1)
+        if resp:
+            try:
+                txt = resp.decode(errors="ignore").strip()
+                if txt:
+                    print(f"[CFG RESP] {txt}")
+            except Exception:
+                pass
+    ser.close()
+    print("[CFG] Radar started.")
+
 def CLIController(user_input):
         #send command
         config_port.write(user_input.encode('utf-8'))
@@ -120,4 +145,4 @@ def main():
                     config_port = serial.Serial('/dev/ttyUSB0', 115200)   #sometimes switches, I don't know why
 
         #call bootstrapper and initiate the radar
-        InitiateRadar()
+        send_cfg(config_port, 'radar_profile.cfg')
