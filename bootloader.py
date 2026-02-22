@@ -14,6 +14,7 @@ import server as Server
 import sys, time
 import argparse
 import platform
+from signal import signal, SIGTERM
 
 #import enums
 from enums import BUFF_SIZES, CMD_INDEX, MAIN_STATUS, CMD_PORT_STATUS, AI_STATUS, BOOT_MODE, PLATFORM
@@ -76,7 +77,7 @@ def set_cmd_defaults():
     #check for current platform to change serial port settings
     if platform.node() == "raspberrypi":
         cmd_data[CMD_INDEX.PLATFORM] = PLATFORM.RASPBERRY_PI
-    elif platform.node() == "DESKTOP-QL18C7K": #TODO: update with laptop node name
+    elif platform.node() == "DESKTOP-QL18C7K":
         cmd_data[CMD_INDEX.PLATFORM] = PLATFORM.FRITZ_LAPTOP
     elif platform.node() == "DESKTOP-A8R7298":
         cmd_data[CMD_INDEX.PLATFORM] = PLATFORM.FRITZ_DESKTOP
@@ -93,6 +94,8 @@ def start_command_process():
     This function starts the data port process. A wrapper function is
     needed to allow calling from another script.
     """
+
+    signal(SIGTERM, CmdPrt.shutdown) #stops radar on process termination
 
     CmdPrt.main()
 
@@ -133,7 +136,7 @@ def shutdown():
     cmd_buffer.close()
     cmd_buffer.unlink()
     radar_buffer.close()
-    radar_buffer.close()
+    radar_buffer.unlink()
 
     print("Done!")
 

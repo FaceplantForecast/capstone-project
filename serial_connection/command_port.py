@@ -49,9 +49,20 @@ def InitiateRadar():
 
     print("Configuration sent. Radar should be running.")
 
+def send_sensor_stop(ser):
+    """Send 'sensorStop' command."""
+    try:
+        ser.write(b"sensorStop\n")
+        ser.flush()
+        time.sleep(0.1)
+        print("[CFG] Sent sensorStop.")
+        ser.close()
+    except Exception as e:
+        print("[CFG] Stop failed:", e)
+
+
 def send_cfg(ser, cfg_file):
-
-
+    send_sensor_stop(ser)
     if not os.path.exists(cfg_file):
         raise FileNotFoundError(cfg_file)
 
@@ -115,6 +126,10 @@ def UserCLI():
             #call CLI Controller function
             print(CLIController(user_input))
         
+def shutdown():
+    global config_port
+    send_sensor_stop(config_port)
+    print("STOPPING RADAR")
 
 def main():
     global config_port
