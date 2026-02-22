@@ -56,7 +56,6 @@ def send_sensor_stop(ser):
         ser.flush()
         time.sleep(0.1)
         print("[CFG] Sent sensorStop.")
-        ser.close()
     except Exception as e:
         print("[CFG] Stop failed:", e)
 
@@ -82,7 +81,6 @@ def send_cfg(ser, cfg_file):
                     print(f"[CFG RESP] {txt}")
             except Exception:
                 pass
-    ser.close()
     print("[CFG] Radar started.")
 
 def CLIController(user_input):
@@ -129,6 +127,7 @@ def UserCLI():
 def shutdown():
     global config_port
     send_sensor_stop(config_port)
+    config_port.close()
     print("STOPPING RADAR")
 
 def main():
