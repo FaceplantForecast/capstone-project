@@ -202,7 +202,7 @@ def main():
 
 if __name__ == "__main__":
     try:
-        sys.exit(main())
+        main()
     except KeyboardInterrupt:
         print("[EXIT] User stopped.")
     finally:
