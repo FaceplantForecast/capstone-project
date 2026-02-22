@@ -200,9 +200,11 @@ def main():
                            name="DataProc")
     data_proc.start()
 
-    input("press Enter to end...\n")
-
-    shutdown()
-
 if __name__ == "__main__":
-    sys.exit(main())
+    try:
+        sys.exit(main())
+    except KeyboardInterrupt:
+        print("[EXIT] User stopped.")
+    finally:
+        shutdown()
+        print("Radar stopped cleanly.")
