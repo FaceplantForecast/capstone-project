@@ -200,6 +200,9 @@ def main():
                            name="DataProc")
     data_proc.start()
 
+    while True:
+        time.sleep(5) #this just keeps the bootloader active
+
 if __name__ == "__main__":
     try:
         main()

@@ -41,8 +41,8 @@ FEATURE_KEYS = [
     "mean_doppler", "num_points", "vz", "speed",
 ]
 
-TFLITE_MODEL_PATH = "model.tflite"
-SCALER_PATH = "scaler.npz"
+TFLITE_MODEL_PATH = "./model/model.tflite"
+SCALER_PATH = "./model/scaler.npz"
 
 FALL_THRESHOLD = 0.5
 RESET_THRESHOLD = 0.05
@@ -103,7 +103,7 @@ MIN_POINTS_FOR_WINDOW = 5
 REQUIRE_HEIGHT_FOR_WINDOW = False
 
 # --- Debug / logging ---
-DEBUG = False
+_DEBUG = False
 MISS_PRINT_EVERY = 20
 HEALTH_PRINT_EVERY_SEC = 5.0
 
@@ -449,7 +449,7 @@ def compute_frame_features(frame, track: TrackState):
     cx, cy, cz, height, spread_xy, _ = _cluster_stats(pts)
 
     if height < MIN_HEIGHT_M or spread_xy > MAX_SPREAD_XY_M:
-        if not DEBUG:
+        if not _DEBUG:
             return None
 
     cx_s, cy_s, cz_s = track.update_centroid_ema(float(cx), float(cy), float(cz))
@@ -733,7 +733,7 @@ def live_loop(stream):
 
         if feat is None:
             miss_count += 1
-            if DEBUG or (miss_count % MISS_PRINT_EVERY == 0):
+            if _DEBUG or (miss_count % MISS_PRINT_EVERY == 0):
                 print(f"        (no valid person cluster) misses={miss_count}")
             continue
 
@@ -804,6 +804,7 @@ def live_loop(stream):
                 print(f"[ALERT] (latched/cooldown) reason={reason} p={p:.3f}")
         else:
             print(f"[INFO] p_fall={p:.3f}")
+#========================================================================
 
 #deprecated; for debug modes
 def stream_frames(con, debug=DEBUG.NONE, mode=BOOT_MODE.STANDARD):
