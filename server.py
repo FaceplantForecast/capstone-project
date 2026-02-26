@@ -18,6 +18,8 @@ global cmd_data
 global radar_buffer
 global radar_data
 
+DEBUG = False
+
 #===============================================================
 #SERVER SETUP
 #GCP endpoint + auth token (WebSocket)
@@ -85,25 +87,26 @@ async def _send_fall_flag_ws(probability: float, frame_id: int, ts: float):
     Internal coroutine: open WSS, send one JSON message, close.
     Includes auth_token both in query string and in the JSON body.
     """
-    msg = {"fall_detected": 1, "ts": time.strftime("%m-%d-%Y %H:%M:%S", time.localtime())}
+    msg = {
+            "fall_detected": 1,
+            "probability": float(probability),
+            "frame_id": int(frame_id),
+            "ts": time.strftime("%m-%d-%Y %H:%M:%S", time.localtime(ts))
+        }
 
-    print(f"[GCP] Connecting to {GCP_WSS_URL} ...")
     try:
         async with websockets.connect(GCP_WSS_URL) as ws:
-            # Send payload
             await ws.send(json.dumps(msg))
-            print("[GCP] Sent fall flag payload")
-
-            # Optional: try to read a response (if server replies)
-            try:
-                reply = await asyncio.wait_for(ws.recv(), timeout=3.0)
-                print(f"[GCP] Received reply: {reply}")
-            except asyncio.TimeoutError:
-                print("[GCP] No reply from server (timeout), assuming fire-and-forget.")
-    except websockets.exceptions.ConnectionClosedError as e:
-        print(f"[GCP] WebSocket closed: code={e.code}, reason={e.reason}")
+            if DEBUG:
+                print("[GCP] Sent fall flag payload")
     except Exception as e:
         print(f"[GCP] Failed to send fall flag via WSS: {e}")
+
+def send_fall_flag(probability: float, frame_id: int, ts: float):
+    try:
+        asyncio.run(_send_fall_flag_ws(probability, frame_id, ts))
+    except RuntimeError as e:
+        print(f"[GCP] asyncio runtime error: {e}")
 
 def main():
     bootstrapper()
