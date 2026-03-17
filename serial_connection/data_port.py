@@ -22,7 +22,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
-from enums import PACKET_DATA, DEBUG_LEVEL as DEBUG, BUFF_SIZES, CMD_INDEX, DAT_PORT_STATUS, BOOT_MODE, RADAR_DATA, PLATFORM
+from enums import PACKET_DATA, DEBUG_LEVEL as DEBUG, BUFF_SIZES, CMD_INDEX, DAT_PORT_STATUS, BOOT_MODE, RADAR_DATA, PLATFORM, APP_CMD
 
 #global variables so that all functions modify the same instances
 global cmd_buffer
@@ -33,6 +33,8 @@ global radar_data
 # ===============================================================
 # WITHIN THESE EQUALS SIGNS, THE AI MODEL IS BORN! FUS RO DAH!
 # Also it was all written by Charles "They Called Him Mr. AI Back In College" Marks
+
+#region Config
 
 #AI config
 WINDOW_SIZE = 48
@@ -120,9 +122,10 @@ GAIN_ALPHA = 0.03
 MAX_GAIN = 5.0
 
 FALL_DETECTED = 0
+#endregion
 
 # ----------------- Trend detection helper -----------------
-
+#region Trend Detection
 def is_rising_trend(ps,
                     window=10,
                     min_rise=0.05,
@@ -162,10 +165,10 @@ def is_rising_trend(ps,
         return False
 
     return True
-
+#endregion
 
 # ----------------- Background Snapshot Compensator -----------------
-
+#region Background Snapshot Compensator
 class BackgroundSnapshotCompensator:
     """
     Two-phase compensator:
@@ -250,9 +253,10 @@ class BackgroundSnapshotCompensator:
 
 
 BG_COMP = BackgroundSnapshotCompensator()
+#endregion
 
 # ----------------- TFLite + scaler -----------------
-
+#region TFLite + Scaler
 def load_tflite_model(path: str):
     interpreter = tf.lite.Interpreter(model_path=path)
     interpreter.allocate_tensors()
@@ -279,9 +283,10 @@ def run_inference(window_array: np.ndarray) -> float:
     interpreter.set_tensor(input_index, X)
     interpreter.invoke()
     return float(interpreter.get_tensor(output_index)[0][0])
+#endregion
 
-# ----------------- Clustering helpers -----------------
-
+# ----------------- Clustering Helpers -----------------
+#region Clustering Helpers
 def _adaptive_min_samples(n_pts: int) -> int:
     ms = int(np.ceil(DBSCAN_MIN_SAMPLES_FRAC * n_pts))
     ms = max(DBSCAN_MIN_SAMPLES_MIN, min(DBSCAN_MIN_SAMPLES_MAX, ms))
@@ -377,10 +382,10 @@ def pick_person_cluster(points_xyz, labels, prev_centroid=None):
         return np.zeros(n, dtype=bool)
 
     return labels == best_label
+#endregion
 
-
-# ----------------- Feature computation -----------------
-
+# ----------------- Feature Computation -----------------
+#region Feature Computation
 class TrackState:
     def __init__(self):
         self.prev_feat = None
@@ -476,9 +481,10 @@ def compute_frame_features(frame, track: TrackState):
 
     track.prev_feat = feat
     return feat
+#endregion
 
 # ----------------- Background Capture Phase -----------------
-
+#region Background Capture
 def build_background_from_stream(stream):
     print(f"\n[BG] Please clear the room. Waiting {BACKGROUND_WAIT_SEC} seconds...")
     for i in range(BACKGROUND_WAIT_SEC, 0, -1):
@@ -511,10 +517,9 @@ def build_background_from_stream(stream):
 
     BG_COMP.build_background()
     print("[BG] Background baseline built. Beginning live inference.\n")
-
-
+#endregion
 # ===============================================================
-
+#region Helpers
 def bootstrapper():
     """
     This function handles the startup sequence for the process
@@ -556,12 +561,12 @@ def check_dropped_frames():
     data_port = serial.Serial('COM3', 3125000, timeout=0.1)   # for data streaming
 
     stream_frames(data_port, mode=BOOT_MODE.DEMO_DROPPED_FRAMES)
+#endregion
 
-#=========================================================
-# STREAMING CODE
+#====================================STREAMING CODE====================================
 
 # ----------------- UART parsing (BUFFERED) -----------------
-
+#region UART Parsing
 MAGIC_WORD = b'\x02\x01\x04\x03\x06\x05\x08\x07'
 HEADER_LEN = 40
 
@@ -704,10 +709,41 @@ def uart_frame_stream(ser):
         snr = np.array([d["snr"] for d in dets], dtype=np.float32)
 
         yield dict(frame_id=fid, timestamp=ts, x=x, y=y, z=z, doppler=dop, snr=snr)
+#endregion
 
-# ----------------- Live loop -----------------
+# ----------------- Live Loop -----------------
+#region Live Loop
+def handle_runtime_commands(stream, window, track, p_hist):
+    """Handle in-band APP commands while streaming frames.
+
+    REDO_BACKGROUND_SCAN pauses inference, rebuilds the background baseline, and
+    resets runtime model state before normal frame processing resumes.
+    """
+    global cmd_data
+    global FALL_DETECTED
+
+    if cmd_data[CMD_INDEX.APP_CMD] != APP_CMD.REDO_BACKGROUND_SCAN:
+        return
+
+    print("[CMD] REDO_BACKGROUND_SCAN received. Pausing inference and rebuilding baseline...")
+    cmd_data[CMD_INDEX.APP_CMD] = APP_CMD.NONE
+
+    # Clear latched outputs/state so no stale fall output leaks across recalibration.
+    radar_data[RADAR_DATA.FALL_DETECTED] = 0
+    radar_data[RADAR_DATA.PROBABILITY] = 0
+    FALL_DETECTED = 0
+
+    window.clear()
+    p_hist.clear()
+    track.prev_feat = None
+    track.prev_centroid_ema = None
+
+    build_background_from_stream(stream)
 
 def live_loop(stream):
+    """
+    Main loop for data collection and processing.
+    """
     global FALL_DETECTED
 
     window = collections.deque(maxlen=WINDOW_SIZE)
@@ -728,6 +764,8 @@ def live_loop(stream):
     print("[LIVE] Starting fall detection...")
 
     for frame in stream:
+        handle_runtime_commands(stream, window, track, p_hist)
+
         total_frames += 1
         feat = compute_frame_features(frame, track)
 
@@ -804,8 +842,8 @@ def live_loop(stream):
                 print(f"[ALERT] (latched/cooldown) reason={reason} p={p:.3f}")
         else:
             print(f"[INFO] p_fall={p:.3f}")
+#endregion
 #========================================================================
-
 #deprecated; for debug modes
 def stream_frames(con, debug=DEBUG.NONE, mode=BOOT_MODE.STANDARD):
     local_frame_buffer = bytearray()

@@ -60,6 +60,11 @@ class APP_STATUS(IntEnum):
     NOTICE      = 3
     PAUSED      = 4
 
+class APP_CMD(IntEnum):
+    NONE                    = 0
+    REDO_BACKGROUND_SCAN    = 1
+    RESTART_FAILED_DAEMONS  = 2
+
 class PACKET_DATA(IntEnum):
     RESULT              = 0
     HEADER_START_IDX    = 1
