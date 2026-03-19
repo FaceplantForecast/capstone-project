@@ -16,7 +16,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
-from enums import PACKET_DATA, DEBUG_LEVEL as DEBUG, BUFF_SIZES, CMD_INDEX, BOOT_MODE, PLATFORM
+from enums import PACKET_DATA, DEBUG_LEVEL as DEBUG, BUFF_SIZES, CMD_INDEX, BOOT_MODE, PLATFORM, CMD_PORT_STATUS
 
 #global variables so that all functions modify the same instances
 global cmd_buffer
@@ -24,9 +24,9 @@ global cmd_data
 global config_port
 
 
-def bootstrapper():
+def _bootstrapper():
     """
-    This function handles the startup sequence for the process
+    Handle the startup sequence for the process.
     """
     global cmd_buffer
     global cmd_data
@@ -38,19 +38,13 @@ def bootstrapper():
     cmd_data = np.ndarray(  shape=(BUFF_SIZES.CMD_BUFF,),
                             dtype=np.int8,
                             buffer=cmd_buffer.buf)
-
-def InitiateRadar():
-    # Send a config file line by line
-    with open('radar_profile.cfg', 'r') as f:
-        for line in f:
-            if line.strip() and not line.startswith('%'):  # skip comments
-                config_port.write((line.strip() + '\n').encode())
-                time.sleep(0.01)  # small delay between commands
-
-    print("Configuration sent. Radar should be running.")
+    
+    cmd_data[CMD_INDEX.CMD_PORT_STATUS] = CMD_PORT_STATUS.CONNECTING
 
 def send_sensor_stop(ser):
-    """Send 'sensorStop' command."""
+    """
+    Send 'sensorStop' command.
+    """
     try:
         ser.write(b"sensorStop\n")
         ser.flush()
@@ -61,7 +55,15 @@ def send_sensor_stop(ser):
 
 
 def send_cfg(ser, cfg_file):
+    """
+    Send radar config file and begin radar operation.
+    """
+    global cmd_data
+
+    #flag Cmd port as sending data
+    cmd_data[CMD_INDEX.CMD_PORT_STATUS] = CMD_PORT_STATUS.SENDING
     send_sensor_stop(ser)
+    
     if not os.path.exists(cfg_file):
         raise FileNotFoundError(cfg_file)
 
@@ -82,35 +84,41 @@ def send_cfg(ser, cfg_file):
             except Exception:
                 pass
     print("[CFG] Radar started.")
+    cmd_data[CMD_INDEX.CMD_PORT_STATUS] = CMD_PORT_STATUS.ONLINE
 
-def CLIController(user_input):
-        #send command
-        config_port.write(user_input.encode('utf-8'))
-        time.sleep(0.1)
+def _CLIController(user_input):
+    """
+    Send CLI command.
+    """
+    config_port.write(user_input.encode('utf-8'))
+    time.sleep(0.1)
 
-        #read twice to get to the "meat"
+    #read twice to get to the "meat"
+    data = config_port.readline()
+    print(data.decode())
+    data = config_port.readline()
+
+    #read until the terminal goes back to ready state
+    output = ""
+    i = 0
+    while data.decode() != "mmwDemo:/>\n":
+        if user_input.replace('\r\n', '') not in data.decode():
+            output = output + data.decode()
         data = config_port.readline()
-        print(data.decode())
-        data = config_port.readline()
+        i += 1
+        if i > 10:
+            print("ERROR")
+            break
+    
+    #read one more line to prep for next cycle
+    config_port.readline()
 
-        #read until the terminal goes back to ready state
-        output = ""
-        i = 0
-        while data.decode() != "mmwDemo:/>\n":
-            if user_input.replace('\r\n', '') not in data.decode():
-                output = output + data.decode()
-            data = config_port.readline()
-            i += 1
-            if i > 10:
-                print("ERROR")
-                break
-        
-        #read one more line to prep for next cycle
-        config_port.readline()
+    return output
 
-        return output
-
-def UserCLI():
+def _UserCLI():
+    """
+    User CLI interface (deprecated).
+    """
     global config_port
 
     if 'config_port' in globals(): #make sure to only run this if the port is actually defined
@@ -122,9 +130,12 @@ def UserCLI():
                 break
             
             #call CLI Controller function
-            print(CLIController(user_input))
+            print(_CLIController(user_input))
         
 def shutdown():
+    """
+    Public function to shutdown the radar.
+    """
     global config_port
     send_sensor_stop(config_port)
     config_port.close()
@@ -133,7 +144,7 @@ def shutdown():
 def main():
     global config_port
 
-    bootstrapper()
+    _bootstrapper()
 
     #don't start connection in the server test
     if cmd_data[CMD_INDEX.BOOT_MODE] != BOOT_MODE.DEMO_CONNECTION_TEST:

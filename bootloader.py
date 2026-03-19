@@ -11,13 +11,19 @@ import numpy as np
 import serial_connection.command_port as CmdPrt
 import serial_connection.data_port as DatPrt
 import server as Server
-import sys, time
+import time
 import argparse
 import platform
 from signal import signal, SIGTERM
 
 #import enums
-from enums import BUFF_SIZES, CMD_INDEX, MAIN_STATUS, CMD_PORT_STATUS, AI_STATUS, BOOT_MODE, PLATFORM
+from enums import BUFF_SIZES, CMD_INDEX, MAIN_STATUS, CMD_PORT_STATUS, AI_STATUS, BOOT_MODE, PLATFORM, APP_CMD
+
+# Supervisory constants for daemon recovery behaviour.
+PROCESS_MAX_RESTARTS = 3
+PROCESS_MONITOR_SLEEP_SEC = 1.0
+PROCESS_HEALTHY_RESET_SEC = 10.0
+PROCESS_RESTART_DELAY_SEC = 0.75
 
 #global variables so that all functions modify the same instances
 global cmd_buffer
@@ -25,15 +31,17 @@ global cmd_data
 global radar_buffer
 global radar_data
 
+# process table, keyed by logical process name
+PROCESS_SPECS = {
+    "server": {"target": lambda: Server.main(), "name": "ServerProc"},
+    "command_port": {"target": lambda: _start_command_process(), "name": "CommandProc"},
+    "data_port": {"target": lambda: DatPrt.main(), "name": "DataProc"},
+}
+PROCESS_STATE = {}
 
-#processes
-global command_proc
-global data_proc
-global server_proc
-
-def create_buffers():
+def _create_buffers():
     """
-    This function handles setting up all the buffers
+    Set up shared-memory buffers used by all service processes.
     """
     global cmd_buffer
     global cmd_data
@@ -62,10 +70,9 @@ def create_buffers():
                             buffer=radar_buffer.buf)
     radar_data[:] = np.zeros(BUFF_SIZES.RADAR_LEN) #populate the array with zeros
 
-def set_cmd_defaults():
+def _set_cmd_defaults():
     """
-    This function sets the default values for the command buffer.
-    It should only run on startup or on a system reset.
+    Set default command-buffer values for normal boot operation.
     """
     global cmd_data
 
@@ -73,6 +80,7 @@ def set_cmd_defaults():
     cmd_data[CMD_INDEX.AI_STATUS] = AI_STATUS.OFFLINE
     cmd_data[CMD_INDEX.MAIN_STATUS] = MAIN_STATUS.RUNNING
     cmd_data[CMD_INDEX.CMD_PORT_STATUS] = CMD_PORT_STATUS.OFFLINE
+    cmd_data[CMD_INDEX.APP_CMD] = APP_CMD.NONE
 
     #check for current platform to change serial port settings
     if platform.node() == "raspberrypi":
@@ -82,61 +90,149 @@ def set_cmd_defaults():
     elif platform.node() == "DESKTOP-A8R7298":
         cmd_data[CMD_INDEX.PLATFORM] = PLATFORM.FRITZ_DESKTOP
 
-def start_server_process():
-    """
-    This function starts the server process. A wrapper function is
-    needed to allow calling from another script.
-    """
-    Server.main()
 
-def start_command_process():
+def _start_command_process():
     """
-    This function starts the data port process. A wrapper function is
-    needed to allow calling from another script.
+    Start the command-port process with a SIGTERM hook for clean radar shutdown.
     """
-
     signal(SIGTERM, CmdPrt.shutdown) #stops radar on process termination
 
     CmdPrt.main()
 
-def start_data_process():
+def send_process_notification(event_type, process_name, message, **details):
     """
-    This function starts the data port process. A wrapper function is
-    needed to allow calling from another script.
+    Forward process health events to the cloud service via the server transport helper.
     """
+    payload = {"process": process_name, **details}
+    try:
+        Server.send_system_event(event_type=event_type, message=message, **payload)
+    except Exception as err:
+        print(f"[BOOTLOADER] Failed to send {event_type} notification: {err}")
 
-    DatPrt.main()
 
-def shutdown():
-    """
-    This function handles shutting down the system. That means killing
-    daemon processes and closing/unlinking shared memory pools
-    """
-    global cmd_buffer
-    global radar_buffer
-    global command_proc
-    global data_proc
-    global server_proc
 
+def _start_named_process(proc_key):
+    """
+    Create and start one daemon process from PROCESS_SPECS, then track lifecycle metadata.
+    """
+    spec = PROCESS_SPECS[proc_key]
+    proc = mp.Process(target=spec["target"], daemon=True, name=spec["name"])
+    proc.start()
+
+    PROCESS_STATE[proc_key]["proc"] = proc
+    PROCESS_STATE[proc_key]["last_start_ts"] = time.time()
+    PROCESS_STATE[proc_key]["death_handled"] = False
+
+def _initialise_process_table():
+    """
+    Prepare per-process supervisor state used by the crash-restart monitor.
+    """
+    PROCESS_STATE.clear()
+    for proc_key in PROCESS_SPECS:
+        PROCESS_STATE[proc_key] = {
+            "proc": None,
+            "restart_count": 0,
+            "suspended": False,
+            "last_start_ts": 0.0,
+            "death_handled": False,
+        }
+
+def _handle_server_commands():
+    """
+    Consume server-driven APP_CMD requests relevant to the bootloader supervisor.
+    """
+    global cmd_data
+
+    if cmd_data[CMD_INDEX.APP_CMD] == APP_CMD.RESTART_FAILED_DAEMONS:
+        print("[BOOTLOADER] Received server request to retry failed daemons.")
+        for proc_key, state in PROCESS_STATE.items():
+            state["suspended"] = False
+            state["restart_count"] = 0
+
+            proc = state["proc"]
+            if proc is None or not proc.is_alive():
+                _start_named_process(proc_key)
+
+        cmd_data[CMD_INDEX.APP_CMD] = APP_CMD.NONE
+
+def _monitor_and_restart_processes():
+    """
+    Monitor child daemons and restart crashed children up to retry budget.
+    """
+    while True:
+        _handle_server_commands()
+
+        now = time.time()
+        for proc_key, state in PROCESS_STATE.items():
+            proc = state["proc"]
+            if proc is None:
+                continue
+
+            if proc.is_alive():
+                if (now - state["last_start_ts"]) >= PROCESS_HEALTHY_RESET_SEC:
+                    state["restart_count"] = 0
+                state["death_handled"] = False
+                continue
+
+            if state["death_handled"]:
+                continue
+
+            state["death_handled"] = True
+            exit_code = proc.exitcode
+            state["restart_count"] += 1
+
+            send_process_notification(
+                event_type="process_crashed",
+                process_name=proc_key,
+                message=f"Process {proc_key} crashed.",
+                exit_code=exit_code,
+                restart_attempt=state["restart_count"],
+            )
+
+            if state["restart_count"] >= PROCESS_MAX_RESTARTS:
+                state["suspended"] = True
+                send_process_notification(
+                    event_type="process_restart_failed",
+                    process_name=proc_key,
+                    message=(
+                        f"Process {proc_key} failed to restart {PROCESS_MAX_RESTARTS} times "
+                        "and is now suspended until server retry command."
+                    ),
+                    exit_code=exit_code,
+                    max_restarts=PROCESS_MAX_RESTARTS,
+                )
+                continue
+
+            if not state["suspended"]:
+                time.sleep(PROCESS_RESTART_DELAY_SEC)
+                _start_named_process(proc_key)
+
+        time.sleep(PROCESS_MONITOR_SLEEP_SEC)
+
+def _shutdown():
+    """
+    Stop child processes and release shared-memory buffers.
+    """
     print("Shutting down...\n")
 
-    #terminate processed first
-    server_proc.terminate()
-    command_proc.terminate()
-    data_proc.terminate()
+    for state in PROCESS_STATE.values():
+        proc = state.get("proc")
+        if proc is not None and proc.is_alive():
+            proc.terminate()
 
-    time.sleep(0.25) #delay to give data_proc time to terminate
+    time.sleep(0.25)
 
-    #then close processes
-    server_proc.close()
-    command_proc.close()
-    data_proc.close()
+    for state in PROCESS_STATE.values():
+        proc = state.get("proc")
+        if proc is not None:
+            proc.close()
 
-    #close and unlink shared memory buffers
-    cmd_buffer.close()
-    cmd_buffer.unlink()
-    radar_buffer.close()
-    radar_buffer.unlink()
+    if cmd_buffer is not None:
+        cmd_buffer.close()
+        cmd_buffer.unlink()
+    if radar_buffer is not None:
+        radar_buffer.close()
+        radar_buffer.unlink()
 
     print("Done!")
 
@@ -164,11 +260,11 @@ def main():
         "--demo-connection", action="store_true",
         help="Start in connection test mode"
     )
-
     args = parser.parse_args()
 
-    create_buffers()
-    set_cmd_defaults()
+    _create_buffers()
+    _set_cmd_defaults()
+    _initialise_process_table()
 
     #launch in the demo visualizer mode
     if args.demo_visualizer:
@@ -181,27 +277,18 @@ def main():
         print("Launcing in CONNECTION TEST mode\n")
         cmd_data[CMD_INDEX.BOOT_MODE] = BOOT_MODE.DEMO_CONNECTION_TEST
 
-    #create and start daemon processes for all components
-    server_proc = mp.Process(target=start_server_process,
-                             daemon=True,
-                             name="ServerProc")
-    server_proc.start()
-
-    command_proc = mp.Process(target=start_command_process,
-                              daemon=True,
-                              name="CommandProc")
-    command_proc.start()
-
-    #wait to allow config file time to be sent
-    time.sleep(1)
-
-    data_proc = mp.Process(target=start_data_process,
-                           daemon=True,
-                           name="DataProc")
-    data_proc.start()
-
+    #start processes in expected order: server -> command port -> data port.
+    _start_named_process("server")
+    _start_named_process("command_port")
+    
+    #wait until command port is done sending config to start the data port
     while True:
-        time.sleep(5) #this just keeps the bootloader active
+        if cmd_data[CMD_INDEX.CMD_PORT_STATUS] == CMD_PORT_STATUS.ONLINE:
+            break
+        time.sleep(0.1)
+    _start_named_process("data_port")
+
+    _monitor_and_restart_processes()
 
 if __name__ == "__main__":
     try:
@@ -209,5 +296,5 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("[EXIT] User stopped.")
     finally:
-        shutdown()
+        _shutdown()
         print("Radar stopped cleanly.")

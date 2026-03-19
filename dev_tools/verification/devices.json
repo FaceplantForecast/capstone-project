@@ -1,0 +1,65 @@
+{
+  "base_url": "gcr-ws-482782751069.us-central1.run.app/ws",
+  "devices": [
+    {
+      "name": "Device 1",
+      "token": "TOKEN_FOR_DEVICE_1",
+      "device_id": "sim-pi-01",
+      "account_id": "account-1"
+    },
+    {
+      "name": "Device 2",
+      "token": "TOKEN_FOR_DEVICE_2",
+      "device_id": "sim-pi-02",
+      "account_id": "account-1"
+    },
+    {
+      "name": "Device 3",
+      "token": "TOKEN_FOR_DEVICE_3",
+      "device_id": "sim-pi-03",
+      "account_id": "account-2"
+    },
+    {
+      "name": "Device 4",
+      "token": "TOKEN_FOR_DEVICE_4",
+      "device_id": "sim-pi-04",
+      "account_id": "account-2"
+    },
+    {
+      "name": "Device 5",
+      "token": "TOKEN_FOR_DEVICE_5",
+      "device_id": "sim-pi-05",
+      "account_id": "account-3"
+    },
+    {
+      "name": "Device 6",
+      "token": "TOKEN_FOR_DEVICE_6",
+      "device_id": "sim-pi-06",
+      "account_id": "account-3"
+    },
+    {
+      "name": "Device 7",
+      "token": "TOKEN_FOR_DEVICE_7",
+      "device_id": "sim-pi-07",
+      "account_id": "account-4"
+    },
+    {
+      "name": "Device 8",
+      "token": "TOKEN_FOR_DEVICE_8",
+      "device_id": "sim-pi-08",
+      "account_id": "account-4"
+    },
+    {
+      "name": "Device 9",
+      "token": "TOKEN_FOR_DEVICE_9",
+      "device_id": "sim-pi-09",
+      "account_id": "account-5"
+    },
+    {
+      "name": "Device 10",
+      "token": "TOKEN_FOR_DEVICE_10",
+      "device_id": "sim-pi-10",
+      "account_id": "account-5"
+    }
+  ]
+}
