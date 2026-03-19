@@ -1,0 +1,91 @@
+<!doctype html>
+<meta charset="utf-8" />
+<title>Pi WebSocket Viewer</title>
+<style>
+  :root { font-family: system-ui, sans-serif; }
+  body { margin: 24px; }
+  #status { padding: 8px 12px; border-radius: 8px; display: inline-block; }
+  .ok { background: #e7f7ee; color: #136f4a; }
+  .bad { background: #fde7e7; color: #8a1c1c; }
+  .warn { background: #fff5e6; color: #7a4b00; }
+  #latest { margin-top: 16px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; background: #fafafa; }
+  #log { margin-top: 16px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; height: 40vh; overflow: auto; background: #fff; white-space: pre-wrap; }
+  #send { margin-top: 16px; display:flex; gap:8px; }
+  #send textarea { flex:1; height: 80px; }
+</style>
+
+<div>
+  <div id="status" class="warn">connecting…</div>
+</div>
+
+<h3>Latest PI data</h3>
+<pre id="latest">{}</pre>
+
+<h3>Live stream</h3>
+<pre id="log"></pre>
+
+<div id="send">
+  <textarea id="cmd">{ "action": "set_rate", "value": 2 }</textarea>
+  <button id="sendBtn">Send command → Pi</button>
+</div>
+
+<script>
+  // ── 1) SET THESE ─────────────────────────────────────────────────────────────
+  const HOST  = "gcr-ws-482782751069.us-central1.run.app";   // ← your Cloud Run host (no https://, no path)
+  const TOKEN = "M8b4eFJHq2pI3V9nW5r0dE-PLZpQyX7uB1cTa9kN4mE";                 // ← same token the Pi uses
+  // ────────────────────────────────────────────────────────────────────────────
+
+  const statusEl = document.getElementById("status");
+  const logEl = document.getElementById("log");
+  const latestEl = document.getElementById("latest");
+  const cmdEl = document.getElementById("cmd");
+  const sendBtn = document.getElementById("sendBtn");
+
+  const url = `wss://${HOST}/ws?role=app&token=${encodeURIComponent(TOKEN)}`;
+  let ws;
+
+  function setStatus(text, cls) {
+    statusEl.textContent = text;
+    statusEl.className = cls;
+  }
+  function line(s) {
+    logEl.textContent += s + "\n";
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+  function pretty(obj) {
+    try { return JSON.stringify(obj, null, 2); } catch { return String(obj); }
+  }
+
+  function connect() {
+    setStatus("connecting…", "warn");
+    ws = new WebSocket(url);
+
+    ws.onopen = () => setStatus("connected", "ok");
+    ws.onclose = (e) => setStatus(`closed (${e.code})`, "bad");
+    ws.onerror = (e) => { setStatus("error", "bad"); console.error(e); };
+
+    ws.onmessage = (ev) => {
+      let msg = ev.data;
+      try { msg = JSON.parse(ev.data); } catch {}
+      // The server forwards Pi → App as: { type: "data", payload: {...} }
+      if (typeof msg === "object" && msg.type === "data") {
+        latestEl.textContent = pretty(msg.payload);
+        line(`[data] ${pretty(msg.payload)}`);
+      } else {
+        line(typeof msg === "string" ? msg : pretty(msg));
+      }
+    };
+  }
+
+  // send a command to Pis (goes to server, which forwards as {type:"cmd", payload:<your JSON>})
+  sendBtn.onclick = () => {
+    try {
+      const payload = JSON.parse(cmdEl.value);
+      ws?.readyState === 1 ? ws.send(JSON.stringify(payload)) : alert("WebSocket not open");
+    } catch (e) {
+      alert("Command must be valid JSON");
+    }
+  };
+
+  connect();
+</script>

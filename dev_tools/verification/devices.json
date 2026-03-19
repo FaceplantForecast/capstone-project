@@ -3,61 +3,61 @@
   "devices": [
     {
       "name": "Device 1",
-      "token": "TOKEN_FOR_DEVICE_1",
+      "token": "M8b4eFJHq2pI3V9nW5r0dE-PLZpQyX7uB1cTa9kN4mE",
       "device_id": "sim-pi-01",
       "account_id": "account-1"
     },
     {
       "name": "Device 2",
-      "token": "TOKEN_FOR_DEVICE_2",
+      "token": "M8b4eFJHq2pI3V9nW5r0dE-PLZpQyX7uB1cTa9kN4mE",
       "device_id": "sim-pi-02",
       "account_id": "account-1"
     },
     {
       "name": "Device 3",
-      "token": "TOKEN_FOR_DEVICE_3",
+      "token": "M8b4eFJHq2pI3V9nW5r0dE-PLZpQyX7uB1cTa9kN4mE",
       "device_id": "sim-pi-03",
       "account_id": "account-2"
     },
     {
       "name": "Device 4",
-      "token": "TOKEN_FOR_DEVICE_4",
+      "token": "M8b4eFJHq2pI3V9nW5r0dE-PLZpQyX7uB1cTa9kN4mE",
       "device_id": "sim-pi-04",
       "account_id": "account-2"
     },
     {
       "name": "Device 5",
-      "token": "TOKEN_FOR_DEVICE_5",
+      "token": "M8b4eFJHq2pI3V9nW5r0dE-PLZpQyX7uB1cTa9kN4mE",
       "device_id": "sim-pi-05",
       "account_id": "account-3"
     },
     {
       "name": "Device 6",
-      "token": "TOKEN_FOR_DEVICE_6",
+      "token": "M8b4eFJHq2pI3V9nW5r0dE-PLZpQyX7uB1cTa9kN4mE",
       "device_id": "sim-pi-06",
       "account_id": "account-3"
     },
     {
       "name": "Device 7",
-      "token": "TOKEN_FOR_DEVICE_7",
+      "token": "M8b4eFJHq2pI3V9nW5r0dE-PLZpQyX7uB1cTa9kN4mE",
       "device_id": "sim-pi-07",
       "account_id": "account-4"
     },
     {
       "name": "Device 8",
-      "token": "TOKEN_FOR_DEVICE_8",
+      "token": "M8b4eFJHq2pI3V9nW5r0dE-PLZpQyX7uB1cTa9kN4mE",
       "device_id": "sim-pi-08",
       "account_id": "account-4"
     },
     {
       "name": "Device 9",
-      "token": "TOKEN_FOR_DEVICE_9",
+      "token": "M8b4eFJHq2pI3V9nW5r0dE-PLZpQyX7uB1cTa9kN4mE",
       "device_id": "sim-pi-09",
       "account_id": "account-5"
     },
     {
       "name": "Device 10",
-      "token": "TOKEN_FOR_DEVICE_10",
+      "token": "M8b4eFJHq2pI3V9nW5r0dE-PLZpQyX7uB1cTa9kN4mE",
       "device_id": "sim-pi-10",
       "account_id": "account-5"
     }

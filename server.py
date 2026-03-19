@@ -60,6 +60,7 @@ async def _send_message_ws(msg: dict):
     async with websockets.connect(GCP_WSS_URL) as ws:
         await ws.send(json.dumps(msg))
 
+#TODO: change device and account ID away from hard-coded values
 def _build_base_message(msg_type: str, payload: dict):
     """
     Build message into standard format. Valid message types are:
@@ -68,7 +69,9 @@ def _build_base_message(msg_type: str, payload: dict):
     """
     return {
         "msg_type": msg_type,
-        "ts": time.strftime("%m-%d-%Y %H:%M:%S", time.localtime()),
+        "ts_send": time.strftime("%m-%d-%Y %H:%M:%S", time.localtime()),
+        "device_id": "deployed-pi-01",
+        "account_id": "account-1",
         "payload": payload,
     }
 
@@ -93,7 +96,7 @@ def send_fall_flag(probability: float, frame_id: int, ts: float):
         "fall_detected": 1,
         "probability": float(probability),
         "frame_id": int(frame_id),
-        "ts": time.strftime("%m-%d-%Y %H:%M:%S", time.localtime(ts)),
+        "ts_fall": time.strftime("%m-%d-%Y %H:%M:%S", time.localtime(ts)),
     }
     msg = _build_base_message("fall_event", payload)
 

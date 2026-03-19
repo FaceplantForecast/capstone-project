@@ -1,27 +1,10 @@
-"""
-multi_device_simulator.py
-
-GUI tool for simulating multiple independent "pi" devices connected to the
-Faceplant Forecast GCP websocket backend.
-
-This version loads device definitions from a JSON config file instead of
-hardcoding them in the script.
-
-Features:
-- Multiple independently controlled simulated devices
-- Manual connect/disconnect per device
-- Manual fall flag send per device
-- Manual system event send per device
-- Per-device token / device_id / account_id fields loaded from JSON
-- Incoming command log display
-- "Connect All" / "Disconnect All" / "Send Fall From All" controls
-
-Requirements:
-    pip install websockets
-
-Run:
-    python multi_device_simulator.py
-"""
+# ==================================================================================
+# Faceplant Forecast, 2026
+# This code creates a GUI to test 10 simulated devices connecting to the GCP server
+# and sending fall flags in order to verify the functionality of the website and
+# app with multiple connections. Config for each simulated device is stored within
+# devices.json
+# ==================================================================================
 
 import asyncio
 import json
@@ -60,18 +43,20 @@ def make_timestamp(ts: Optional[float] = None) -> str:
     return time.strftime("%m-%d-%Y %H:%M:%S", time.localtime(ts))
 
 
-def build_base_message(msg_type: str, payload: dict) -> dict:
+def build_base_message(msg_type: str, device_id: str, account_id: str, payload: dict) -> dict:
     """
     Build a message in the same top-level shape as your uploaded server.py:
     {
         "msg_type": "...",
-        "ts": "...",
+        "ts_send": "...",
         "payload": {...}
     }
     """
     return {
         "msg_type": msg_type,
-        "ts": make_timestamp(),
+        "ts_send": make_timestamp(),
+        "device_id": device_id,
+        "account_id": account_id,
         "payload": payload,
     }
 
@@ -206,29 +191,27 @@ class SimulatedDevice:
             return f"{base}?role=pi&token={self.cfg.token}"
         return f"{base}?token={self.cfg.token}"
 
-    def build_register_message(self) -> dict:
-        return build_base_message("register", {
-            "role": "pi",
-            "device_id": self.cfg.device_id,
-            "account_id": self.cfg.account_id,
-        })
+    def build_connection_message(self) -> dict:
+        return {
+            "type": "status",
+            "event": "boot_connected",
+            "status": "connected",
+            "device": self.cfg.device_id,
+            "timestamp": make_timestamp(time.time())
+        }
 
     def build_fall_message(self, probability: float, frame_id: int, event_ts: float) -> dict:
-        return build_base_message("fall_event", {
+        return build_base_message("fall_event", self.cfg.device_id, self.cfg.account_id, {
             "fall_detected": 1,
             "probability": float(probability),
             "frame_id": int(frame_id),
-            "ts": make_timestamp(event_ts),
-            "device_id": self.cfg.device_id,
-            "account_id": self.cfg.account_id,
+            "ts_fall": make_timestamp(event_ts),
         })
 
     def build_system_event(self, event_type: str, message: str) -> dict:
-        return build_base_message("system_event", {
+        return build_base_message("system_event", self.cfg.device_id, self.cfg.account_id, {
             "event_type": event_type,
             "message": message,
-            "device_id": self.cfg.device_id,
-            "account_id": self.cfg.account_id,
         })
 
     def connect(self) -> None:
@@ -332,32 +315,31 @@ class SimulatedDevice:
         self._push_log(f"Connecting to {self.websocket_url()}")
 
         try:
-            async with asyncio.timeout(CONNECT_TIMEOUT_SEC):
-                async with websockets.connect(self.websocket_url()) as ws:
-                    self.state.ws = ws
-                    self.state.connecting = False
-                    self.state.connected = True
-                    self._push_status()
-                    self._push_log("Connected.")
+            async with websockets.connect(self.websocket_url()) as ws:
+                self.state.ws = ws
+                self.state.connecting = False
+                self.state.connected = True
+                self._push_status()
+                self._push_log("Connected.")
 
-                    register_msg = self.build_register_message()
-                    await ws.send(json.dumps(register_msg))
-                    self.state.sent_count += 1
-                    self._push_log("Sent register message.")
-                    self._push_status()
+                register_msg = self.build_connection_message()
+                await ws.send(json.dumps(register_msg))
+                self.state.sent_count += 1
+                self._push_log("Sent register message.")
+                self._push_status()
 
-                    while not self.state.stop_requested:
-                        try:
-                            message = await asyncio.wait_for(ws.recv(), timeout=0.25)
-                            self.state.recv_count += 1
-                            self._handle_incoming(message)
-                            self._push_status()
-                        except asyncio.TimeoutError:
-                            continue
-                        except websockets.ConnectionClosed as exc:
-                            self.state.last_error = f"connection closed: code={exc.code}, reason={exc.reason}"
-                            self._push_log(self.state.last_error)
-                            break
+                while not self.state.stop_requested:
+                    try:
+                        message = await asyncio.wait_for(ws.recv(), timeout=0.25)
+                        self.state.recv_count += 1
+                        self._handle_incoming(message)
+                        self._push_status()
+                    except asyncio.TimeoutError:
+                        continue
+                    except websockets.ConnectionClosed as exc:
+                        self.state.last_error = f"connection closed: code={exc.code}, reason={exc.reason}"
+                        self._push_log(self.state.last_error)
+                        break
 
         except TimeoutError:
             self.state.last_error = "connection timeout"
