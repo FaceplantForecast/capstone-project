@@ -53,24 +53,14 @@ RESET_THRESHOLD = 0.05
 ALERT_COOLDOWN_SEC = 8.0   # minimum time between notifications
 REARM_LOW_SEC = 2.0        # must stay <= RESET_THRESHOLD for this long to rearm
 
-# --- NEW: Trend/ramp fall detection (for small spikes like 0.07) ---
+# --- Trend/ramp fall detection (for small spikes like 0.07) ---
 TREND_ENABLE = True
-
-# History window for trend check (number of consecutive p values)
-TREND_WINDOW = 10
-
-# Require total rise across the window (0.02 -> 0.07 is +0.05)
-TREND_MIN_RISE = 0.05
-
-# Require average slope (rise/(window-1)); set ~ TREND_MIN_RISE/(TREND_WINDOW-1)
-TREND_MIN_SLOPE = 0.005
-
-# Require final p to reach at least this (prevents tiny drifts triggering)
-TREND_MIN_END = 0.001
-
-# Allow some noise while still being "mostly increasing"
-TREND_ALLOW_DROPS = 2
-TREND_MIN_UP_STEPS = 6
+TREND_WINDOW = 9        # History window for trend check (number of consecutive p values)
+TREND_MIN_RISE = 0.2    # Require total rise across the window (0.02 -> 0.07 is +0.05)
+TREND_MIN_SLOPE = 0.025 # Require average slope (rise/(window-1)); set ~ TREND_MIN_RISE/(TREND_WINDOW-1)
+TREND_MIN_END = 0.38    # Require final p to reach at least this (prevents tiny drifts triggering)
+TREND_ALLOW_DROPS = 1   # Allow some noise while still being "mostly increasing"
+TREND_MIN_UP_STEPS = 7
 
 # Near-range point removal (radome/self-reflection)
 MIN_RANGE_M = 0.25
@@ -127,12 +117,12 @@ FALL_DETECTED = 0
 # ----------------- Trend detection helper -----------------
 #region Trend Detection
 def is_rising_trend(ps,
-                    window=10,
-                    min_rise=0.05,
-                    min_slope=0.005,
-                    min_end=0.06,
-                    allow_drops=2,
-                    min_up_steps=6):
+                    window=TREND_WINDOW,
+                    min_rise=TREND_MIN_RISE,
+                    min_slope=TREND_MIN_SLOPE,
+                    min_end=TREND_MIN_END,
+                    allow_drops=TREND_ALLOW_DROPS,
+                    min_up_steps=TREND_MIN_UP_STEPS):
     """
     Detect a non-random rising ramp in probability history.
 
