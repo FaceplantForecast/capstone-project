@@ -15,11 +15,11 @@ import json
 
 # ----------------- CONFIG -----------------
 
-CFG_PORT = "COM5"
+CFG_PORT = "COM6"
 CFG_BAUD = 115200
 CFG_FILE = "radar_profile.cfg"
 
-UART_PORT = "COM6"
+UART_PORT = "COM3"
 UART_BAUD = 3125000
 
 WINDOW_SIZE = 48
