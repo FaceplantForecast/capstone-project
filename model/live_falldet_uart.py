@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-#commit test
-import struct
+
 import time
 import collections
 import numpy as np
@@ -12,8 +11,11 @@ import asyncio
 import websockets
 import json
 
-
-# ----------------- CONFIG -----------------
+from mmwave_parser import (
+    parser_helper,
+    parser_one_mmw_demo_output_packet,
+    getUint32,
+)
 
 CFG_PORT = "COM6"
 CFG_BAUD = 115200
@@ -31,104 +33,73 @@ FEATURE_KEYS = [
 TFLITE_MODEL_PATH = "model.tflite"
 SCALER_PATH = "scaler.npz"
 
-FALL_THRESHOLD = 0.5
-RESET_THRESHOLD = 0.05
+FALL_THRESHOLD = 0.95
+RESET_THRESHOLD = 0.5
 
-# --- alert spam control ---
-ALERT_COOLDOWN_SEC = 8.0   # minimum time between notifications
-REARM_LOW_SEC = 2.0        # must stay <= RESET_THRESHOLD for this long to rearm
+ALERT_COOLDOWN_SEC = 8.0
+REARM_LOW_SEC = 2.0
 
-# --- NEW: Trend/ramp fall detection (for small spikes like 0.07) ---
-TREND_ENABLE = True
+TREND_ENABLE = False
+TREND_WINDOW = 9
+TREND_MIN_RISE = 0.2
+TREND_MIN_SLOPE = 0.025
+TREND_MIN_END = 0.38
+TREND_ALLOW_DROPS = 1
+TREND_MIN_UP_STEPS = 7
 
-# History window for trend check (number of consecutive p values)
-TREND_WINDOW = 10
-
-# Require total rise across the window (0.02 -> 0.07 is +0.05)
-TREND_MIN_RISE = 0.05
-
-# Require average slope (rise/(window-1)); set ~ TREND_MIN_RISE/(TREND_WINDOW-1)
-TREND_MIN_SLOPE = 0.005
-
-# Require final p to reach at least this (prevents tiny drifts triggering)
-TREND_MIN_END = 0.001
-
-# Allow some noise while still being "mostly increasing"
-TREND_ALLOW_DROPS = 2
-TREND_MIN_UP_STEPS = 6
-
-# Near-range point removal (radome/self-reflection)
 MIN_RANGE_M = 0.25
 
-# --- SNR filtering (on snr_adj) ---
 SNR_THRESHOLD_ADJ = 3.5
 SNR_RELAX_DB = 3.0
 MIN_POINTS_AFTER_SNR = 8
-SNR_CLIP_MAX = 200.0
+SNR_CLIP_MAX = 5.0
 
-# --- Clustering knobs ---
 DBSCAN_EPS_CANDIDATES = [0.25, 0.30, 0.36, 0.42, 0.50, 0.60]
 DBSCAN_MIN_SAMPLES_FRAC = 0.06
 DBSCAN_MIN_SAMPLES_MIN = 4
 DBSCAN_MIN_SAMPLES_MAX = 12
 MIN_POINTS_FALLBACK_ALL = 25
 
-# --- Human-ish gating ---
 MIN_HEIGHT_M = 0.15
 MAX_SPREAD_XY_M = 3.5
-MAX_RANGE_FOR_PERSON_M = 10.0  # set None to disable
+MAX_RANGE_FOR_PERSON_M = None
 
-# --- Temporal tracking ---
 TRACK_MAX_DIST_M = 0.75
 TRACK_BONUS = 1.0
 
-# --- Centroid smoothing ---
 CENTROID_EMA_ALPHA = 0.35
 
-# --- Window gating ---
 MIN_POINTS_FOR_WINDOW = 5
 REQUIRE_HEIGHT_FOR_WINDOW = False
 
-# --- Debug / logging ---
 DEBUG = False
 MISS_PRINT_EVERY = 20
 HEALTH_PRINT_EVERY_SEC = 5.0
 
-# --- Background capture ---
-BACKGROUND_WAIT_SEC = 10           # give people time to leave
-BACKGROUND_CAPTURE_SEC = 10        # capture empty-room data for this long
-BACKGROUND_MIN_FRAMES = 80         # minimum frames to accept baseline
+BACKGROUND_WAIT_SEC = 10
+BACKGROUND_CAPTURE_SEC = 10
+BACKGROUND_MIN_FRAMES = 80
 BG_BIN_SIZE_M = 0.15
 BG_MAX_RANGE_M = 20.0
 
-# Gain correction (still useful after background subtraction)
-TARGET_MEDIAN_SNR = 10.0
+TARGET_MEDIAN_SNR = 100.0
 GAIN_ALPHA = 0.03
 MAX_GAIN = 5.0
 
 FALL_DETECTED = 0
 
-# GCP endpoint + auth token
 BASE_GCP_URL = "gcr-ws-482782751069.us-central1.run.app/ws"
 AUTH_TOKEN = "M8b4eFJHq2pI3V9nW5r0dE-PLZpQyX7uB1cTa9kN4mE"
 GCP_WSS_URL = f"wss://{BASE_GCP_URL}?role=pi&token={AUTH_TOKEN}"
 
 
-# ----------------- Trend detection helper -----------------
-
 def is_rising_trend(ps,
-                    window=10,
-                    min_rise=0.05,
-                    min_slope=0.005,
-                    min_end=0.06,
-                    allow_drops=2,
-                    min_up_steps=6):
-    """
-    Detect a non-random rising ramp in probability history.
-
-    ps: list/deque of recent p values (oldest -> newest)
-    True if it looks like a real ramp instead of jitter.
-    """
+                    window=TREND_WINDOW,
+                    min_rise=TREND_MIN_RISE,
+                    min_slope=TREND_MIN_SLOPE,
+                    min_end=TREND_MIN_END,
+                    allow_drops=TREND_ALLOW_DROPS,
+                    min_up_steps=TREND_MIN_UP_STEPS):
     if len(ps) < window:
         return False
 
@@ -157,16 +128,7 @@ def is_rising_trend(ps,
     return True
 
 
-# ----------------- Background Snapshot Compensator -----------------
-
 class BackgroundSnapshotCompensator:
-    """
-    Two-phase compensator:
-      Phase A (capture): accumulate per-bin SNR samples and build fixed bg_snr[bin] = median.
-      Phase B (run): subtract fixed bg_snr[bin] from incoming SNR and apply gain correction.
-
-    This ensures "background" doesn't learn the person.
-    """
     def __init__(
         self,
         bin_size_m=BG_BIN_SIZE_M,
@@ -199,6 +161,7 @@ class BackgroundSnapshotCompensator:
         y = np.asarray(y, dtype=np.float32)
         z = np.asarray(z, dtype=np.float32)
         snr = np.asarray(snr, dtype=np.float32)
+
         if snr.size == 0:
             return
 
@@ -245,14 +208,13 @@ class BackgroundSnapshotCompensator:
 BG_COMP = BackgroundSnapshotCompensator()
 
 
-# ----------------- TFLite + scaler -----------------
-
 def load_tflite_model(path: str):
     interpreter = tf.lite.Interpreter(model_path=path)
     interpreter.allocate_tensors()
     in_info = interpreter.get_input_details()[0]
     out_info = interpreter.get_output_details()[0]
     return interpreter, in_info["index"], out_info["index"]
+
 
 def load_scaler(path: str):
     if not os.path.exists(path):
@@ -263,8 +225,10 @@ def load_scaler(path: str):
     scale = np.where(scale == 0, 1.0, scale).astype(np.float32)
     return mean, scale
 
+
 interpreter, input_index, output_index = load_tflite_model(TFLITE_MODEL_PATH)
 SCALER_MEAN, SCALER_SCALE = load_scaler(SCALER_PATH)
+
 
 def run_inference(window_array: np.ndarray) -> float:
     arr = window_array.astype(np.float32)
@@ -274,8 +238,6 @@ def run_inference(window_array: np.ndarray) -> float:
     interpreter.invoke()
     return float(interpreter.get_tensor(output_index)[0][0])
 
-
-# ----------------- Radar control helpers -----------------
 
 def send_cfg(cfg_port, cfg_baud, cfg_file):
     print(f"[CFG] Opening {cfg_port} @ {cfg_baud} ...")
@@ -303,6 +265,7 @@ def send_cfg(cfg_port, cfg_baud, cfg_file):
     ser.close()
     print("[CFG] Radar started.")
 
+
 def send_sensor_stop(cfg_port, cfg_baud):
     try:
         ser = serial.Serial(cfg_port, baudrate=cfg_baud, timeout=1.0)
@@ -315,12 +278,51 @@ def send_sensor_stop(cfg_port, cfg_baud):
         print("[CFG] Stop failed:", e)
 
 
-# ----------------- Clustering helpers -----------------
+def preprocess_frame_like_dataset(frame, use_background_subtraction=True):
+    x = frame["x"]
+    y = frame["y"]
+    z = frame["z"]
+    doppler = frame["doppler"]
+    snr = frame["snr"]
+
+    if snr.size == 0:
+        return None
+
+    r = np.sqrt(x * x + y * y + z * z)
+    mask_r = r >= MIN_RANGE_M
+
+    if not np.any(mask_r):
+        return None
+
+    x_f = x[mask_r]
+    y_f = y[mask_r]
+    z_f = z[mask_r]
+    doppler_f = doppler[mask_r]
+    snr_f = snr[mask_r]
+
+    if use_background_subtraction:
+        snr_adj = BG_COMP.clean_snr(x_f, y_f, z_f, snr_f)
+    else:
+        snr_adj = snr_f.astype(np.float32)
+
+    if SNR_CLIP_MAX is not None:
+        snr_adj = np.clip(snr_adj, 0.0, float(SNR_CLIP_MAX))
+
+    return {
+        "x": x_f,
+        "y": y_f,
+        "z": z_f,
+        "doppler": doppler_f,
+        "snr": snr_f,
+        "snr_adj": snr_adj,
+    }
+
 
 def _adaptive_min_samples(n_pts: int) -> int:
     ms = int(np.ceil(DBSCAN_MIN_SAMPLES_FRAC * n_pts))
     ms = max(DBSCAN_MIN_SAMPLES_MIN, min(DBSCAN_MIN_SAMPLES_MAX, ms))
     return ms
+
 
 def _dbscan_sweep(pts, eps_list, min_samples):
     for eps in eps_list:
@@ -328,6 +330,7 @@ def _dbscan_sweep(pts, eps_list, min_samples):
         if np.any(labels != -1):
             return labels
     return np.full(len(pts), -1, dtype=int)
+
 
 def cluster_frame_points(points_xyz):
     n = len(points_xyz)
@@ -345,6 +348,7 @@ def cluster_frame_points(points_xyz):
     labels = _dbscan_sweep(pts_xy, [e * 1.15 for e in DBSCAN_EPS_CANDIDATES], ms)
     return labels
 
+
 def _cluster_stats(pts):
     cx, cy, cz = pts.mean(axis=0)
     height = float(pts[:, 2].max() - pts[:, 2].min())
@@ -354,6 +358,7 @@ def _cluster_stats(pts):
     ))
     r = float(np.sqrt(cx * cx + cy * cy + cz * cz))
     return cx, cy, cz, height, spread_xy, r
+
 
 def pick_person_cluster(points_xyz, labels, prev_centroid=None):
     n = len(points_xyz)
@@ -414,8 +419,6 @@ def pick_person_cluster(points_xyz, labels, prev_centroid=None):
     return labels == best_label
 
 
-# ----------------- Feature computation -----------------
-
 class TrackState:
     def __init__(self):
         self.prev_feat = None
@@ -427,27 +430,42 @@ class TrackState:
         else:
             px, py, pz = self.prev_centroid_ema
             a = CENTROID_EMA_ALPHA
-            self.prev_centroid_ema = (a * cx + (1 - a) * px,
-                                      a * cy + (1 - a) * py,
-                                      a * cz + (1 - a) * pz)
+            self.prev_centroid_ema = (
+                a * cx + (1 - a) * px,
+                a * cy + (1 - a) * py,
+                a * cz + (1 - a) * pz
+            )
         return self.prev_centroid_ema
 
 
 def compute_frame_features(frame, track: TrackState):
-    x, y, z, doppler, snr, t = (
-        frame["x"], frame["y"], frame["z"],
-        frame["doppler"], frame["snr"], frame["timestamp"]
+    t = frame["timestamp"]
+
+    default_feat = dict(
+        cx=0.0,
+        cy=0.0,
+        cz=0.0,
+        height=0.0,
+        spread_xy=0.0,
+        mean_doppler=0.0,
+        num_points=0,
+        timestamp=float(t),
+        vx=0.0,
+        vy=0.0,
+        vz=0.0,
+        speed=0.0,
     )
 
-    r = np.sqrt(x * x + y * y + z * z)
-    mask_r = r >= MIN_RANGE_M
-    if not np.any(mask_r):
-        return None
-    x, y, z, doppler, snr = x[mask_r], y[mask_r], z[mask_r], doppler[mask_r], snr[mask_r]
+    pre = preprocess_frame_like_dataset(frame, use_background_subtraction=True)
+    if pre is None:
+        track.prev_feat = default_feat
+        return default_feat
 
-    snr_adj = BG_COMP.clean_snr(x, y, z, snr)
-    if SNR_CLIP_MAX is not None:
-        snr_adj = np.clip(snr_adj, 0.0, float(SNR_CLIP_MAX))
+    x = pre["x"]
+    y = pre["y"]
+    z = pre["z"]
+    doppler = pre["doppler"]
+    snr_adj = pre["snr_adj"]
 
     def _apply_thr(thr: float):
         mask = snr_adj > thr
@@ -459,8 +477,11 @@ def compute_frame_features(frame, track: TrackState):
         return pts, dd
 
     out = _apply_thr(SNR_THRESHOLD_ADJ)
+
     if out is None:
-        return None
+        track.prev_feat = default_feat
+        return default_feat
+
     points_xyz, dop_f = out
 
     if len(points_xyz) < MIN_POINTS_AFTER_SNR and SNR_RELAX_DB > 0:
@@ -469,14 +490,17 @@ def compute_frame_features(frame, track: TrackState):
             points_xyz, dop_f = out2
 
     if len(points_xyz) == 0:
-        return None
+        track.prev_feat = default_feat
+        return default_feat
 
     labels = cluster_frame_points(points_xyz)
 
     prev_centroid = track.prev_centroid_ema if track.prev_centroid_ema is not None else None
     person_mask = pick_person_cluster(points_xyz, labels, prev_centroid=prev_centroid)
+
     if not np.any(person_mask):
-        return None
+        track.prev_feat = default_feat
+        return default_feat
 
     pts = points_xyz[person_mask]
     dop = dop_f[person_mask]
@@ -484,13 +508,15 @@ def compute_frame_features(frame, track: TrackState):
     cx, cy, cz, height, spread_xy, _ = _cluster_stats(pts)
 
     if height < MIN_HEIGHT_M or spread_xy > MAX_SPREAD_XY_M:
-        if not DEBUG:
-            return None
+        track.prev_feat = default_feat
+        return default_feat
 
     cx_s, cy_s, cz_s = track.update_centroid_ema(float(cx), float(cy), float(cz))
 
     feat = dict(
-        cx=float(cx_s), cy=float(cy_s), cz=float(cz_s),
+        cx=float(cx_s),
+        cy=float(cy_s),
+        cz=float(cz_s),
         height=float(height),
         spread_xy=float(spread_xy),
         mean_doppler=float(np.mean(dop)) if dop.size else 0.0,
@@ -513,163 +539,102 @@ def compute_frame_features(frame, track: TrackState):
     return feat
 
 
-# ----------------- UART parsing (BUFFERED) -----------------
-
-MAGIC_WORD = b'\x02\x01\x04\x03\x06\x05\x08\x07'
-HEADER_LEN = 40
-
-def get_uint16(b: bytes) -> int:
-    return int.from_bytes(b, byteorder="little", signed=False)
-
-class UARTFrameParser:
-    def __init__(self):
-        self.buf = bytearray()
-
-    def feed(self, data: bytes):
-        if data:
-            self.buf.extend(data)
-
-    def _discard_until_magic(self) -> bool:
-        idx = self.buf.find(MAGIC_WORD)
-        if idx == -1:
-            keep = len(MAGIC_WORD) - 1
-            if len(self.buf) > keep:
-                self.buf = self.buf[-keep:]
-            return False
-        if idx > 0:
-            del self.buf[:idx]
-        return True
-
-    def next_frame(self):
-        if not self._discard_until_magic():
-            return None
-        if len(self.buf) < HEADER_LEN:
-            return None
-
-        totalPacketLen = int.from_bytes(self.buf[12:16], "little", signed=False)
-        if totalPacketLen < HEADER_LEN or totalPacketLen > 65535:
-            del self.buf[:1]
-            return None
-        if len(self.buf) < totalPacketLen:
-            return None
-
-        pkt = bytes(self.buf[:totalPacketLen])
-        del self.buf[:totalPacketLen]
-
-        header = pkt[:HEADER_LEN]
-        payload = pkt[HEADER_LEN:]
-
-        (
-            version,
-            totalPacketLen2,
-            platform,
-            frameNumber,
-            timeCpuCycles,
-            numDetectedObj,
-            numTLVs,
-            subFrameNumber
-        ) = struct.unpack('<IIIIIIII', header[8:8 + 32])
-
-        xs, ys, zs, vs = [], [], [], []
-        snrs = []
-
-        offset = 0
-        for _ in range(numTLVs):
-            if offset + 8 > len(payload):
-                break
-            tlv_type, tlv_len = struct.unpack('<II', payload[offset:offset + 8])
-            offset += 8
-
-            tlv_payload = payload[offset:offset + tlv_len]
-            offset += tlv_len
-
-            if tlv_type == 1 and numDetectedObj > 0:
-                point_size = 16
-                expected = numDetectedObj * point_size
-                if len(tlv_payload) < expected:
-                    return None
-                for i in range(numDetectedObj):
-                    start = i * point_size
-                    x, y, z, v = struct.unpack('<ffff', tlv_payload[start:start + point_size])
-                    xs.append(float(x))
-                    ys.append(float(y))
-                    zs.append(float(z))
-                    vs.append(float(v))
-
-            elif tlv_type == 7 and numDetectedObj > 0:
-                point_size = 4
-                expected = numDetectedObj * point_size
-                usable = min(len(tlv_payload), expected)
-                for i in range(usable // point_size):
-                    start = i * point_size
-                    snr = get_uint16(tlv_payload[start:start + 2])
-                    snrs.append(float(snr))
-
-        n = len(xs)
-        if len(snrs) < n:
-            snrs.extend([0.0] * (n - len(snrs)))
-
-        detections = []
-        for i in range(n):
-            detections.append({
-                "x": xs[i],
-                "y": ys[i],
-                "z": zs[i],
-                "doppler": vs[i],
-                "snr": snrs[i],
-            })
-
-        ts = time.time()
-        return frameNumber, ts, detections
-
-
 def uart_frame_stream(port, baud):
-    ser = serial.Serial(
-        port=port,
-        baudrate=baud,
-        timeout=0.01,
-        bytesize=serial.EIGHTBITS,
-        parity=serial.PARITY_NONE,
-        stopbits=serial.STOPBITS_ONE,
-        rtscts=False,
-        dsrdtr=False,
-    )
-    ser.reset_input_buffer()
+    ser = serial.Serial(port=port, baudrate=baud, timeout=0.1)
     print(f"[UART] Listening on {port} @ {baud}")
 
-    parser = UARTFrameParser()
+    buf = bytearray()
 
-    read_size = 16384
-    last_tune = time.time()
+    try:
+        while True:
+            chunk = ser.read(4096)
+            if chunk:
+                buf.extend(chunk)
 
-    while True:
-        chunk = ser.read(read_size)
-        if chunk:
-            parser.feed(chunk)
+            while True:
+                if len(buf) < 40:
+                    break
 
-        now = time.time()
-        if now - last_tune > 2.0:
-            read_size = 8192 if read_size == 16384 else 16384
-            last_tune = now
+                try:
+                    headerStartIndex, totalPacketNumBytes, numDetObj, numTlv, subFrameNumber = \
+                        parser_helper(buf, len(buf), debug=False)
+                except Exception as e:
+                    if DEBUG:
+                        print(f"[PARSE WARN] parser_helper failed: {e}")
 
-        out = parser.next_frame()
-        if out is None:
-            continue
+                    if len(buf) > 8192:
+                        buf = buf[-8192:]
+                    elif len(buf) > 1:
+                        buf = buf[1:]
+                    else:
+                        buf = bytearray()
+                    break
 
-        fid, ts, dets = out
-        if not dets:
-            continue
+                if headerStartIndex == -1 or totalPacketNumBytes <= 0:
+                    if len(buf) > 8192:
+                        buf = buf[-8192:]
+                    break
 
-        x = np.array([d["x"] for d in dets], dtype=np.float32)
-        y = np.array([d["y"] for d in dets], dtype=np.float32)
-        z = np.array([d["z"] for d in dets], dtype=np.float32)
-        dop = np.array([d["doppler"] for d in dets], dtype=np.float32)
-        snr = np.array([d["snr"] for d in dets], dtype=np.float32)
+                if len(buf) < headerStartIndex + totalPacketNumBytes:
+                    break
 
-        yield dict(frame_id=fid, timestamp=ts, x=x, y=y, z=z, doppler=dop, snr=snr)
+                frame_bytes = buf[headerStartIndex: headerStartIndex + totalPacketNumBytes]
+                buf = buf[headerStartIndex + totalPacketNumBytes:]
 
+                try:
+                    (result,
+                     hdrIdx2,
+                     totalBytes2,
+                     numDetObj2,
+                     numTlv2,
+                     subFrameNumber2,
+                     detectedX_array,
+                     detectedY_array,
+                     detectedZ_array,
+                     detectedV_array,
+                     detectedRange_array,
+                     detectedAzimuth_array,
+                     detectedElevAngle_array,
+                     detectedSNR_array,
+                     detectedNoise_array) = parser_one_mmw_demo_output_packet(
+                        frame_bytes,
+                        len(frame_bytes),
+                        debug=False,
+                    )
+                except Exception as e:
+                    if DEBUG:
+                        print(f"[PARSE WARN] packet parse failed: {e}")
+                    continue
 
-# ----------------- Background Capture Phase -----------------
+                if result != 0:
+                    continue
+
+                try:
+                    frame_id = getUint32(frame_bytes[20:24])
+                except Exception:
+                    frame_id = -1
+
+                ts = time.time()
+
+                x = np.asarray(detectedX_array, dtype=np.float32)
+                y = np.asarray(detectedY_array, dtype=np.float32)
+                z = np.asarray(detectedZ_array, dtype=np.float32)
+                doppler = np.asarray(detectedV_array, dtype=np.float32)
+                snr = np.asarray(detectedSNR_array, dtype=np.float32)
+
+                yield {
+                    "frame_id": frame_id,
+                    "timestamp": ts,
+                    "x": x,
+                    "y": y,
+                    "z": z,
+                    "doppler": doppler,
+                    "snr": snr,
+                }
+    finally:
+        ser.close()
+        print("[UART] Closed.")
+
 
 def build_background_from_stream(stream):
     print(f"\n[BG] Please clear the room. Waiting {BACKGROUND_WAIT_SEC} seconds...")
@@ -684,7 +649,15 @@ def build_background_from_stream(stream):
 
     while time.time() - start < BACKGROUND_CAPTURE_SEC:
         frame = next(stream)
-        x, y, z, snr = frame["x"], frame["y"], frame["z"], frame["snr"]
+
+        x = frame["x"]
+        y = frame["y"]
+        z = frame["z"]
+        snr = frame["snr"]
+
+        if snr.size == 0:
+            frames += 1
+            continue
 
         r = np.sqrt(x * x + y * y + z * z)
         mask_r = r >= MIN_RANGE_M
@@ -696,16 +669,16 @@ def build_background_from_stream(stream):
         pts_total += int(snr.size)
 
     if frames < BACKGROUND_MIN_FRAMES:
-        print(f"[BG WARN] Only captured {frames} frames (<{BACKGROUND_MIN_FRAMES}). "
-              f"Background may be weak. Consider increasing BACKGROUND_CAPTURE_SEC.")
+        print(
+            f"[BG WARN] Only captured {frames} frames (<{BACKGROUND_MIN_FRAMES}). "
+            f"Background may be weak. Consider increasing BACKGROUND_CAPTURE_SEC."
+        )
     else:
         print(f"[BG] Captured {frames} frames, pts_total={pts_total}")
 
     BG_COMP.build_background()
     print("[BG] Background baseline built. Beginning live inference.\n")
 
-
-# ----------------- GCP flag sender (WSS) -----------------
 
 async def _send_fall_flag_ws(probability: float, frame_id: int, ts: float):
     msg = {
@@ -723,14 +696,13 @@ async def _send_fall_flag_ws(probability: float, frame_id: int, ts: float):
     except Exception as e:
         print(f"[GCP] Failed to send fall flag via WSS: {e}")
 
+
 def send_fall_flag(probability: float, frame_id: int, ts: float):
     try:
         asyncio.run(_send_fall_flag_ws(probability, frame_id, ts))
     except RuntimeError as e:
         print(f"[GCP] asyncio runtime error: {e}")
 
-
-# ----------------- Live loop -----------------
 
 def live_loop(stream):
     global FALL_DETECTED
@@ -743,11 +715,9 @@ def live_loop(stream):
     valid_frames = 0
     last_health = time.time()
 
-    # anti-spam state
     last_alert_ts = -1e9
     low_start_ts = None
 
-    # --- NEW: probability history for trend detection ---
     p_hist = collections.deque(maxlen=50)
 
     print("[LIVE] Starting fall detection...")
@@ -756,19 +726,13 @@ def live_loop(stream):
         total_frames += 1
         feat = compute_frame_features(frame, track)
 
-        if feat is None:
+        if feat["num_points"] <= 0:
             miss_count += 1
             if DEBUG or (miss_count % MISS_PRINT_EVERY == 0):
                 print(f"        (no valid person cluster) misses={miss_count}")
-            continue
-
-        valid_frames += 1
-        miss_count = 0
-
-        if feat["num_points"] < MIN_POINTS_FOR_WINDOW:
-            continue
-        if REQUIRE_HEIGHT_FOR_WINDOW and feat["height"] < MIN_HEIGHT_M:
-            continue
+        else:
+            valid_frames += 1
+            miss_count = 0
 
         vec = np.array([feat[k] for k in FEATURE_KEYS], np.float32)
         window.append(vec)
@@ -788,7 +752,6 @@ def live_loop(stream):
         ts_now = frame["timestamp"]
         p_hist.append(p)
 
-        # rearm only after sustained low
         if p <= RESET_THRESHOLD:
             if low_start_ts is None:
                 low_start_ts = ts_now
@@ -797,7 +760,6 @@ def live_loop(stream):
         else:
             low_start_ts = None
 
-        # --- triggers ---
         abs_trigger = (p > FALL_THRESHOLD)
 
         trend_trigger = False
@@ -809,9 +771,8 @@ def live_loop(stream):
                 min_slope=TREND_MIN_SLOPE,
                 min_end=TREND_MIN_END,
                 allow_drops=TREND_ALLOW_DROPS,
-                min_up_steps=TREND_MIN_UP_STEPS,
+                min_up_steps=max(TREND_MIN_UP_STEPS, TREND_WINDOW / 2),
             )
-
         should_alert = abs_trigger or trend_trigger
 
         if should_alert:
@@ -826,8 +787,6 @@ def live_loop(stream):
         else:
             print(f"[INFO] p_fall={p:.3f}")
 
-
-# ----------------- Main -----------------
 
 if __name__ == "__main__":
     try:
