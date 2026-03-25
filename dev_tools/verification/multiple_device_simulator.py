@@ -37,7 +37,7 @@ CONNECT_TIMEOUT_SEC = 8
 # ============================================================
 
 def make_timestamp(ts: Optional[float] = None) -> str:
-    """Return timestamp in the same format as your current server code."""
+    """Return timestamp in the same human-readable format."""
     if ts is None:
         ts = time.time()
     return time.strftime("%m-%d-%Y %H:%M:%S", time.localtime(ts))
@@ -45,10 +45,12 @@ def make_timestamp(ts: Optional[float] = None) -> str:
 
 def build_base_message(msg_type: str, device_id: str, account_id: str, payload: dict) -> dict:
     """
-    Build a message in the same top-level shape as your uploaded server.py:
+    Build the "normal" message shape used by the simulator for fall/system events:
     {
         "msg_type": "...",
         "ts_send": "...",
+        "device_id": "...",
+        "account_id": "...",
         "payload": {...}
     }
     """
@@ -88,6 +90,7 @@ class DeviceRuntimeState:
     last_error: str = ""
     sent_count: int = 0
     recv_count: int = 0
+    power_state: str = "wall"
 
 
 # ============================================================
@@ -179,6 +182,7 @@ class SimulatedDevice:
             "last_error": self.state.last_error,
             "sent_count": self.state.sent_count,
             "recv_count": self.state.recv_count,
+            "power_state": self.state.power_state,
         }))
 
     def websocket_url(self) -> str:
@@ -191,14 +195,52 @@ class SimulatedDevice:
             return f"{base}?role=pi&token={self.cfg.token}"
         return f"{base}?token={self.cfg.token}"
 
+    # ------------------------------------------------------------
+    # Status-style messages
+    # ------------------------------------------------------------
+
     def build_connection_message(self) -> dict:
+        """
+        Message sent right after the websocket opens so the backend knows
+        the simulated device is online.
+        """
         return {
             "type": "status",
             "event": "boot_connected",
             "status": "connected",
             "device": self.cfg.device_id,
-            "timestamp": make_timestamp(time.time())
+            "timestamp": time.time()
         }
+
+    def build_disconnect_message(self) -> dict:
+        """
+        Status-style message sent before the websocket is closed so the
+        backend can see that this device intentionally disconnected.
+        """
+        return {
+            "type": "status",
+            "event": "boot_connected",
+            "status": "disconnected",
+            "device": self.cfg.device_id,
+            "timestamp": time.time()
+        }
+
+    def build_power_state_message(self, on_wall_power: bool) -> dict:
+        """
+        Power state messages have a different structure from the normal
+        fall/system messages.
+        """
+        return {
+            "type": "status",
+            "event": "power_state",
+            "status": "System on Wall Power" if on_wall_power else "System on Battery Backup",
+            "device": self.cfg.device_id,
+            "timestamp": time.time()
+        }
+
+    # ------------------------------------------------------------
+    # Normal simulator messages
+    # ------------------------------------------------------------
 
     def build_fall_message(self, probability: float, frame_id: int, event_ts: float) -> dict:
         return build_base_message("fall_event", self.cfg.device_id, self.cfg.account_id, {
@@ -214,6 +256,10 @@ class SimulatedDevice:
             "message": message,
         })
 
+    # ------------------------------------------------------------
+    # Connection control
+    # ------------------------------------------------------------
+
     def connect(self) -> None:
         """Start background thread and connect if not already running."""
         if self.state.connected or self.state.connecting:
@@ -228,7 +274,13 @@ class SimulatedDevice:
         self.state.thread.start()
 
     def disconnect(self) -> None:
-        """Request disconnect from websocket and stop the loop."""
+        """
+        Request disconnect from websocket and stop the loop.
+
+        The actual disconnect path now tries to:
+          1. send a disconnect status message
+          2. close the websocket cleanly
+        """
         self.state.stop_requested = True
 
         if self.state.loop is not None:
@@ -237,6 +289,10 @@ class SimulatedDevice:
             except Exception as exc:
                 self.state.last_error = f"disconnect scheduling error: {exc}"
                 self._push_status()
+
+    # ------------------------------------------------------------
+    # Manual event senders
+    # ------------------------------------------------------------
 
     def send_fall(self, probability: Optional[float] = None) -> None:
         """Send a manual fall flag."""
@@ -278,6 +334,37 @@ class SimulatedDevice:
             self._push_log(self.state.last_error)
             self._push_status()
 
+    def send_power_state(self, on_wall_power: bool) -> None:
+        """
+        Send a manual power-state notification using the alternate status message format.
+        """
+        if not self.state.connected or self.state.loop is None:
+            self._push_log("Cannot send power_state: device is not connected.")
+            return
+
+        msg = self.build_power_state_message(on_wall_power=on_wall_power)
+
+        try:
+            fut = asyncio.run_coroutine_threadsafe(self._async_send(msg), self.state.loop)
+            fut.result(timeout=5)
+
+            self.state.power_state = "wall" if on_wall_power else "battery"
+            self._push_status()
+
+            if on_wall_power:
+                self._push_log("Sent power_state: System on Wall Power")
+            else:
+                self._push_log("Sent power_state: System on Battery Backup")
+
+        except Exception as exc:
+            self.state.last_error = f"send power_state error: {exc}"
+            self._push_log(self.state.last_error)
+            self._push_status()
+
+    # ------------------------------------------------------------
+    # Thread / async internals
+    # ------------------------------------------------------------
+
     def _thread_main(self) -> None:
         """Create a dedicated event loop for this device thread."""
         loop = asyncio.new_event_loop()
@@ -315,17 +402,34 @@ class SimulatedDevice:
         self._push_log(f"Connecting to {self.websocket_url()}")
 
         try:
-            async with websockets.connect(self.websocket_url()) as ws:
+            async with websockets.connect(
+                self.websocket_url(),
+                open_timeout=CONNECT_TIMEOUT_SEC
+            ) as ws:
                 self.state.ws = ws
                 self.state.connecting = False
                 self.state.connected = True
                 self._push_status()
                 self._push_log("Connected.")
 
+                # Send initial "connected" status
                 register_msg = self.build_connection_message()
                 await ws.send(json.dumps(register_msg))
                 self.state.sent_count += 1
                 self._push_log("Sent register message.")
+                self._push_status()
+
+                # Optionally also send the current simulated power state immediately
+                # so the backend knows what state the device starts in.
+                initial_power_msg = self.build_power_state_message(
+                    on_wall_power=(self.state.power_state == "wall")
+                )
+                await ws.send(json.dumps(initial_power_msg))
+                self.state.sent_count += 1
+                self._push_log(
+                    "Sent initial power_state: "
+                    + ("System on Wall Power" if self.state.power_state == "wall" else "System on Battery Backup")
+                )
                 self._push_status()
 
                 while not self.state.stop_requested:
@@ -364,8 +468,21 @@ class SimulatedDevice:
         self._push_status()
 
     async def _async_disconnect(self) -> None:
-        """Gracefully close websocket if open."""
+        """
+        Gracefully disconnect:
+          1. send disconnect status notification
+          2. close websocket
+        """
         if self.state.ws is not None:
+            try:
+                disconnect_msg = self.build_disconnect_message()
+                await self.state.ws.send(json.dumps(disconnect_msg))
+                self.state.sent_count += 1
+                self._push_log("Sent disconnect status message.")
+                self._push_status()
+            except Exception as exc:
+                self._push_log(f"Could not send disconnect message: {exc}")
+
             try:
                 await self.state.ws.close()
             except Exception:
@@ -416,15 +533,23 @@ class DeviceRow:
         self.stats_label = ttk.Label(self.frame, textvariable=self.stats_var, width=12)
         self.stats_label.grid(row=0, column=4, padx=6)
 
+        self.power_var = tk.StringVar(value="Wall")
+        self.power_label = ttk.Label(self.frame, textvariable=self.power_var, width=10)
+        self.power_label.grid(row=0, column=5, padx=6)
+
         self.connect_btn = ttk.Button(self.frame, text="Connect", command=self.on_connect)
         self.disconnect_btn = ttk.Button(self.frame, text="Disconnect", command=self.on_disconnect)
         self.fall_btn = ttk.Button(self.frame, text="Send Fall", command=self.on_send_fall)
         self.system_btn = ttk.Button(self.frame, text="Send System", command=self.on_send_system)
+        self.wall_btn = ttk.Button(self.frame, text="Wall Power", command=self.on_wall_power)
+        self.battery_btn = ttk.Button(self.frame, text="Battery", command=self.on_battery_power)
 
-        self.connect_btn.grid(row=0, column=5, padx=2)
-        self.disconnect_btn.grid(row=0, column=6, padx=2)
-        self.fall_btn.grid(row=0, column=7, padx=2)
-        self.system_btn.grid(row=0, column=8, padx=2)
+        self.connect_btn.grid(row=0, column=6, padx=2)
+        self.disconnect_btn.grid(row=0, column=7, padx=2)
+        self.fall_btn.grid(row=0, column=8, padx=2)
+        self.system_btn.grid(row=0, column=9, padx=2)
+        self.wall_btn.grid(row=0, column=10, padx=2)
+        self.battery_btn.grid(row=0, column=11, padx=2)
 
     def grid(self, **kwargs):
         self.frame.grid(**kwargs)
@@ -449,7 +574,23 @@ class DeviceRow:
         self.sync_config_to_device()
         self.device.send_system_event()
 
-    def update_status(self, connected: bool, connecting: bool, last_error: str, sent_count: int, recv_count: int):
+    def on_wall_power(self):
+        self.sync_config_to_device()
+        self.device.send_power_state(True)
+
+    def on_battery_power(self):
+        self.sync_config_to_device()
+        self.device.send_power_state(False)
+
+    def update_status(
+        self,
+        connected: bool,
+        connecting: bool,
+        last_error: str,
+        sent_count: int,
+        recv_count: int,
+        power_state: str,
+    ):
         if connecting:
             self.status_var.set("Connecting...")
         elif connected:
@@ -459,7 +600,9 @@ class DeviceRow:
 
         if last_error:
             self.status_var.set(self.status_var.get() + " (!)")
+
         self.stats_var.set(f"TX:{sent_count} RX:{recv_count}")
+        self.power_var.set("Wall" if power_state == "wall" else "Battery")
 
 
 class SimulatorApp:
@@ -468,7 +611,7 @@ class SimulatorApp:
     def __init__(self, root: tk.Tk, config_path: str):
         self.root = root
         self.root.title("Faceplant Forecast - Multi Device Simulator")
-        self.root.geometry("1350x780")
+        self.root.geometry("1650x780")
 
         self.ui_queue: queue.Queue = queue.Queue()
         self.devices: list[SimulatedDevice] = []
@@ -495,6 +638,8 @@ class SimulatorApp:
         ttk.Button(top, text="Connect All", command=self.connect_all).pack(side="left", padx=4)
         ttk.Button(top, text="Disconnect All", command=self.disconnect_all).pack(side="left", padx=4)
         ttk.Button(top, text="Send Fall From All", command=self.send_fall_all).pack(side="left", padx=4)
+        ttk.Button(top, text="Set All Wall Power", command=self.set_all_wall_power).pack(side="left", padx=4)
+        ttk.Button(top, text="Set All Battery", command=self.set_all_battery_power).pack(side="left", padx=4)
         ttk.Button(top, text="Reload Config", command=self.reload_config).pack(side="left", padx=4)
 
         header = ttk.Frame(self.root, padding=(10, 0))
@@ -505,6 +650,7 @@ class SimulatorApp:
             ("Account ID", 2),
             ("Status", 3),
             ("Stats", 4),
+            ("Power", 5),
         ]
         for text, col in headers:
             ttk.Label(header, text=text).grid(row=0, column=col, padx=8, sticky="w")
@@ -546,6 +692,18 @@ class SimulatorApp:
             row.device.cfg.base_url = self.base_url_var.get().strip()
             row.sync_config_to_device()
             row.device.send_fall()
+
+    def set_all_wall_power(self):
+        for row in self.rows:
+            row.device.cfg.base_url = self.base_url_var.get().strip()
+            row.sync_config_to_device()
+            row.device.send_power_state(True)
+
+    def set_all_battery_power(self):
+        for row in self.rows:
+            row.device.cfg.base_url = self.base_url_var.get().strip()
+            row.sync_config_to_device()
+            row.device.send_power_state(False)
 
     def reload_config(self):
         """
@@ -597,6 +755,7 @@ class SimulatorApp:
                         last_error=data["last_error"],
                         sent_count=data["sent_count"],
                         recv_count=data["recv_count"],
+                        power_state=data["power_state"],
                     )
         except queue.Empty:
             pass

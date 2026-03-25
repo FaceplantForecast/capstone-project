@@ -1,10 +1,10 @@
-﻿# Faceplant Forecast — Radar Fall Detection System
+﻿# Faceplant Forecast — FALLWATCH Radar Fall Detection System
 
 ![Fallwatch Logo](FallWatch_nb.png)
 
 **ECEN 403/404 | Team 20 | Texas A&M University | Fall 2025 – Spring 2026**
 
-This repository contains the Raspberry Pi software stack for the Faceplant Forecast Human Activity Detector. The system uses a **TI AWR2944EVM millimeter-wave radar module** to continuously monitor a room, runs radar data through a custom-trained AI model to detect fall events, and automatically pushes notifications to a cloud backend when a fall is detected.
+This repository contains the Raspberry Pi software stack for the Faceplant Forecast Human Activity Detector. The FALLWATCH system uses a **TI AWR2944EVM millimeter-wave radar module** to continuously monitor a room, runs radar data through a custom-trained AI model to detect fall events, and automatically pushes notifications to a cloud backend when a fall is detected.
 
 ---
 
@@ -20,7 +20,7 @@ This repository contains the Raspberry Pi software stack for the Faceplant Forec
 
 ## System Overview
 
-The full system consists of three hardware/software layers:
+The full FALLWATCH system consists of three hardware/software layers:
 
 1. **TI AWR2944EVM** — millimeter-wave radar sensor connected to the Raspberry Pi over two USB-serial ports (a CLI/config port and a data port).
 2. **Raspberry Pi 5** *(this repo)* — processes radar frames in real time, runs an AI inference model, and sends fall events to the cloud.
