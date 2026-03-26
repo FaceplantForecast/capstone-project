@@ -17,11 +17,11 @@ from mmwave_parser import (
     getUint32,
 )
 
-CFG_PORT = "COM6"
+CFG_PORT = "COM5"
 CFG_BAUD = 115200
 CFG_FILE = "radar_profile.cfg"
 
-UART_PORT = "COM3"
+UART_PORT = "COM6"
 UART_BAUD = 3125000
 
 WINDOW_SIZE = 48
@@ -33,26 +33,26 @@ FEATURE_KEYS = [
 TFLITE_MODEL_PATH = "model.tflite"
 SCALER_PATH = "scaler.npz"
 
-FALL_THRESHOLD = 0.95
-RESET_THRESHOLD = 0.5
+FALL_THRESHOLD = 0.90
+RESET_THRESHOLD = 0.6
 
-ALERT_COOLDOWN_SEC = 8.0
+ALERT_COOLDOWN_SEC = 6.0
 REARM_LOW_SEC = 2.0
 
 TREND_ENABLE = False
-TREND_WINDOW = 9
-TREND_MIN_RISE = 0.2
-TREND_MIN_SLOPE = 0.025
-TREND_MIN_END = 0.38
-TREND_ALLOW_DROPS = 1
-TREND_MIN_UP_STEPS = 7
+TREND_WINDOW = 7
+TREND_MIN_RISE = 0.03
+TREND_MIN_SLOPE = 0.009
+TREND_MIN_END = 0.06
+TREND_ALLOW_DROPS = 2
+TREND_MIN_UP_STEPS = 3
 
 MIN_RANGE_M = 0.25
 
 SNR_THRESHOLD_ADJ = 3.5
 SNR_RELAX_DB = 3.0
 MIN_POINTS_AFTER_SNR = 8
-SNR_CLIP_MAX = 5.0
+SNR_CLIP_MAX = None   # match collector behavior
 
 DBSCAN_EPS_CANDIDATES = [0.25, 0.30, 0.36, 0.42, 0.50, 0.60]
 DBSCAN_MIN_SAMPLES_FRAC = 0.06
@@ -60,9 +60,9 @@ DBSCAN_MIN_SAMPLES_MIN = 4
 DBSCAN_MIN_SAMPLES_MAX = 12
 MIN_POINTS_FALLBACK_ALL = 25
 
-MIN_HEIGHT_M = 0.15
+MIN_HEIGHT_M = 0.01
 MAX_SPREAD_XY_M = 3.5
-MAX_RANGE_FOR_PERSON_M = None
+MAX_RANGE_FOR_PERSON_M = 20
 
 TRACK_MAX_DIST_M = 0.75
 TRACK_BONUS = 1.0
@@ -82,7 +82,8 @@ BACKGROUND_MIN_FRAMES = 80
 BG_BIN_SIZE_M = 0.15
 BG_MAX_RANGE_M = 20.0
 
-TARGET_MEDIAN_SNR = 100.0
+# match collector
+TARGET_MEDIAN_SNR = 10.0
 GAIN_ALPHA = 0.03
 MAX_GAIN = 5.0
 
@@ -278,21 +279,26 @@ def send_sensor_stop(cfg_port, cfg_baud):
         print("[CFG] Stop failed:", e)
 
 
-def preprocess_frame_like_dataset(frame, use_background_subtraction=True):
+def frame_to_dataset_like_rows(frame, sample_frame_idx=1, use_background_subtraction=True):
+    """
+    Build the exact same per-point row structure as collect_radar_data.py:
+      sample_frame, frame_id, timestamp, x, y, z, doppler, snr, snr_adj
+    """
+    frame_id = frame["frame_id"]
+    ts = frame["timestamp"]
     x = frame["x"]
     y = frame["y"]
     z = frame["z"]
     doppler = frame["doppler"]
     snr = frame["snr"]
 
+    rows = []
+
     if snr.size == 0:
-        return None
+        return rows
 
     r = np.sqrt(x * x + y * y + z * z)
     mask_r = r >= MIN_RANGE_M
-
-    if not np.any(mask_r):
-        return None
 
     x_f = x[mask_r]
     y_f = y[mask_r]
@@ -305,8 +311,48 @@ def preprocess_frame_like_dataset(frame, use_background_subtraction=True):
     else:
         snr_adj = snr_f.astype(np.float32)
 
+    # keep identical to collector unless you intentionally want clipping
     if SNR_CLIP_MAX is not None:
         snr_adj = np.clip(snr_adj, 0.0, float(SNR_CLIP_MAX))
+
+    for xi, yi, zi, vi, snri, snr_adji in zip(
+        x_f, y_f, z_f, doppler_f, snr_f, snr_adj
+    ):
+        rows.append({
+            "sample_frame": int(sample_frame_idx),
+            "frame_id": int(frame_id),
+            "timestamp": float(ts),
+            "x": float(xi),
+            "y": float(yi),
+            "z": float(zi),
+            "doppler": float(vi),
+            "snr": float(snri),
+            "snr_adj": float(snr_adji),
+        })
+
+    return rows
+
+
+def preprocess_frame_like_dataset(frame, use_background_subtraction=True):
+    """
+    Convert a live frame into the same point-level representation used in the
+    dataset collector, then return arrays for the live clustering/features code.
+    """
+    rows = frame_to_dataset_like_rows(
+        frame,
+        sample_frame_idx=1,
+        use_background_subtraction=use_background_subtraction,
+    )
+
+    if not rows:
+        return None
+
+    x_f = np.array([r["x"] for r in rows], dtype=np.float32)
+    y_f = np.array([r["y"] for r in rows], dtype=np.float32)
+    z_f = np.array([r["z"] for r in rows], dtype=np.float32)
+    doppler_f = np.array([r["doppler"] for r in rows], dtype=np.float32)
+    snr_f = np.array([r["snr"] for r in rows], dtype=np.float32)
+    snr_adj = np.array([r["snr_adj"] for r in rows], dtype=np.float32)
 
     return {
         "x": x_f,
@@ -315,6 +361,7 @@ def preprocess_frame_like_dataset(frame, use_background_subtraction=True):
         "doppler": doppler_f,
         "snr": snr_f,
         "snr_adj": snr_adj,
+        "rows": rows,
     }
 
 
@@ -682,10 +729,12 @@ def build_background_from_stream(stream):
 
 async def _send_fall_flag_ws(probability: float, frame_id: int, ts: float):
     msg = {
+        "msg_type" : "fall_event",
         "fall_detected": 1,
         "probability": float(probability),
         "frame_id": int(frame_id),
-        "ts": time.strftime("%m-%d-%Y %H:%M:%S", time.localtime(ts))
+        "ts": time.strftime("%m-%d-%Y %H:%M:%S", time.localtime(ts)),
+        "device_id": "Main_PI"
     }
 
     try:
@@ -725,6 +774,13 @@ def live_loop(stream):
     for frame in stream:
         total_frames += 1
         feat = compute_frame_features(frame, track)
+
+        if DEBUG:
+            pre = preprocess_frame_like_dataset(frame, use_background_subtraction=True)
+            if pre is not None and pre["rows"]:
+                print("[DEBUG] First 5 dataset-like rows:")
+                for row in pre["rows"][:5]:
+                    print(row)
 
         if feat["num_points"] <= 0:
             miss_count += 1
@@ -771,8 +827,9 @@ def live_loop(stream):
                 min_slope=TREND_MIN_SLOPE,
                 min_end=TREND_MIN_END,
                 allow_drops=TREND_ALLOW_DROPS,
-                min_up_steps=max(TREND_MIN_UP_STEPS, TREND_WINDOW / 2),
+                min_up_steps=TREND_MIN_UP_STEPS,
             )
+
         should_alert = abs_trigger or trend_trigger
 
         if should_alert:
