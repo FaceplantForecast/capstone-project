@@ -372,6 +372,25 @@ def pick_person_cluster(points_xyz, labels, prev_centroid=None):
         return np.zeros(n, dtype=bool)
 
     return labels == best_label
+
+
+class TrackState:
+    def __init__(self):
+        self.prev_feat = None
+        self.prev_centroid_ema = None
+
+    def update_centroid_ema(self, cx, cy, cz):
+        if self.prev_centroid_ema is None:
+            self.prev_centroid_ema = (cx, cy, cz)
+        else:
+            px, py, pz = self.prev_centroid_ema
+            a = CENTROID_EMA_ALPHA
+            self.prev_centroid_ema = (
+                a * cx + (1 - a) * px,
+                a * cy + (1 - a) * py,
+                a * cz + (1 - a) * pz
+            )
+        return self.prev_centroid_ema
 #endregion
 
 # ----------------- Feature Computation -----------------
@@ -392,22 +411,118 @@ class TrackState:
                                       a * cz + (1 - a) * pz)
         return self.prev_centroid_ema
 
+def frame_to_dataset_like_rows(frame, sample_frame_idx=1, use_background_subtraction=True):
+    """
+    Build the exact same per-point row structure as collect_radar_data.py:
+      sample_frame, frame_id, timestamp, x, y, z, doppler, snr, snr_adj
+    """
+    frame_id = frame["frame_id"]
+    ts = frame["timestamp"]
+    x = frame["x"]
+    y = frame["y"]
+    z = frame["z"]
+    doppler = frame["doppler"]
+    snr = frame["snr"]
 
-def compute_frame_features(frame, track: TrackState):
-    x, y, z, doppler, snr, t = (
-        frame["x"], frame["y"], frame["z"],
-        frame["doppler"], frame["snr"], frame["timestamp"]
-    )
+    rows = []
+
+    if snr.size == 0:
+        return rows
 
     r = np.sqrt(x * x + y * y + z * z)
     mask_r = r >= MIN_RANGE_M
-    if not np.any(mask_r):
-        return None
-    x, y, z, doppler, snr = x[mask_r], y[mask_r], z[mask_r], doppler[mask_r], snr[mask_r]
 
-    snr_adj = BG_COMP.clean_snr(x, y, z, snr)
+    x_f = x[mask_r]
+    y_f = y[mask_r]
+    z_f = z[mask_r]
+    doppler_f = doppler[mask_r]
+    snr_f = snr[mask_r]
+
+    if use_background_subtraction:
+        snr_adj = BG_COMP.clean_snr(x_f, y_f, z_f, snr_f)
+    else:
+        snr_adj = snr_f.astype(np.float32)
+
+    # keep identical to collector unless you intentionally want clipping
     if SNR_CLIP_MAX is not None:
         snr_adj = np.clip(snr_adj, 0.0, float(SNR_CLIP_MAX))
+
+    for xi, yi, zi, vi, snri, snr_adji in zip(
+        x_f, y_f, z_f, doppler_f, snr_f, snr_adj
+    ):
+        rows.append({
+            "sample_frame": int(sample_frame_idx),
+            "frame_id": int(frame_id),
+            "timestamp": float(ts),
+            "x": float(xi),
+            "y": float(yi),
+            "z": float(zi),
+            "doppler": float(vi),
+            "snr": float(snri),
+            "snr_adj": float(snr_adji),
+        })
+
+    return rows
+
+def preprocess_frame_like_dataset(frame, use_background_subtraction=True):
+    """
+    Convert a live frame into the same point-level representation used in the
+    dataset collector, then return arrays for the live clustering/features code.
+    """
+    rows = frame_to_dataset_like_rows(
+        frame,
+        sample_frame_idx=1,
+        use_background_subtraction=use_background_subtraction,
+    )
+
+    if not rows:
+        return None
+
+    x_f = np.array([r["x"] for r in rows], dtype=np.float32)
+    y_f = np.array([r["y"] for r in rows], dtype=np.float32)
+    z_f = np.array([r["z"] for r in rows], dtype=np.float32)
+    doppler_f = np.array([r["doppler"] for r in rows], dtype=np.float32)
+    snr_f = np.array([r["snr"] for r in rows], dtype=np.float32)
+    snr_adj = np.array([r["snr_adj"] for r in rows], dtype=np.float32)
+
+    return {
+        "x": x_f,
+        "y": y_f,
+        "z": z_f,
+        "doppler": doppler_f,
+        "snr": snr_f,
+        "snr_adj": snr_adj,
+        "rows": rows,
+    }
+
+def compute_frame_features(frame, track: TrackState):
+    t = frame["timestamp"]
+
+    default_feat = dict(
+        cx=0.0,
+        cy=0.0,
+        cz=0.0,
+        height=0.0,
+        spread_xy=0.0,
+        mean_doppler=0.0,
+        num_points=0,
+        timestamp=float(t),
+        vx=0.0,
+        vy=0.0,
+        vz=0.0,
+        speed=0.0,
+    )
+
+    pre = preprocess_frame_like_dataset(frame, use_background_subtraction=True)
+    if pre is None:
+        track.prev_feat = default_feat
+        return default_feat
+
+    x = pre["x"]
+    y = pre["y"]
+    z = pre["z"]
+    doppler = pre["doppler"]
+    snr_adj = pre["snr_adj"]
 
     def _apply_thr(thr: float):
         mask = snr_adj > thr
@@ -419,8 +534,11 @@ def compute_frame_features(frame, track: TrackState):
         return pts, dd
 
     out = _apply_thr(SNR_THRESHOLD_ADJ)
+
     if out is None:
-        return None
+        track.prev_feat = default_feat
+        return default_feat
+
     points_xyz, dop_f = out
 
     if len(points_xyz) < MIN_POINTS_AFTER_SNR and SNR_RELAX_DB > 0:
@@ -429,14 +547,17 @@ def compute_frame_features(frame, track: TrackState):
             points_xyz, dop_f = out2
 
     if len(points_xyz) == 0:
-        return None
+        track.prev_feat = default_feat
+        return default_feat
 
     labels = cluster_frame_points(points_xyz)
 
     prev_centroid = track.prev_centroid_ema if track.prev_centroid_ema is not None else None
     person_mask = pick_person_cluster(points_xyz, labels, prev_centroid=prev_centroid)
+
     if not np.any(person_mask):
-        return None
+        track.prev_feat = default_feat
+        return default_feat
 
     pts = points_xyz[person_mask]
     dop = dop_f[person_mask]
@@ -444,13 +565,15 @@ def compute_frame_features(frame, track: TrackState):
     cx, cy, cz, height, spread_xy, _ = _cluster_stats(pts)
 
     if height < MIN_HEIGHT_M or spread_xy > MAX_SPREAD_XY_M:
-        if not _DEBUG:
-            return None
+        track.prev_feat = default_feat
+        return default_feat
 
     cx_s, cy_s, cz_s = track.update_centroid_ema(float(cx), float(cy), float(cz))
 
     feat = dict(
-        cx=float(cx_s), cy=float(cy_s), cz=float(cz_s),
+        cx=float(cx_s),
+        cy=float(cy_s),
+        cz=float(cz_s),
         height=float(height),
         spread_xy=float(spread_xy),
         mean_doppler=float(np.mean(dop)) if dop.size else 0.0,
@@ -471,6 +594,7 @@ def compute_frame_features(frame, track: TrackState):
 
     track.prev_feat = feat
     return feat
+
 #endregion
 
 # ----------------- Background Capture Phase -----------------
