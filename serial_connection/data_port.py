@@ -46,15 +46,15 @@ FEATURE_KEYS = [
 TFLITE_MODEL_PATH = "./model/model.tflite"
 SCALER_PATH = "./model/scaler.npz"
 
-FALL_THRESHOLD = 0.5
-RESET_THRESHOLD = 0.05
+FALL_THRESHOLD = 0.9
+RESET_THRESHOLD = 0.6
 
 # --- alert spam control ---
-ALERT_COOLDOWN_SEC = 8.0   # minimum time between notifications
+ALERT_COOLDOWN_SEC = 6.0   # minimum time between notifications
 REARM_LOW_SEC = 2.0        # must stay <= RESET_THRESHOLD for this long to rearm
 
 # --- Trend/ramp fall detection (for small spikes like 0.07) ---
-TREND_ENABLE = True
+TREND_ENABLE = False
 TREND_WINDOW = 9        # History window for trend check (number of consecutive p values)
 TREND_MIN_RISE = 0.2    # Require total rise across the window (0.02 -> 0.07 is +0.05)
 TREND_MIN_SLOPE = 0.025 # Require average slope (rise/(window-1)); set ~ TREND_MIN_RISE/(TREND_WINDOW-1)
