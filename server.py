@@ -177,7 +177,7 @@ def _control_loop():
                                frame_id=radar_data[RADAR_DATA.FRAME_ID],
                                ts=radar_data[RADAR_DATA.TIMESTAMP])
             fall_latched = 1
-            radar_data[RADAR_DATA.FALL_DETECTED] == 0 #reset buffer flag
+            radar_data[RADAR_DATA.FALL_DETECTED] = 0 #reset buffer flag
         else:
             fall_latched = 0
 
@@ -187,3 +187,6 @@ def main():
     _bootstrapper()
     _start_command_listener_thread()
     _control_loop()
+
+if __name__ == "__main__":
+    main()

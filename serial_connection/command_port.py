@@ -171,3 +171,7 @@ def main():
 
         #call bootstrapper and initiate the radar
         send_cfg(config_port, 'radar_profile.cfg')
+
+        #keep process open
+        while True:
+            time.sleep(10)

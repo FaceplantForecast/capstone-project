@@ -813,8 +813,6 @@ def uart_frame_stream(ser):
             continue
 
         fid, ts, dets = out
-        if not dets:
-            continue
 
         x = np.array([d["x"] for d in dets], dtype=np.float32)
         y = np.array([d["y"] for d in dets], dtype=np.float32)
@@ -887,15 +885,9 @@ def live_loop(stream):
             miss_count += 1
             if _DEBUG or (miss_count % MISS_PRINT_EVERY == 0):
                 print(f"        (no valid person cluster) misses={miss_count}")
-            continue
-
-        valid_frames += 1
-        miss_count = 0
-
-        if feat["num_points"] < MIN_POINTS_FOR_WINDOW:
-            continue
-        if REQUIRE_HEIGHT_FOR_WINDOW and feat["height"] < MIN_HEIGHT_M:
-            continue
+        else:
+            valid_frames += 1
+            miss_count = 0
 
         vec = np.array([feat[k] for k in FEATURE_KEYS], np.float32)
         window.append(vec)
