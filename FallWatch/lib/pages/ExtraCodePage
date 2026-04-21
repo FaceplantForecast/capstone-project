@@ -1,0 +1,589 @@
+import 'dart:convert';
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
+import '../services/fall_logger.dart';
+import '../services/notification_services.dart';
+
+class PiSocket {
+  final String wsUrl;
+  late final WebSocketChannel channel;
+  Timer? _ping;
+
+  DateTime _parseToDateTime(dynamic ts) {
+  // 1) null -> now
+  if (ts == null) return DateTime.now();
+
+  // 2) Already DateTime
+  if (ts is DateTime) return ts;
+
+  // 3) Numeric -> epoch milliseconds
+  if (ts is int) return DateTime.fromMillisecondsSinceEpoch(ts);
+  if (ts is double) return DateTime.fromMillisecondsSinceEpoch(ts.toInt());
+
+  // 4) String -> try ISO, epoch string, or custom MM-DD-YYYY HH:MM:SS
+  if (ts is String) {
+    final trimmed = ts.trim();
+
+    // a) ISO / tryParse
+    final iso = DateTime.tryParse(trimmed);
+    if (iso != null) return iso;
+
+    // b) numeric string epoch
+    final asInt = int.tryParse(trimmed);
+    if (asInt != null) return DateTime.fromMillisecondsSinceEpoch(asInt);
+
+    // c) custom MM-DD-YYYY HH:MM:SS
+    final custom = _parseMmDdYyyyHms(trimmed);
+    if (custom != null) return custom;
+
+    // fallback
+    return DateTime.now();
+  }
+
+  // unknown -> now
+  return DateTime.now();
+}
+
+DateTime? _parseMmDdYyyyHms(String s) {
+  final regex = RegExp(r'^\s*(\d{1,2})-(\d{1,2})-(\d{4})\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?\s*$');
+  final m = regex.firstMatch(s);
+  if (m == null) return null;
+
+  final month = int.tryParse(m.group(1)!);
+  final day = int.tryParse(m.group(2)!);
+  final year = int.tryParse(m.group(3)!);
+  final hour = int.tryParse(m.group(4)!) ?? 0;
+  final minute = int.tryParse(m.group(5)!) ?? 0;
+  final second = m.group(6) != null ? int.tryParse(m.group(6)!) ?? 0 : 0;
+
+  if (year == null || month == null || day == null) return null;
+
+  try {
+    return DateTime(year, month, day, hour, minute, second);
+  } catch (_) {
+    return null;
+  }
+}
+
+  PiSocket({required this.wsUrl}) {
+    channel = WebSocketChannel.connect(Uri.parse(wsUrl));
+
+    // Optional: keep-alive ping every 25s
+    _ping = Timer.periodic(const Duration(seconds: 25), (_) {
+      channel.sink.add('{"type":"ping"}');
+    });
+  }
+
+  Stream<FallEvent> get events => channel.stream.map((data) {
+  final s = data.toString().trim();
+  final jsonString = s.contains("'") ? s.replaceAll("'", '"') : s;
+  print("📩 Received from Pi: $jsonString");
+
+  Map<String, dynamic> msg;
+  try {
+    msg = json.decode(jsonString) as Map<String, dynamic>;
+  } catch (e) {
+    print("⚠️ JSON decode failed: $e");
+    msg = {'payload': {'fall_detected': 0, 'ts': null}, 'raw': s};
+  }
+
+  //Extract payload
+  final payload = (msg['payload'] is Map)
+      ? msg['payload'] as Map<String, dynamic>
+      : <String, dynamic>{};
+
+  final fdRaw = payload['fall_detected'];
+  final bool fd = fdRaw is bool
+      ? fdRaw
+      : fdRaw is int
+          ? fdRaw == 1
+          : fdRaw is String
+              ? (fdRaw == '1' || fdRaw.toLowerCase() == 'true')
+              : false;
+  final rawTs = payload['ts'];
+
+  final DateTime parsedTs = _parseToDateTime(rawTs);
+  //final ts = (payload['ts']?.toString().isNotEmpty ?? false)
+    //  ? payload['ts'].toString()
+    //  : _nowStamp();
+
+  return FallEvent(fallDetected: fd, timestamp: parsedTs, raw: msg);
+});
+
+  void sendCommand(String command) => channel.sink.add(command);
+
+  void close() {
+    _ping?.cancel();
+    channel.sink.close();
+  }
+}
+
+class FallEvent {
+  final bool fallDetected;
+  final DateTime timestamp;
+  final Map<String, dynamic> raw;
+  FallEvent({required this.fallDetected, required this.timestamp, required this.raw});
+}
+
+
+
+class DevicePage extends StatefulWidget {
+  final Function(bool)? onConnectionChanged;
+
+  const DevicePage({
+    super.key,
+    this.onConnectionChanged,
+  });
+
+  @override
+  State<DevicePage> createState() => _DevicePageState();
+}
+
+class _DevicePageState extends State<DevicePage> {
+  PiSocket? socket;
+  String statusText = 'Connecting…';
+  String lastEventText = '';
+  bool connected = false;
+  bool isWallPower = true;
+  String powerStatus = 'Wall Power';
+
+  final TextEditingController _cmdController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+
+  static const String server = 'gcr-ws-482782751069.us-central1.run.app';
+  static const String token = 'M8b4eFJHq2pI3V9nW5r0dE-PLZpQyX7uB1cTa9kN4mE';
+  static final String wsUrl = 'wss://$server?token=$token';
+
+  Timer? _reconnectTimer;
+  bool _manuallyClosed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _connect();
+  }
+
+  void _scheduleReconnect() {
+    if (_manuallyClosed) return;
+
+    _reconnectTimer?.cancel();
+    _reconnectTimer = Timer(const Duration(seconds: 3), () {
+      if (!_manuallyClosed) {
+        print("🔄 Attempting reconnect...");
+        _connect();
+      }
+    });
+  }
+
+  Future<void> _connect() async {
+    
+    _reconnectTimer?.cancel();
+    
+
+    _manuallyClosed = true;
+
+    setState(() {
+      statusText = 'Connecting to $wsUrl…';
+      connected = false;
+    });
+    widget.onConnectionChanged?.call(false);
+
+    try {
+      socket?.close();
+      socket = PiSocket(wsUrl: wsUrl);
+
+      _manuallyClosed = false;
+
+      bool firstMessageReceived = false;
+
+      socket!.events.listen(
+        (evt) async {
+          if (!firstMessageReceived) {
+            firstMessageReceived = true;
+            setState(() {
+            connected = true;
+            statusText = 'Connected';
+            print('✅ WebSocket connected successfully!');
+            });
+            widget.onConnectionChanged?.call(true);
+          }
+          setState(() {
+            lastEventText = evt.fallDetected
+                ? '🚨 Fall Detected at ${evt.timestamp}'
+                : '✅ No Fall at ${evt.timestamp}';
+          });
+
+          final payload = evt.raw['payload'];
+
+          if (payload != null &&
+              payload['event'] == 'power_state') {
+
+            final status = payload['status']?.toString() ?? '';
+
+            setState(() {
+              if (status.contains('Wall Power')) {
+                isWallPower = true;
+                powerStatus = 'Wall Power';
+              } else if (status.contains('Battery')) {
+                isWallPower = false;
+                powerStatus = 'Battery Backup';
+              }
+            });
+          }
+                   
+          if (evt.fallDetected) {
+            await FallLogger.logFallEvent(
+              source: 'websocket',
+              fallDetected: evt.fallDetected,
+              timestamp: evt.timestamp,
+              extra: evt.raw,
+            );
+          }
+          if (evt.fallDetected) {
+            await NotificationService.showManualNotification(
+              title: 'Fall Detected!',
+              body: 'A fall was detected at ${evt.timestamp}.',
+            );
+            print('🔔 Notification sent for fall at ${evt.timestamp}');
+          }
+        },
+        onError: (err) {
+          setState(() {
+            connected = false;
+            statusText = 'WebSocket error: $err';
+          });
+            widget.onConnectionChanged?.call(false);
+          print("WebSocket error, scheduling reconnect…");
+          _scheduleReconnect();
+        },
+        onDone: () {
+          setState(() {
+            connected = false;
+            statusText = 'Connection closed';
+          });
+            widget.onConnectionChanged?.call(false);
+          print("WebSocket closed, scheduling reconnect…");
+          _scheduleReconnect();
+        },
+      );
+
+      Future.delayed(const Duration(seconds: 3), () {
+      if (!mounted) return;
+      if (!firstMessageReceived) {
+        setState(() {
+          connected = false;
+          statusText = 'Failed to connect (timeout)';
+        });
+          widget.onConnectionChanged?.call(false);
+        print("Timeout — scheduling reconnect...");
+          _scheduleReconnect();
+      }
+    });
+  } catch (e) {
+    setState(() {
+      connected = false;
+      statusText = 'Error connecting: $e';
+    });
+      widget.onConnectionChanged?.call(false);
+    _scheduleReconnect();
+  }
+} 
+  
+  @override
+  void dispose() {
+    _manuallyClosed = true;
+    _reconnectTimer?.cancel();
+    _cmdController.dispose();
+    socket?.close();
+    super.dispose();
+  }
+
+  void _sendCustomCommand() {
+    if (_formKey.currentState!.validate()) {
+      final cmd = _cmdController.text.trim();
+      socket?.sendCommand(cmd);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Sent command: $cmd')),
+      );
+      _cmdController.clear();
+    }
+  }
+
+  // void _requestStatus() => socket?.sendCommand('GET_STATUS');
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final color = connected ? Colors.green : Colors.red;
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('Live Fall Detection'),
+//       ),
+//       body: Center(
+//         child: ConstrainedBox(
+//           constraints: const BoxConstraints(maxWidth: 520),
+//           child: Column(
+//             mainAxisAlignment: MainAxisAlignment.center,
+//             children: [
+//               Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+//                 Icon(Icons.circle, color: color, size: 12),
+//                 const SizedBox(width: 8),
+//                 Flexible(child: Text(statusText, textAlign: TextAlign.center)),
+//               ]),
+//               const SizedBox(height: 20),
+//               Text(
+//                 lastEventText.isEmpty ? 'Waiting for data…' : lastEventText,
+//                 textAlign: TextAlign.center,
+//                 style: const TextStyle(fontSize: 18),
+//               ),
+//               const SizedBox(height: 28),
+//               Form(
+//                   key: _formKey,
+//                   child: Column(
+//                     children: [
+//                       TextFormField(
+//                         controller: _cmdController,
+//                         decoration: InputDecoration(
+//                           labelText: 'Enter command',
+//                           border: OutlineInputBorder(
+//                             borderRadius: BorderRadius.circular(8),
+//                           ),
+//                           hintText: 'Send JSON command',
+//                         ),
+//                         validator: (value) {
+//                           if (value == null || value.trim().isEmpty) {
+//                             return 'Please enter a command';
+//                           }
+//                           return null;
+//                         },
+//                       ),
+//                       const SizedBox(height: 12),
+//                       ElevatedButton.icon(
+//                         onPressed: _sendCustomCommand,
+//                         icon: const Icon(Icons.send),
+//                         label: const Text('Send Command'),
+//                       ),
+//                       const SizedBox(height: 20),
+//                     ],
+//                   ),
+//                 ),
+//               Wrap(spacing: 12, runSpacing: 12, alignment: WrapAlignment.center, children: [
+//                 OutlinedButton(onPressed: _connect,child: const Text('Reconnect')),
+//               ]),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+  @override
+  Widget build(BuildContext context) {
+    final bool isFall = lastEventText.contains('Fall Detected');
+
+    return Scaffold(
+       appBar: AppBar(
+        title: const Text('Fall Detection'),
+      ),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFFE8F1FA),
+              Color.fromARGB(255, 187, 179, 179),
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+
+              // CONNECTION STATUS
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                width: double.infinity * 0.5,
+                padding: const EdgeInsets.symmetric(vertical: 18),
+                color: connected
+                    ? const Color.fromARGB(255, 46, 151, 53)
+                    : Colors.red.shade600,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      connected ? Icons.check_circle : Icons.error,
+                      color: Colors.white,
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      connected ? "Device Connected" : "Device Disconnected",
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 28),
+
+              // MAIN CONTENT
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Column(
+                    children: [
+
+                      // FALL STATUS CARD
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        width: double.infinity * .5,
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: isFall
+                              ? Colors.red.shade600
+                              : Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              blurRadius: 18,
+                              color: Colors.black.withOpacity(0.08),
+                              offset: const Offset(0, 8),
+                            )
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            Icon(
+                              isFall
+                                  ? Icons.warning_amber_rounded
+                                  : Icons.sensors,
+                              size: 60,
+                              color:
+                                  isFall ? Colors.white : Colors.blueGrey,
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              lastEventText.isEmpty
+                                  ? "Waiting for device data..."
+                                  : lastEventText,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                color: isFall
+                                    ? Colors.white
+                                    : Colors.black87,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 30),
+
+                      // RECONNECT BUTTON
+                      ElevatedButton.icon(
+                        onPressed: _connect,
+                        icon: const Icon(Icons.refresh),
+                        label: const Text("Reconnect Device"),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 28, vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                      ),
+
+                      const Spacer(),
+                      Align(
+                        alignment: Alignment.bottomRight,
+                        child:
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: isWallPower ? Colors.green : Colors.red,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              isWallPower ? Icons.power : Icons.battery_alert,
+                              color: Colors.white,
+                            ),
+                            const SizedBox(width: 8),
+                
+                            Text(
+                              powerStatus,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                          ),
+                        ),
+                      ),
+                      // {"type":"data","payload":{"type":"status","event":"power_state","status":"System on Battery Backup","device":"raspberry_pi","timestamp":1772127905.0061448}}
+                      // {"type":"data","payload":{"type":"status","event":"power_state","status":"System on Wall Power","device":"raspberry_pi","timestamp":1772127879.9227018}}
+                
+
+                      // ADVANCED COMMAND SECTION
+                      ExpansionTile(
+                        tilePadding: EdgeInsets.zero,
+                        title: const Text(
+                          "Advanced Commands",
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        children: [
+                          Form(
+                            key: _formKey,
+                            child: Column(
+                              children: [
+                                TextFormField(
+                                  controller: _cmdController,
+                                  decoration: InputDecoration(
+                                    labelText: 'Enter JSON Command',
+                                    border: OutlineInputBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null ||
+                                        value.trim().isEmpty) {
+                                      return 'Please enter a command';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                const SizedBox(height: 12),
+                                ElevatedButton.icon(
+                                  onPressed: _sendCustomCommand,
+                                  icon: const Icon(Icons.send),
+                                  label: const Text('Send Command'),
+                                ),
+                                const SizedBox(height: 20),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

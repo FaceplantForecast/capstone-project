@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "568132043683",
+    "project_id": "radar-fcm",
+    "storage_bucket": "radar-fcm.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:568132043683:android:718ec119a1c17a2dec1016",
+        "android_client_info": {
+          "package_name": "com.henry.FallWatch"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAswlJURFGXMFi8xMoXiydhG6LZWbEphmM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

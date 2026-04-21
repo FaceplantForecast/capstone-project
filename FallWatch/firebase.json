@@ -1,0 +1,1 @@
+{"flutter":{"platforms":{"android":{"default":{"projectId":"radar-fcm","appId":"1:568132043683:android:718ec119a1c17a2dec1016","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"radar-fcm","configurations":{"android":"1:568132043683:android:718ec119a1c17a2dec1016","windows":"1:568132043683:web:0f2b1e77ff4ebeabec1016"}}}}}}
