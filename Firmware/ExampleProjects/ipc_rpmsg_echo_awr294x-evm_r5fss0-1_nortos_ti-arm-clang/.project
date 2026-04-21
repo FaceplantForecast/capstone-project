@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>ipc_rpmsg_echo_awr294x-evm_r5fss0-1_nortos_ti-arm-clang</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.cdt.managedbuilder.core.genmakebuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>com.ti.ccstudio.core.ccsNature</nature>
+		<nature>org.eclipse.cdt.core.cnature</nature>
+		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
+		<nature>org.eclipse.cdt.core.ccnature</nature>
+	</natures>
+	<linkedResources>
+		<link>
+			<name>README.html</name>
+			<type>1</type>
+			<locationURI>MCU_PLUS_SDK_PATH/docs/api_guide_awr294x/EXAMPLES_DRIVERS_IPC_NOTIFY_ECHO.html</locationURI>
+		</link>
+	</linkedResources>
+	<variableList>
+		<variable>
+			<name>MCU_PLUS_SDK_PATH</name>
+			<value>$%7BCOM_TI_MCU_PLUS_SDK_AWR294X_INSTALL_DIR%7D</value>
+		</variable>
+	</variableList>
+</projectDescription>

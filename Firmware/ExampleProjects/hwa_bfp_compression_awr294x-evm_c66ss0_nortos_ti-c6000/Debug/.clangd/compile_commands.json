@@ -1,0 +1,12 @@
+[
+   {
+      "directory" : "C:/Users/there/Documents/Capstone/RadarFirmware/ExampleProjects/hwa_bfp_compression_awr294x-evm_c66ss0_nortos_ti-c6000/Debug",
+      "command"   : "clang++ -I\"C:/ti/ccs2030/ccs/tools/compiler/ti-cgt-c6000_8.5.0.LTS/include\" -I\"C:/ti/mmwave_mcuplus_sdk_04_07_01_04/mcu_plus_sdk_awr294x_10_01_00_04/source\" -DSOC_AWR294X -D_DEBUG_=1 -I\"C:/Users/there/Documents/Capstone/RadarFirmware/ExampleProjects/hwa_bfp_compression_awr294x-evm_c66ss0_nortos_ti-c6000/Debug/syscfg\" -xc",
+      "file"      : "C:/Users/there/Documents/Capstone/RadarFirmware/ExampleProjects/hwa_bfp_compression_awr294x-evm_c66ss0_nortos_ti-c6000/hwa_bfp_compression.c"
+   },
+   {
+      "directory" : "C:/Users/there/Documents/Capstone/RadarFirmware/ExampleProjects/hwa_bfp_compression_awr294x-evm_c66ss0_nortos_ti-c6000/Debug",
+      "command"   : "clang++ -I\"C:/ti/ccs2030/ccs/tools/compiler/ti-cgt-c6000_8.5.0.LTS/include\" -I\"C:/ti/mmwave_mcuplus_sdk_04_07_01_04/mcu_plus_sdk_awr294x_10_01_00_04/source\" -DSOC_AWR294X -D_DEBUG_=1 -I\"C:/Users/there/Documents/Capstone/RadarFirmware/ExampleProjects/hwa_bfp_compression_awr294x-evm_c66ss0_nortos_ti-c6000/Debug/syscfg\" -xc",
+      "file"      : "C:/Users/there/Documents/Capstone/RadarFirmware/ExampleProjects/hwa_bfp_compression_awr294x-evm_c66ss0_nortos_ti-c6000/main.c"
+   }
+]

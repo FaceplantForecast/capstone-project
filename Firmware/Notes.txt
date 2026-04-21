@@ -1,0 +1,21 @@
+When debugging, you need to first flash the cssdebug app image with the uart sbl image.
+-----------------------------------------------------------------------------------
+
+When running a nortos script, you first need to run the sbl_null project for the specific processor
+and then load the built script. 
+-----------------------------------------------------------------------------------
+
+To create a new project, you actually have to import a project and select the empty project with
+the specific processor(s) you want to use.
+-----------------------------------------------------------------------------------
+
+Use the ....appimage_qspi and the qspi sbl, then set SOP jumpers to 001. Otherwise it will not work
+-----------------------------------------------------------------------------------
+
+Make sure to use PuTTY to connect to the CLI rather than the CCS terminal
+-----------------------------------------------------------------------------------
+
+Remember, Status Code 0 is for SUCCESS
+-----------------------------------------------------------------------------------
+
+Switched to using demo firmware

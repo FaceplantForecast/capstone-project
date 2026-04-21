@@ -1,0 +1,16 @@
+{
+  "folders": [
+    {
+      "path": ""
+    },
+    {
+      "path": "ExampleProjects"
+    },
+    {
+      "path": "TestProjects"
+    }
+  ],
+  "settings": {
+    "CCS.debug.breakpoint.showCore": true
+  }
+}

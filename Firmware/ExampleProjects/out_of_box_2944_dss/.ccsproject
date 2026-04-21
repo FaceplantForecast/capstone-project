@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?ccsproject version="1.0"?>
+<projectOptions>
+	<ccsVariant value="50:Theia-based"/>
+	<ccsVersion value="70.3.0"/>
+	<deviceFamily value="C6000"/>
+	<connection value="common/targetdb/connections/TIXDS110_Connection.xml"/>
+	<executableActions value=""/>
+	<createSlaveProjects value=""/>
+	<ignoreDefaultDeviceSettings value="true"/>
+	<ignoreDefaultCCSSettings value="true"/>
+	<activeTargetConfiguration value="targetConfigs/AWR2944.ccxml"/>
+	<templateProperties value="id=awr294x_mmw_demo_dssDDM.projectspec.out_of_box_2944_dss"/>
+	<isTargetConfigurationManual value="false"/>
+	<origin value="C:\ti\radar_toolbox_3_20_00_04\source\ti\examples\Out_Of_Box_Demo\src\awr294x\awr294x_mmw_demo_dssDDM.projectspec"/>
+	<filesToOpen value=""/>
+</projectOptions>

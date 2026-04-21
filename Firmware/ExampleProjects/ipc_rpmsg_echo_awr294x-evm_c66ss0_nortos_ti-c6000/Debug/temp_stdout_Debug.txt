@@ -1,0 +1,24 @@
+[C:/Users/there/Documents/Capstone/RadarFirmware/ExampleProjects/ipc_rpmsg_echo_awr294x-evm_c66ss0_nortos_ti-c6000/Debug/ipc_rpmsg_echo_awr294x-evm_c66ss0_nortos_ti-c6000.rprc_tmp] Parsing file ...
+Found section 0 with adddress 0x00800000, size 0x00011f60 bytes
+Found section 1 with adddress 0x00815f60, size 0x00001770 bytes
+Found section 2 with adddress 0x008184a0, size 0x00000678 bytes
+Found section 3 with adddress 0x00818b18, size 0x00000180 bytes
+Found section 4 with adddress 0x00818c98, size 0x00000038 bytes
+[C:/Users/there/Documents/Capstone/RadarFirmware/ExampleProjects/ipc_rpmsg_echo_awr294x-evm_c66ss0_nortos_ti-c6000/Debug/ipc_rpmsg_echo_awr294x-evm_c66ss0_nortos_ti-c6000.rprc_tmp] Found 5 sections. 5 are non-XIP sections, 0 are XIP sections, NON-XIP entryPoint = 0x008100e0
+Merging section @ 0x00818b18 of size 0x00000180, with section @ 0x008184a0 of size 0x00000678
+Merging section @ 0x00818c98 of size 0x00000038, with section @ 0x008184a0 of size 0x000007f8
+Writing section header  #0, adddress 0x00800000, size 0x00011f60 bytes to file [C:/Users/there/Documents/Capstone/RadarFirmware/ExampleProjects/ipc_rpmsg_echo_awr294x-evm_c66ss0_nortos_ti-c6000/Debug/ipc_rpmsg_echo_awr294x-evm_c66ss0_nortos_ti-c6000.rprc]
+Writing section data with adddress 0x00800000, size 0x00011f60 bytes to file [C:/Users/there/Documents/Capstone/RadarFirmware/ExampleProjects/ipc_rpmsg_echo_awr294x-evm_c66ss0_nortos_ti-c6000/Debug/ipc_rpmsg_echo_awr294x-evm_c66ss0_nortos_ti-c6000.rprc]
+Writing section header  #1, adddress 0x00815f60, size 0x00001770 bytes to file [C:/Users/there/Documents/Capstone/RadarFirmware/ExampleProjects/ipc_rpmsg_echo_awr294x-evm_c66ss0_nortos_ti-c6000/Debug/ipc_rpmsg_echo_awr294x-evm_c66ss0_nortos_ti-c6000.rprc]
+Writing section data with adddress 0x00815f60, size 0x00001770 bytes to file [C:/Users/there/Documents/Capstone/RadarFirmware/ExampleProjects/ipc_rpmsg_echo_awr294x-evm_c66ss0_nortos_ti-c6000/Debug/ipc_rpmsg_echo_awr294x-evm_c66ss0_nortos_ti-c6000.rprc]
+Writing section header  #2, adddress 0x008184a0, size 0x00000830 bytes to file [C:/Users/there/Documents/Capstone/RadarFirmware/ExampleProjects/ipc_rpmsg_echo_awr294x-evm_c66ss0_nortos_ti-c6000/Debug/ipc_rpmsg_echo_awr294x-evm_c66ss0_nortos_ti-c6000.rprc]
+Writing section data with adddress 0x008184a0, size 0x00000678 bytes to file [C:/Users/there/Documents/Capstone/RadarFirmware/ExampleProjects/ipc_rpmsg_echo_awr294x-evm_c66ss0_nortos_ti-c6000/Debug/ipc_rpmsg_echo_awr294x-evm_c66ss0_nortos_ti-c6000.rprc]
+Writing section data with adddress 0x00818b18, size 0x00000180 bytes to file [C:/Users/there/Documents/Capstone/RadarFirmware/ExampleProjects/ipc_rpmsg_echo_awr294x-evm_c66ss0_nortos_ti-c6000/Debug/ipc_rpmsg_echo_awr294x-evm_c66ss0_nortos_ti-c6000.rprc]
+Writing section data with adddress 0x00818c98, size 0x00000038 bytes to file [C:/Users/there/Documents/Capstone/RadarFirmware/ExampleProjects/ipc_rpmsg_echo_awr294x-evm_c66ss0_nortos_ti-c6000/Debug/ipc_rpmsg_echo_awr294x-evm_c66ss0_nortos_ti-c6000.rprc]
+[C:/Users/there/Documents/Capstone/RadarFirmware/ExampleProjects/ipc_rpmsg_echo_awr294x-evm_c66ss0_nortos_ti-c6000/Debug/ipc_rpmsg_echo_awr294x-evm_c66ss0_nortos_ti-c6000.rprc] Parsing file ...
+Found section 0 with adddress 0x00800000, size 0x00011f60 bytes
+Found section 1 with adddress 0x00815f60, size 0x00001770 bytes
+Found section 2 with adddress 0x008184a0, size 0x00000830 bytes
+[C:/Users/there/Documents/Capstone/RadarFirmware/ExampleProjects/ipc_rpmsg_echo_awr294x-evm_c66ss0_nortos_ti-c6000/Debug/ipc_rpmsg_echo_awr294x-evm_c66ss0_nortos_ti-c6000.rprc] Found 3 sections. 3 are non-XIP sections, 0 are XIP sections, NON-XIP entryPoint = 0x008100e0
+[C:/Users/there/Documents/Capstone/RadarFirmware/ExampleProjects/ipc_rpmsg_echo_awr294x-evm_c66ss0_nortos_ti-c6000/Debug/ipc_rpmsg_echo_awr294x-evm_c66ss0_nortos_ti-c6000.rprc_xip] Parsing file ...
+[C:/Users/there/Documents/Capstone/RadarFirmware/ExampleProjects/ipc_rpmsg_echo_awr294x-evm_c66ss0_nortos_ti-c6000/Debug/ipc_rpmsg_echo_awr294x-evm_c66ss0_nortos_ti-c6000.rprc_xip] Found 0 sections. 0 are non-XIP sections, 0 are XIP sections, NON-XIP entryPoint = 0x00000000

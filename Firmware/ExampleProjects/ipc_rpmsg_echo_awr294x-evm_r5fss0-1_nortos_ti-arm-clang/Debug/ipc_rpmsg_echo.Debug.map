@@ -1,0 +1,1413 @@
+******************************************************************************
+            TI ARM Clang Linker PC v4.0.3                      
+******************************************************************************
+>> Linked Thu Oct  2 16:55:12 2025
+
+OUTPUT FILE NAME:   <ipc_rpmsg_echo_awr294x-evm_r5fss0-1_nortos_ti-arm-clang.out>
+ENTRY POINT SYMBOL: "_vectors"  address: 00000000
+
+
+MEMORY CONFIGURATION
+
+         name            origin    length      used     unused   attr    fill
+----------------------  --------  ---------  --------  --------  ----  --------
+  R5F_VECS              00000000   00000040  00000040  00000000  RWIX
+  R5F_TCMA              00000040   00003fc0  00000000  00003fc0  RWIX
+  R5F_TCMB              00080000   00004000  00000000  00004000  RWIX
+  MSS_L2                102a0000   00040000  0001a8c8  00025738  RWIX
+  USER_SHM_MEM          102e8000   00004000  00000000  00004000  RWIX
+  LOG_SHM_MEM           102ec000   00004000  00002000  00002000  RWIX
+  MAILBOX_HSM           44000000   000003ce  00000000  000003ce  RWIX
+  MAILBOX_R5F           44000400   000003ce  00000000  000003ce  RWIX
+  DSS_L3                88000000   00200000  00000000  00200000  RWIX
+  RTOS_NORTOS_IPC_SHM_M c5000200   00001d40  00001c80  000000c0  RWIX
+
+
+SEGMENT ALLOCATION MAP
+
+run origin  load origin   length   init length attrs members
+----------  ----------- ---------- ----------- ----- -------
+00000000    00000000    00000040   00000040    r-x
+  00000000    00000000    00000040   00000040    r-x .vectors
+102a0000    102a0000    0000d970   00000000    rw-
+  102a0000    102a0000    00001970   00000000    rw- .bss
+  102a1970    102a1970    00008000   00000000    rw- .sysmem
+  102a9970    102a9970    00004000   00000000    rw- .stack
+102ad970    102ad970    0000b6e8   0000b6e8    r-x
+  102ad970    102ad970    00008da0   00008da0    r-x .text
+  102b6710    102b6710    000012a0   000012a0    r-- .rodata
+  102b79b0    102b79b0    00000dd0   00000dd0    r-x .text.hwi
+  102b8780    102b8780    000004a0   000004a0    r-x .text.cache
+  102b8c20    102b8c20    000002c0   000002c0    r-x .text.mpu
+  102b8ee0    102b8ee0    00000170   00000170    r-x .text.boot
+  102b9050    102b9050    00000008   00000008    r-x .text:abort
+102b9058    102b9058    00001870   00000470    rw-
+  102b9058    102b9058    00000470   00000470    rw- .data
+  102b94c8    102b94c8    00000100   00000000    rw- .irqstack
+  102b95c8    102b95c8    00000100   00000000    rw- .fiqstack
+  102b96c8    102b96c8    00001000   00000000    rw- .svcstack
+  102ba6c8    102ba6c8    00000100   00000000    rw- .abortstack
+  102ba7c8    102ba7c8    00000100   00000000    rw- .undefinedstack
+
+
+SECTION ALLOCATION MAP
+
+ output                                  attributes/
+section   page    origin      length       input sections
+--------  ----  ----------  ----------   ----------------
+.vectors   0    00000000    00000040     
+                  00000000    00000040     nortos.awr294x.r5f.ti-arm-clang.debug.lib : HwiP_armv7r_vectors_nortos_asm.obj (.vectors)
+
+.bss       0    102a0000    00001970     UNINITIALIZED
+                  102a0000    00001008     (.common:gHwiCtrl)
+                  102a1008    00000730     (.common:gIpcRpmsgCtrl)
+                  102a1738    000000c0     ipc_rpmsg_echo.o (.bss.gRecvMsgObject)
+                  102a17f8    000000c0     (.common:gAckReplyMsgObject)
+                  102a18b8    0000007a     nortos.awr294x.r5f.ti-arm-clang.debug.lib : DebugP_shmLogWriter.obj (.bss.DebugP_shmLogWriterPutChar.lineBuf)
+                  102a1932    00000002     --HOLE--
+                  102a1934    00000004                                               : HwiP_armv7r_vim.obj (.bss.gdummy)
+                  102a1938    00000038     (.common:gClockCtrl)
+
+.sysmem    0    102a1970    00008000     UNINITIALIZED
+                  102a1970    00000010     libc.a : memory.c.obj (.sysmem)
+                  102a1980    00007ff0     --HOLE--
+
+.stack     0    102a9970    00004000     UNINITIALIZED
+                  102a9970    00000004     nortos.awr294x.r5f.ti-arm-clang.debug.lib : boot_armv7r_asm.obj (.stack)
+                  102a9974    00003ffc     --HOLE--
+
+.text      0    102ad970    00008da0     
+                  102ad970    00000ddc     libc.a : _printfi.c.obj (.text:__TI_printfi_nofloat)
+                  102ae74c    00000004     libclang_rt.builtins.a : aeabi_div0.c.obj (.text.__aeabi_idiv0)
+                  102ae750    00000a34     nortos.awr294x.r5f.ti-arm-clang.debug.lib : printf.obj (.text._vsnprintf)
+                  102af184    0000000c     libc.a : aeabi_portable.c.obj (.text.__aeabi_errno_addr)
+                  102af190    0000051e     nortos.awr294x.r5f.ti-arm-clang.debug.lib : printf.obj (.text._ftoa)
+                  102af6ae    00000002     --HOLE-- [fill = 0]
+                  102af6b0    00000518     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_notify_v1.obj (.text.IpcNotify_init)
+                  102afbc8    00000008     libsysbm.a : hostexit.c.obj (.text.HOSTexit)
+                  102afbd0    00000478     nortos.awr294x.r5f.ti-arm-clang.debug.lib : printf.obj (.text._etoa)
+                  102b0048    00000004     libclang_rt.builtins.a : aeabi_div0.c.obj (.text.__aeabi_ldiv0)
+                  102b004c    00000004                            : aeabi_memcpy.S.obj (.text.__aeabi_memcpy)
+                  102b0050    00000370     drivers.awr294x.r5f.ti-arm-clang.debug.lib : soc_rcm.obj (.text.SOC_rcmGetClkSrcAndDivReg)
+                  102b03c0    0000033c                                                : ipc_notify_v1.obj (.text.IpcNotify_isr)
+                  102b06fc    00000004     --HOLE-- [fill = 0]
+                  102b0700    000002b2     ipc_rpmsg_echo.o (.text.ipc_rpmsg_echo_main_core_start)
+                  102b09b2    00000002     --HOLE-- [fill = 0]
+                  102b09b4    0000000c     libclang_rt.builtins.a : aeabi_memset.S.obj (.text.__aeabi_memclr)
+                  102b09c0    0000023e     nortos.awr294x.r5f.ti-arm-clang.debug.lib : printf.obj (.text._ntoa_format)
+                  102b0bfe    00000002     --HOLE-- [fill = 0]
+                  102b0c00    0000020c     drivers.awr294x.r5f.ti-arm-clang.debug.lib : soc.obj (.text.SOC_controlModuleUnlockMMR)
+                  102b0e0c    00000004     --HOLE-- [fill = 0]
+                  102b0e10    00000200                                                : ipc_rpmsg.obj (.text.RPMessage_send)
+                  102b1010    000001d6     nortos.awr294x.r5f.ti-arm-clang.debug.lib : TimerP_rti.obj (.text.TimerP_setup)
+                  102b11e6    00000002     --HOLE-- [fill = 0]
+                  102b11e8    000001d0     libclang_rt.builtins.a : udivsi3.S.obj (.text.__udivsi3)
+                  102b13b8    00000008     --HOLE-- [fill = 0]
+                  102b13c0    000001bc     drivers.awr294x.r5f.ti-arm-clang.debug.lib : soc.obj (.text.SOC_controlModuleLockMMR)
+                  102b157c    00000004     --HOLE-- [fill = 0]
+                  102b1580    000001ae                                                : ipc_rpmsg.obj (.text.RPMessage_recv)
+                  102b172e    00000002     --HOLE-- [fill = 0]
+                  102b1730    00000194                                                : ipc_rpmsg.obj (.text.RPMessage_init)
+                  102b18c4    0000000c     --HOLE-- [fill = 0]
+                  102b18d0    00000194                                                : soc_rcm.obj (.text.SOC_rcmGetHSDIVClkOutMuxClkSrc)
+                  102b1a64    0000000c     --HOLE-- [fill = 0]
+                  102b1a70    00000182                                                : ipc_rpmsg_vring.obj (.text.RPMessage_vringResetInternal)
+                  102b1bf2    0000000e     --HOLE-- [fill = 0]
+                  102b1c00    00000174                                                : ipc_rpmsg.obj (.text.RPMessage_recvHandler)
+                  102b1d74    0000000c     --HOLE-- [fill = 0]
+                  102b1d80    00000156                                                : ipc_notify_v1.obj (.text.IpcNotify_sendMsg)
+                  102b1ed6    0000000a     --HOLE-- [fill = 0]
+                  102b1ee0    00000154                                                : ipc_notify_v1_cfg.obj (.text.IpcNotify_trigInterrupt_ack)
+                  102b2034    0000000c     --HOLE-- [fill = 0]
+                  102b2040    00000146                                                : soc_rcm.obj (.text.SOC_rcmGetDpllHSDivOutFreq)
+                  102b2186    0000000a     --HOLE-- [fill = 0]
+                  102b2190    00000142     nortos.awr294x.r5f.ti-arm-clang.debug.lib : DebugP_shmLogWriter.obj (.text.DebugP_shmLogWriterPutChar)
+                  102b22d2    0000000e     --HOLE-- [fill = 0]
+                  102b22e0    0000013c                                               : ClockP_nortos_r5.obj (.text.ClockP_init)
+                  102b241c    00000004     --HOLE-- [fill = 0]
+                  102b2420    0000013c     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_notify_v1_cfg.obj (.text.IpcNotify_trigInterrupt)
+                  102b255c    00000004     --HOLE-- [fill = 0]
+                  102b2560    00000138     nortos.awr294x.r5f.ti-arm-clang.debug.lib : printf.obj (.text._ntoa_long_long)
+                  102b2698    00000008     --HOLE-- [fill = 0]
+                  102b26a0    00000134     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_rpmsg_vring.obj (.text.RPMessage_vringReset)
+                  102b27d4    0000000c     --HOLE-- [fill = 0]
+                  102b27e0    0000011e                                                : soc_rcm.obj (.text.SOC_rcmGetApllHSDivOutFreq)
+                  102b28fe    00000002     --HOLE-- [fill = 0]
+                  102b2900    0000011c     nortos.awr294x.r5f.ti-arm-clang.debug.lib : DebugP_shmLogWriter.obj (.text.DebugP_shmLogWriterPutLine)
+                  102b2a1c    00000004     --HOLE-- [fill = 0]
+                  102b2a20    0000011c     ipc_rpmsg_echo.o (.text.ipc_rpmsg_echo_remote_core_start)
+                  102b2b3c    00000118     libclang_rt.builtins.a : udivmoddi4.S.obj (.text)
+                  102b2c54    0000000c     --HOLE-- [fill = 0]
+                  102b2c60    00000114     nortos.awr294x.r5f.ti-arm-clang.debug.lib : printf.obj (.text._ntoa_long)
+                  102b2d74    0000000c     --HOLE-- [fill = 0]
+                  102b2d80    00000102     drivers.awr294x.r5f.ti-arm-clang.debug.lib : soc_rcm.obj (.text.SOC_rcmADPLLJGetFOut)
+                  102b2e82    0000000e     --HOLE-- [fill = 0]
+                  102b2e90    000000f6     nortos.awr294x.r5f.ti-arm-clang.debug.lib : SemaphoreP_nortos.obj (.text.SemaphoreP_pend)
+                  102b2f86    0000000a     --HOLE-- [fill = 0]
+                  102b2f90    000000f2     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_rpmsg_vring.obj (.text.RPMessage_vringPutFullTxBuf)
+                  102b3082    0000000e     --HOLE-- [fill = 0]
+                  102b3090    000000e2     ti_drivers_config.o (.text.System_init)
+                  102b3172    0000000e     --HOLE-- [fill = 0]
+                  102b3180    000000dc     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_rpmsg_vring.obj (.text.RPMessage_vringGetFullRxBuf)
+                  102b325c    00000004     --HOLE-- [fill = 0]
+                  102b3260    000000dc                                                : soc_rcm.obj (.text.SOC_rcmGetCoreFout)
+                  102b333c    00000004     --HOLE-- [fill = 0]
+                  102b3340    000000dc                                                : soc_rcm.obj (.text.SOC_rcmGetDSSFout)
+                  102b341c    00000004     --HOLE-- [fill = 0]
+                  102b3420    000000dc                                                : soc_rcm.obj (.text.SOC_rcmGetPerFout)
+                  102b34fc    00000004     --HOLE-- [fill = 0]
+                  102b3500    000000d4                                                : ipc_rpmsg.obj (.text.RPMessage_construct)
+                  102b35d4    0000000c     --HOLE-- [fill = 0]
+                  102b35e0    000000d2                                                : ipc_rpmsg_vring.obj (.text.RPMessage_vringPutEmptyRxBuf)
+                  102b36b2    0000000e     --HOLE-- [fill = 0]
+                  102b36c0    000000c8                                                : ipc_rpmsg_vring.obj (.text.RPMessage_vringGetEmptyTxBuf)
+                  102b3788    00000008     --HOLE-- [fill = 0]
+                  102b3790    000000c6                                                : ipc_rpmsg.obj (.text.RPMessage_coreInit)
+                  102b3856    0000000a     --HOLE-- [fill = 0]
+                  102b3860    000000c4                                                : ipc_notify_v1.obj (.text.IpcNotify_readAckCallback)
+                  102b3924    0000000c     --HOLE-- [fill = 0]
+                  102b3930    000000c0     nortos.awr294x.r5f.ti-arm-clang.debug.lib : printf.obj (.text._out_rev)
+                  102b39f0    000000be                                               : ClockP_nortos.obj (.text.ClockP_timerTickIsr)
+                  102b3aae    00000002     --HOLE-- [fill = 0]
+                  102b3ab0    000000ba                                               : ClockP_nortos.obj (.text.ClockP_stop)
+                  102b3b6a    00000006     --HOLE-- [fill = 0]
+                  102b3b70    000000ba     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_notify_v1.obj (.text.IpcNotify_waitSync)
+                  102b3c2a    00000006     --HOLE-- [fill = 0]
+                  102b3c30    000000b2                                                : soc_rcm.obj (.text.SOC_rcmGetXTALFrequency)
+                  102b3ce2    0000000e     --HOLE-- [fill = 0]
+                  102b3cf0    000000b0                                                : soc_rcm.obj (.text.SOC_rcmSetPeripheralClock)
+                  102b3da0    000000aa                                                : soc_rcm.obj (.text.SOC_rcmGetFreqLeafNode)
+                  102b3e4a    00000006     --HOLE-- [fill = 0]
+                  102b3e50    000000a8     nortos.awr294x.r5f.ti-arm-clang.debug.lib : ClockP_nortos.obj (.text.ClockP_addToList)
+                  102b3ef8    00000008     --HOLE-- [fill = 0]
+                  102b3f00    000000a8                                               : ClockP_nortos.obj (.text.ClockP_destruct)
+                  102b3fa8    00000008     --HOLE-- [fill = 0]
+                  102b3fb0    000000a8     drivers.awr294x.r5f.ti-arm-clang.debug.lib : soc_rcm.obj (.text.SOC_rcmGetCoreHSDivOut)
+                  102b4058    00000008     --HOLE-- [fill = 0]
+                  102b4060    000000a8                                                : soc_rcm.obj (.text.SOC_rcmGetDSSHSDivOut)
+                  102b4108    00000008     --HOLE-- [fill = 0]
+                  102b4110    000000a8                                                : soc_rcm.obj (.text.SOC_rcmGetPerHSDivOut)
+                  102b41b8    00000008     --HOLE-- [fill = 0]
+                  102b41c0    000000a8     nortos.awr294x.r5f.ti-arm-clang.debug.lib : PmuP_armv7r.obj (.text.pmu)
+                  102b4268    00000008     --HOLE-- [fill = 0]
+                  102b4270    000000a4     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_notify_v1.obj (.text.IpcNotify_deInit)
+                  102b4314    0000000c     --HOLE-- [fill = 0]
+                  102b4320    000000a2                                                : ipc_notify_v1.obj (.text.IpcNotify_mailboxWrite)
+                  102b43c2    0000000e     --HOLE-- [fill = 0]
+                  102b43d0    00000098                                                : ipc_notify_v1.obj (.text.IpcNotify_registerClient)
+                  102b4468    00000008     --HOLE-- [fill = 0]
+                  102b4470    00000098                                                : ipc_notify_v1.obj (.text.IpcNotify_syncAll)
+                  102b4508    00000008     --HOLE-- [fill = 0]
+                  102b4510    00000094                                                : ipc_notify_v1.obj (.text.IpcNotify_Params_init)
+                  102b45a4    0000000c     --HOLE-- [fill = 0]
+                  102b45b0    00000092     nortos.awr294x.r5f.ti-arm-clang.debug.lib : ClockP_nortos.obj (.text.ClockP_getTimeUsec)
+                  102b4642    0000000e     --HOLE-- [fill = 0]
+                  102b4650    00000086     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_rpmsg.obj (.text.RPMessage_Params_init)
+                  102b46d6    0000000a     --HOLE-- [fill = 0]
+                  102b46e0    00000086                                                : ipc_rpmsg.obj (.text.RPMessage_getEndPtMsg)
+                  102b4766    0000000a     --HOLE-- [fill = 0]
+                  102b4770    00000084                                                : ipc_rpmsg.obj (.text.RPMessage_notifyCallback)
+                  102b47f4    0000000c     --HOLE-- [fill = 0]
+                  102b4800    00000082                                                : soc_rcm.obj (.text.SOC_rcmGetFreq)
+                  102b4882    0000000e     --HOLE-- [fill = 0]
+                  102b4890    00000082     nortos.awr294x.r5f.ti-arm-clang.debug.lib : DebugP_log.obj (.text._DebugP_assert)
+                  102b4912    0000000e     --HOLE-- [fill = 0]
+                  102b4920    00000080     drivers.awr294x.r5f.ti-arm-clang.debug.lib : soc_rcm.obj (.text.SOC_rcmGetR5InFrequency)
+                  102b49a0    0000007c                                                : ipc_notify_v1.obj (.text.IpcNotify_mailboxReadSwQ)
+                  102b4a1c    00000078     libc.a : snprintf.c.obj (.text.snprintf)
+                  102b4a94    0000000c     --HOLE-- [fill = 0]
+                  102b4aa0    00000076     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_rpmsg_vring.obj (.text.RPMessage_vringIsFullRxBuf)
+                  102b4b16    0000000a     --HOLE-- [fill = 0]
+                  102b4b20    00000072     nortos.awr294x.r5f.ti-arm-clang.debug.lib : ClockP_nortos.obj (.text.ClockP_usleep)
+                  102b4b92    0000000e     --HOLE-- [fill = 0]
+                  102b4ba0    00000072     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_notify_v1.obj (.text.IpcNotify_makeMsg)
+                  102b4c12    0000000e     --HOLE-- [fill = 0]
+                  102b4c20    00000072                                                : ipc_rpmsg.obj (.text.RPMessage_destruct)
+                  102b4c92    0000000e     --HOLE-- [fill = 0]
+                  102b4ca0    00000070     nortos.awr294x.r5f.ti-arm-clang.debug.lib : ClockP_nortos.obj (.text.ClockP_construct)
+                  102b4d10    00000068     libc.a : atoi.c.obj (.text.atoi)
+                  102b4d78    00000008     --HOLE-- [fill = 0]
+                  102b4d80    00000064     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_rpmsg.obj (.text.RPMessage_controlEndPtHandler)
+                  102b4de4    0000000c     --HOLE-- [fill = 0]
+                  102b4df0    00000062                                                : soc_rcm.obj (.text.SOC_rcmInsert16)
+                  102b4e52    0000000e     --HOLE-- [fill = 0]
+                  102b4e60    0000005e                                                : ipc_rpmsg_vring.obj (.text.RPMessage_vringCheckEmptyTxBuf)
+                  102b4ebe    00000002     --HOLE-- [fill = 0]
+                  102b4ec0    0000005e     nortos.awr294x.r5f.ti-arm-clang.debug.lib : SemaphoreP_nortos.obj (.text.SemaphoreP_post)
+                  102b4f1e    00000002     --HOLE-- [fill = 0]
+                  102b4f20    0000005c     ti_power_clock_config.o (.text.Module_clockSetFrequency)
+                  102b4f7c    00000058     libc.a : snprintf.c.obj (.text._outs)
+                  102b4fd4    0000000c     --HOLE-- [fill = 0]
+                  102b4fe0    00000054     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_notify_v1.obj (.text.IpcNotify_getMemoryToWrite)
+                  102b5034    0000000c     --HOLE-- [fill = 0]
+                  102b5040    00000054                                                : soc_rcm.obj (.text.SOC_rcmGetModuleClkDivVal)
+                  102b5094    00000054     libc.a : autoinit.c.obj (.text:__TI_auto_init_nobinit_nopinit)
+                  102b50e8    00000008     --HOLE-- [fill = 0]
+                  102b50f0    00000052     ti_dpl_config.o (.text.Dpl_init)
+                  102b5142    0000000e     --HOLE-- [fill = 0]
+                  102b5150    00000052     drivers.awr294x.r5f.ti-arm-clang.debug.lib : pinmux.obj (.text.Pinmux_config)
+                  102b51a2    0000000e     --HOLE-- [fill = 0]
+                  102b51b0    00000052                                                : ipc_rpmsg.obj (.text.RPMessage_allocEndPtMsg)
+                  102b5202    0000000e     --HOLE-- [fill = 0]
+                  102b5210    00000052                                                : soc_rcm.obj (.text.SOC_rcmGetClkSrcFromClkSelVal)
+                  102b5262    0000000e     --HOLE-- [fill = 0]
+                  102b5270    00000052     nortos.awr294x.r5f.ti-arm-clang.debug.lib : SemaphoreP_nortos.obj (.text.SemaphoreP_construct)
+                  102b52c2    0000000e     --HOLE-- [fill = 0]
+                  102b52d0    0000004e     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_notify_v1.obj (.text.IpcNotify_getMemoryToRead)
+                  102b531e    00000002     --HOLE-- [fill = 0]
+                  102b5320    0000004c                                                : ipc_notify_v1.obj (.text.IpcNotify_getWriteMailbox)
+                  102b536c    00000004     --HOLE-- [fill = 0]
+                  102b5370    0000004c                                                : ipc_notify_v1.obj (.text.IpcNotify_unregisterClient)
+                  102b53bc    00000004     --HOLE-- [fill = 0]
+                  102b53c0    0000004c     ti_power_clock_config.o (.text.Module_clockDisable)
+                  102b540c    00000004     --HOLE-- [fill = 0]
+                  102b5410    0000004c     ti_power_clock_config.o (.text.Module_clockEnable)
+                  102b545c    0000004c     libc.a : memccpy.c.obj (.text.memccpy)
+                  102b54a8    00000008     --HOLE-- [fill = 0]
+                  102b54b0    00000048     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_rpmsg.obj (.text.RPMessage_queueGet)
+                  102b54f8    00000008     --HOLE-- [fill = 0]
+                  102b5500    00000046                                                : ipc_rpmsg.obj (.text.RPMessage_freeEndPtMsg)
+                  102b5546    0000000a     --HOLE-- [fill = 0]
+                  102b5550    00000046                                                : ipc_rpmsg_vring.obj (.text.RPMessage_vringGetSize)
+                  102b5596    0000000a     --HOLE-- [fill = 0]
+                  102b55a0    00000044                                                : soc_rcm.obj (.text.SOC_rcmExtract16)
+                  102b55e4    0000000c     --HOLE-- [fill = 0]
+                  102b55f0    00000044                                                : soc_rcm.obj (.text.SOC_rcmExtract8)
+                  102b5634    0000000c     --HOLE-- [fill = 0]
+                  102b5640    00000044                                                : soc_rcm.obj (.text.SOC_rcmMake16)
+                  102b5684    0000000c     --HOLE-- [fill = 0]
+                  102b5690    00000044     nortos.awr294x.r5f.ti-arm-clang.debug.lib : DebugP_nortos.obj (.text._DebugP_logZone)
+                  102b56d4    0000000c     --HOLE-- [fill = 0]
+                  102b56e0    00000044                                               : printf.obj (.text._strnlen_s)
+                  102b5724    0000000c     --HOLE-- [fill = 0]
+                  102b5730    00000042                                               : ClockP_nortos.obj (.text.ClockP_start)
+                  102b5772    0000000e     --HOLE-- [fill = 0]
+                  102b5780    00000042                                               : DebugP_shmLogWriter.obj (.text.DebugP_shmLogWriterInit)
+                  102b57c2    0000000e     --HOLE-- [fill = 0]
+                  102b57d0    00000042     ti_drivers_config.o (.text.IpcNotify_allocSwQueue)
+                  102b5812    0000000e     --HOLE-- [fill = 0]
+                  102b5820    00000042     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_notify_v1.obj (.text.IpcNotify_getReadDoneAckMailbox)
+                  102b5862    0000000e     --HOLE-- [fill = 0]
+                  102b5870    00000042                                                : ipc_notify_v1.obj (.text.IpcNotify_mailboxWriteCustomIpcConfig)
+                  102b58b2    0000000e     --HOLE-- [fill = 0]
+                  102b58c0    00000040                                                : soc_rcm.obj (.text.SOC_rcmExtract32)
+                  102b5900    0000003e                                                : ipc_rpmsg.obj (.text.RPMessage_getLocalEndPt)
+                  102b593e    00000002     --HOLE-- [fill = 0]
+                  102b5940    0000003e                                                : soc_rcm.obj (.text.SOC_rcmIsPadDisableRequired)
+                  102b597e    00000002     --HOLE-- [fill = 0]
+                  102b5980    0000003c                                                : ipc_rpmsg.obj (.text.RPMessage_deInit)
+                  102b59bc    00000004     --HOLE-- [fill = 0]
+                  102b59c0    0000003c                                                : ipc_rpmsg.obj (.text.RPMessage_isLinuxCore)
+                  102b59fc    00000004     --HOLE-- [fill = 0]
+                  102b5a00    0000003c                                                : ipc_rpmsg_vring.obj (.text.RPMessage_vringGetRxBufAddr)
+                  102b5a3c    00000004     --HOLE-- [fill = 0]
+                  102b5a40    0000003c                                                : ipc_rpmsg_vring.obj (.text.RPMessage_vringGetTxBufAddr)
+                  102b5a7c    00000004     --HOLE-- [fill = 0]
+                  102b5a80    0000003c                                                : ipc_rpmsg_vring.obj (.text.RPMessage_vringGetTxBufLen)
+                  102b5abc    00000004     --HOLE-- [fill = 0]
+                  102b5ac0    0000003a                                                : ipc_rpmsg.obj (.text.RPMessage_coreDeInit)
+                  102b5afa    00000006     --HOLE-- [fill = 0]
+                  102b5b00    0000003a     nortos.awr294x.r5f.ti-arm-clang.debug.lib : printf.obj (.text._atoi)
+                  102b5b3a    00000006     --HOLE-- [fill = 0]
+                  102b5b40    0000003a                                               : printf.obj (.text.snprintf_)
+                  102b5b7a    00000006     --HOLE-- [fill = 0]
+                  102b5b80    00000038     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_notify_v1.obj (.text.IpcNotify_getReadSwQ)
+                  102b5bb8    00000008     --HOLE-- [fill = 0]
+                  102b5bc0    00000038                                                : soc.obj (.text.SOC_getCoreName)
+                  102b5bf8    00000008     --HOLE-- [fill = 0]
+                  102b5c00    00000036                                                : ipc_notify_v1.obj (.text.IpcNotify_syncCallback)
+                  102b5c36    0000000a     --HOLE-- [fill = 0]
+                  102b5c40    00000036                                                : ipc_rpmsg.obj (.text.RPMessage_controlEndPtInit)
+                  102b5c76    0000000a     --HOLE-- [fill = 0]
+                  102b5c80    00000036                                                : ipc_rpmsg.obj (.text.RPMessage_queuePut)
+                  102b5cb6    0000000a     --HOLE-- [fill = 0]
+                  102b5cc0    00000036     ipc_rpmsg_echo.o (.text.ipc_rpmsg_echo_main)
+                  102b5cf6    0000000a     --HOLE-- [fill = 0]
+                  102b5d00    00000034     nortos.awr294x.r5f.ti-arm-clang.debug.lib : TimerP_rti.obj (.text.TimerP_Params_init)
+                  102b5d34    0000000c     --HOLE-- [fill = 0]
+                  102b5d40    00000032     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_notify_v1.obj (.text.IpcNotify_mailboxIsPendingIntr)
+                  102b5d72    0000000e     --HOLE-- [fill = 0]
+                  102b5d80    00000032                                                : ipc_notify_v1.obj (.text.IpcNotify_mailboxReadCustomIpcConfig)
+                  102b5db2    0000000e     --HOLE-- [fill = 0]
+                  102b5dc0    00000032     nortos.awr294x.r5f.ti-arm-clang.debug.lib : TimerP_rti.obj (.text.TimerP_getCount)
+                  102b5df2    0000000e     --HOLE-- [fill = 0]
+                  102b5e00    00000030     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_notify_v1.obj (.text.IpcNotify_getReadDoneMailbox)
+                  102b5e30    00000030                                                : ipc_notify_v1.obj (.text.IpcNotify_getReadMailbox)
+                  102b5e60    00000030     nortos.awr294x.r5f.ti-arm-clang.debug.lib : PmuP_armv7r_asm.obj (.text.pmu)
+                  102b5e90    0000002e     drivers.awr294x.r5f.ti-arm-clang.debug.lib : soc_rcm.obj (.text.SOC_rcmGetPeripheralClockFrequency)
+                  102b5ebe    00000002     --HOLE-- [fill = 0]
+                  102b5ec0    0000002e     nortos.awr294x.r5f.ti-arm-clang.debug.lib : printf.obj (.text._is_digit)
+                  102b5eee    00000002     --HOLE-- [fill = 0]
+                  102b5ef0    0000002c                                               : DebugP_log.obj (.text.DebugP_logZoneEnable)
+                  102b5f1c    00000004     --HOLE-- [fill = 0]
+                  102b5f20    0000002c     ti_pinmux_config.o (.text.Pinmux_init)
+                  102b5f4c    00000004     --HOLE-- [fill = 0]
+                  102b5f50    0000002c     drivers.awr294x.r5f.ti-arm-clang.debug.lib : soc_rcm.obj (.text.SOC_rcmGetHSDivClkSrc)
+                  102b5f7c    00000004     --HOLE-- [fill = 0]
+                  102b5f80    0000002c                                                : soc_rcm.obj (.text.SOC_rcmGetR5Clock)
+                  102b5fac    00000004     --HOLE-- [fill = 0]
+                  102b5fb0    0000002c     nortos.awr294x.r5f.ti-arm-clang.debug.lib : SemaphoreP_nortos.obj (.text.SemaphoreP_constructBinary)
+                  102b5fdc    0000002c     libc.a : snprintf.c.obj (.text._outc)
+                  102b6008    00000008     --HOLE-- [fill = 0]
+                  102b6010    0000002a     nortos.awr294x.r5f.ti-arm-clang.debug.lib : ClockP_nortos.obj (.text.ClockP_sleepTicks)
+                  102b603a    00000006     --HOLE-- [fill = 0]
+                  102b6040    0000002a     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_notify_v1.obj (.text.IpcNotify_isCoreEnabled)
+                  102b606a    00000006     --HOLE-- [fill = 0]
+                  102b6070    0000002a                                                : ipc_rpmsg.obj (.text.RPMessage_putEndPtMsg)
+                  102b609a    00000006     --HOLE-- [fill = 0]
+                  102b60a0    00000028                                                : ipc_notify_v1.obj (.text.IpcNotify_syncCustomIpcConfig)
+                  102b60c8    00000008     --HOLE-- [fill = 0]
+                  102b60d0    00000028     nortos.awr294x.r5f.ti-arm-clang.debug.lib : printf.obj (.text.vprintf_)
+                  102b60f8    00000008     --HOLE-- [fill = 0]
+                  102b6100    00000026                                               : printf.obj (.text._out_buffer)
+                  102b6126    0000000a     --HOLE-- [fill = 0]
+                  102b6130    00000026     main.o (.text.main)
+                  102b6156    0000000a     --HOLE-- [fill = 0]
+                  102b6160    00000024     ti_drivers_config.o (.text.IpcNotify_getConfig)
+                  102b6184    00000024     libclang_rt.builtins.a : aeabi_uldivmod.S.obj (.text.__aeabi_uldivmod)
+                  102b61a8    00000008     --HOLE-- [fill = 0]
+                  102b61b0    00000024     nortos.awr294x.r5f.ti-arm-clang.debug.lib : printf.obj (.text._out_char)
+                  102b61d4    0000000c     --HOLE-- [fill = 0]
+                  102b61e0    00000022     drivers.awr294x.r5f.ti-arm-clang.debug.lib : soc_rcm.obj (.text.SOC_rcmGetFixedRootClkFout)
+                  102b6202    0000000e     --HOLE-- [fill = 0]
+                  102b6210    00000020     nortos.awr294x.r5f.ti-arm-clang.debug.lib : ClockP_nortos.obj (.text.ClockP_isActive)
+                  102b6230    00000020     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_notify_v1_cfg.obj (.text.IpcNotify_wait)
+                  102b6250    00000020                                                : ipc_rpmsg.obj (.text.RPMessage_CreateParams_init)
+                  102b6270    00000020     libc.a : wcslen.c.obj (.text.wcslen)
+                  102b6290    0000001e     nortos.awr294x.r5f.ti-arm-clang.debug.lib : ClockP_nortos.obj (.text.ClockP_Params_init)
+                  102b62ae    00000002     --HOLE-- [fill = 0]
+                  102b62b0    0000001e     drivers.awr294x.r5f.ti-arm-clang.debug.lib : soc.obj (.text.SOC_moduleSetClockFrequency)
+                  102b62ce    00000002     --HOLE-- [fill = 0]
+                  102b62d0    0000001c     libc.a : _printfi.c.obj (.text.strlen)
+                  102b62ec    0000001c            : strlen.c.obj (.text.strlen)
+                  102b6308    0000001c            : memcpy32.S.obj (.text:TI_memcpy_small)
+                  102b6324    0000000c     --HOLE-- [fill = 0]
+                  102b6330    00000018     drivers.awr294x.r5f.ti-arm-clang.debug.lib : soc_rcm.obj (.text.CSL_TopCtrl_readXtalFreqScale)
+                  102b6348    00000008     --HOLE-- [fill = 0]
+                  102b6350    00000018     nortos.awr294x.r5f.ti-arm-clang.debug.lib : ClockP_nortos.obj (.text.ClockP_ticksToUsec)
+                  102b6368    00000008     --HOLE-- [fill = 0]
+                  102b6370    00000018     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_notify_v1.obj (.text.IpcNotify_mailboxClearAllInt)
+                  102b6388    00000008     --HOLE-- [fill = 0]
+                  102b6390    00000018     nortos.awr294x.r5f.ti-arm-clang.debug.lib : SemaphoreP_nortos.obj (.text.SemaphoreP_Params_init)
+                  102b63a8    00000008     --HOLE-- [fill = 0]
+                  102b63b0    00000018                                               : TimerP_rti.obj (.text.TimerP_getReloadCount)
+                  102b63c8    00000018     libc.a : memset32.S.obj (.text:TI_memset_small)
+                  102b63e0    00000016     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_notify_v1.obj (.text.IpcNotify_sendSync)
+                  102b63f6    0000000a     --HOLE-- [fill = 0]
+                  102b6400    00000016                                                : ipc_rpmsg_vring.obj (.text.RPMessage_align)
+                  102b6416    0000000a     --HOLE-- [fill = 0]
+                  102b6420    00000016                                                : soc.obj (.text.SOC_getSelfCpuClk)
+                  102b6436    0000000a     --HOLE-- [fill = 0]
+                  102b6440    00000016     nortos.awr294x.r5f.ti-arm-clang.debug.lib : TimerP_rti.obj (.text.TimerP_start)
+                  102b6456    0000000a     --HOLE-- [fill = 0]
+                  102b6460    00000016                                               : TimerP_rti.obj (.text.TimerP_stop)
+                  102b6476    0000000a     --HOLE-- [fill = 0]
+                  102b6480    00000014     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_notify_v1.obj (.text.IpcNotify_mailboxClearPendingIntr)
+                  102b6494    0000000c     --HOLE-- [fill = 0]
+                  102b64a0    00000014                                                : ipc_rpmsg.obj (.text.RPMessage_controlEndPtDeInit)
+                  102b64b4    0000000c     --HOLE-- [fill = 0]
+                  102b64c0    00000014                                                : soc_rcm.obj (.text.SOC_rcmGetModuleClkDivFromRegVal)
+                  102b64d4    0000000c     --HOLE-- [fill = 0]
+                  102b64e0    00000014     ti_drivers_config.o (.text.System_deinit)
+                  102b64f4    0000000c     --HOLE-- [fill = 0]
+                  102b6500    00000014     nortos.awr294x.r5f.ti-arm-clang.debug.lib : TimerP_rti.obj (.text.TimerP_clearOverflowInt)
+                  102b6514    0000000c     --HOLE-- [fill = 0]
+                  102b6520    00000014     ti_dpl_config.o (.text.putchar_)
+                  102b6534    0000000c     --HOLE-- [fill = 0]
+                  102b6540    00000012     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_rpmsg.obj (.text.RPMessage_queueReset)
+                  102b6552    0000000e     --HOLE-- [fill = 0]
+                  102b6560    00000010                                                : pinmux.obj (.text.CSL_REG32_WR_RAW)
+                  102b6570    00000010                                                : soc.obj (.text.CSL_REG32_WR_RAW)
+                  102b6580    00000010     nortos.awr294x.r5f.ti-arm-clang.debug.lib : ClockP_nortos_r5.obj (.text.ClockP_getTimerCount)
+                  102b6590    00000010                                               : ClockP_nortos_r5.obj (.text.ClockP_timerClearOverflowInt)
+                  102b65a0    00000010     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_notify_v1.obj (.text.IpcNotify_mailboxGetPendingIntr)
+                  102b65b0    00000010                                                : soc.obj (.text.SOC_moduleClockEnable)
+                  102b65c0    00000010     libclang_rt.builtins.a : aeabi_memset.S.obj (.text.__aeabi_memset)
+                  102b65d0    00000010     nortos.awr294x.r5f.ti-arm-clang.debug.lib : printf.obj (.text._out_null)
+                  102b65e0    0000000e     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_notify_v1.obj (.text.IpcNotify_isCustomIpcConfigEnabled)
+                  102b65ee    00000002     --HOLE-- [fill = 0]
+                  102b65f0    0000000c     ti_board_open_close.o (.text.Board_driversOpen)
+                  102b65fc    00000004     --HOLE-- [fill = 0]
+                  102b6600    0000000c     nortos.awr294x.r5f.ti-arm-clang.debug.lib : ClockP_nortos.obj (.text.ClockP_getTicks)
+                  102b660c    00000004     --HOLE-- [fill = 0]
+                  102b6610    0000000c     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_notify_v1.obj (.text.IpcNotify_getSelfCoreId)
+                  102b661c    00000004     --HOLE-- [fill = 0]
+                  102b6620    0000000c     ti_power_clock_config.o (.text.PowerClock_init)
+                  102b662c    00000004     --HOLE-- [fill = 0]
+                  102b6630    0000000a     nortos.awr294x.r5f.ti-arm-clang.debug.lib : HwiP_armv7r_vim.obj (.text.Hwip_dataAndInstructionBarrier)
+                  102b663a    00000006     --HOLE-- [fill = 0]
+                  102b6640    0000000a     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_notify_v1.obj (.text.IpcNotify_dataAndInstructionBarrier)
+                  102b664a    00000006     --HOLE-- [fill = 0]
+                  102b6650    0000000a                                                : ipc_rpmsg_vring.obj (.text.IpcRpMsg_dataAndInstructionBarrier)
+                  102b665a    00000006     --HOLE-- [fill = 0]
+                  102b6660    00000008                                                : soc_rcm.obj (.text.CSL_TopCtrl_getBaseAddress)
+                  102b6668    00000008     --HOLE-- [fill = 0]
+                  102b6670    00000008     ti_power_clock_config.o (.text.PowerClock_deinit)
+                  102b6678    00000008     --HOLE-- [fill = 0]
+                  102b6680    00000008     nortos.awr294x.r5f.ti-arm-clang.debug.lib : SemaphoreP_nortos.obj (.text.SemaphoreP_destruct)
+                  102b6688    00000008     --HOLE-- [fill = 0]
+                  102b6690    00000006     drivers.awr294x.r5f.ti-arm-clang.debug.lib : soc_rcm.obj (.text.CSL_DSSRCM_getBaseAddress)
+                  102b6696    0000000a     --HOLE-- [fill = 0]
+                  102b66a0    00000006                                                : soc_rcm.obj (.text.CSL_RCM_getBaseAddress)
+                  102b66a6    0000000a     --HOLE-- [fill = 0]
+                  102b66b0    00000006                                                : soc_rcm.obj (.text.CSL_TopRCM_getBaseAddress)
+                  102b66b6    0000000a     --HOLE-- [fill = 0]
+                  102b66c0    00000002     ti_board_config.o (.text.Board_deinit)
+                  102b66c2    0000000e     --HOLE-- [fill = 0]
+                  102b66d0    00000002     ti_board_open_close.o (.text.Board_driversClose)
+                  102b66d2    0000000e     --HOLE-- [fill = 0]
+                  102b66e0    00000002     ti_board_config.o (.text.Board_init)
+                  102b66e2    0000000e     --HOLE-- [fill = 0]
+                  102b66f0    00000002     ti_dpl_config.o (.text.Dpl_deinit)
+                  102b66f2    0000000e     --HOLE-- [fill = 0]
+                  102b6700    00000002     ti_drivers_open_close.o (.text.Drivers_open)
+                  102b6702    0000000e     --HOLE-- [fill = 0]
+
+.rodata    0    102b6710    000012a0     
+                  102b6710    00000188     drivers.awr294x.r5f.ti-arm-clang.debug.lib : soc_rcm.obj (.rodata.gSocRcmADPLLJConfigTbl)
+                  102b6898    00000008                                                : soc_rcm.obj (.rodata.gSocRcmXTALFreqTbl)
+                  102b68a0    00000101     libc.a : aeabi_ctype.S.obj (.rodata:__aeabi_ctype_table_)
+                  102b69a1    0000007f     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_rpmsg.obj (.rodata.str1.7723343948726634474.1)
+                  102b6a20    0000007c                                                : ipc_rpmsg.obj (.rodata.str1.882666447729012844.1)
+                  102b6a9c    00000075                                                : ipc_rpmsg.obj (.rodata.str1.2083685040620277556.1)
+                  102b6b11    00000003     ipc_rpmsg_echo.o (.rodata.str1.8781673723393218457.1)
+                  102b6b14    00000074     ti_dpl_config.o (.rodata.cfg)
+                  102b6b88    00000073     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_rpmsg.obj (.rodata.str1.17585504750102706928.1)
+                  102b6bfb    0000006f                                                : ipc_rpmsg.obj (.rodata.str1.7933235615949331309.1)
+                  102b6c6a    00000069                                                : soc_rcm.obj (.rodata.gSocRcmClkSrcInfoMap)
+                  102b6cd3    00000064                                                : ipc_rpmsg.obj (.rodata.str1.14097889213147046469.1)
+                  102b6d37    00000063                                                : ipc_rpmsg.obj (.rodata.str1.2212735509010662771.1)
+                  102b6d9a    00000056     ipc_rpmsg_echo.o (.rodata.str1.10594856072960133.1)
+                  102b6df0    00000050     nortos.awr294x.r5f.ti-arm-clang.debug.lib : printf.obj (.rodata._ftoa.pow10)
+                  102b6e40    0000004b     ipc_rpmsg_echo.o (.rodata.str1.16569425378498583952.1)
+                  102b6e8b    00000040     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_notify_v1.obj (.rodata.str1.10118846006578224169.1)
+                  102b6ecb    0000003d     ipc_rpmsg_echo.o (.rodata.str1.2569960492806026473.1)
+                  102b6f08    0000003d     nortos.awr294x.r5f.ti-arm-clang.debug.lib : TimerP_rti.obj (.rodata.str1.8636677665714190513.1)
+                  102b6f45    00000037                                               : SemaphoreP_nortos.obj (.rodata.str1.10662889980186908518.1)
+                  102b6f7c    00000035     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_rpmsg.obj (.rodata.str1.12490517295006761435.1)
+                  102b6fb1    00000035     ipc_rpmsg_echo.o (.rodata.str1.182526020320540122.1)
+                  102b6fe6    00000035     ipc_rpmsg_echo.o (.rodata.str1.343313209506666693.1)
+                  102b701b    00000034     ipc_rpmsg_echo.o (.rodata.str1.10548861827143506363.1)
+                  102b704f    00000030     ipc_rpmsg_echo.o (.rodata.str1.1250284880471985934.1)
+                  102b707f    0000002f     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_notify_v1.obj (.rodata.str1.9418228565027791152.1)
+                  102b70ae    0000002e     nortos.awr294x.r5f.ti-arm-clang.debug.lib : ClockP_nortos.obj (.rodata.str1.2466132907014901005.1)
+                  102b70dc    0000002e     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_notify_v1_cfg.obj (.rodata.str1.9333447753637572630.1)
+                  102b710a    0000002d                                                : soc_rcm.obj (.rodata.str1.13371245503524111651.1)
+                  102b7137    0000002a     nortos.awr294x.r5f.ti-arm-clang.debug.lib : DebugP_log.obj (.rodata.str1.227947788441500939.1)
+                  102b7161    00000029     drivers.awr294x.r5f.ti-arm-clang.debug.lib : soc_rcm.obj (.rodata.str1.5389960437019493790.1)
+                  102b718a    00000002     --HOLE-- [fill = 0]
+                  102b718c    00000028                                                : soc_rcm.obj (.rodata.gSocRcmFixedClocksTbl)
+                  102b71b4    00000027     nortos.awr294x.r5f.ti-arm-clang.debug.lib : ClockP_nortos_r5.obj (.rodata.str1.12743090444791882666.1)
+                  102b71db    00000023                                               : ClockP_nortos_r5.obj (.rodata.str1.7689125538912326484.1)
+                  102b71fe    00000021     ipc_rpmsg_echo.o (.rodata.str1.2535297069683531246.1)
+                  102b721f    00000021     nortos.awr294x.r5f.ti-arm-clang.debug.lib : ClockP_nortos_r5.obj (.rodata.str1.8559540482768925367.1)
+                  102b7240    00000020     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_notify_v1.obj (.rodata.str1.2046905611612007019.1)
+                  102b7260    0000001f     ipc_rpmsg_echo.o (.rodata.str1.1099735390845977887.1)
+                  102b727f    0000001f     nortos.awr294x.r5f.ti-arm-clang.debug.lib : SemaphoreP_nortos.obj (.rodata.str1.11943902863462617530.1)
+                  102b729e    0000001f     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_rpmsg_vring.obj (.rodata.str1.14997963732428335466.1)
+                  102b72bd    0000001f     nortos.awr294x.r5f.ti-arm-clang.debug.lib : ClockP_nortos_r5.obj (.rodata.str1.2746619892315392655.1)
+                  102b72dc    0000001f     drivers.awr294x.r5f.ti-arm-clang.debug.lib : soc_rcm.obj (.rodata.str1.4312025440500206638.1)
+                  102b72fb    0000001e                                                : ipc_notify_v1.obj (.rodata.str1.16593710740832512674.1)
+                  102b7319    0000001e                                                : ipc_notify_v1.obj (.rodata.str1.9050127465416171240.1)
+                  102b7337    0000001d     nortos.awr294x.r5f.ti-arm-clang.debug.lib : TimerP_rti.obj (.rodata.str1.16072626274289208570.1)
+                  102b7354    0000001d                                               : TimerP_rti.obj (.rodata.str1.3969290967820031423.1)
+                  102b7371    0000001c     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_notify_v1_cfg.obj (.rodata.str1.264689326032831299.1)
+                  102b738d    0000001c                                                : ipc_rpmsg_vring.obj (.rodata.str1.6129980899926192174.1)
+                  102b73a9    0000001b                                                : soc_rcm.obj (.rodata.str1.16607280105437489952.1)
+                  102b73c4    0000001b     nortos.awr294x.r5f.ti-arm-clang.debug.lib : ClockP_nortos.obj (.rodata.str1.6242061149943917857.1)
+                  102b73df    0000001b     ti_drivers_config.o (.rodata.str1.7767457247551078139.1)
+                  102b73fa    0000001a     drivers.awr294x.r5f.ti-arm-clang.debug.lib : soc_rcm.obj (.rodata.gSocRcmCpswClkSrcValMap)
+                  102b7414    0000001a                                                : soc_rcm.obj (.rodata.gSocRcmCptsClkSrcValMap)
+                  102b742e    0000001a                                                : soc_rcm.obj (.rodata.gSocRcmCsiRxClkSrcValMap)
+                  102b7448    0000001a                                                : soc_rcm.obj (.rodata.gSocRcmDssHwaClkSrcValMap)
+                  102b7462    0000001a                                                : soc_rcm.obj (.rodata.gSocRcmDssRtiClkSrcValMap)
+                  102b747c    0000001a                                                : soc_rcm.obj (.rodata.gSocRcmDssSciClkSrcValMap)
+                  102b7496    0000001a                                                : soc_rcm.obj (.rodata.gSocRcmI2CClkSrcValMap)
+                  102b74b0    0000001a                                                : soc_rcm.obj (.rodata.gSocRcmMcanClkSrcValMap)
+                  102b74ca    0000001a                                                : soc_rcm.obj (.rodata.gSocRcmQspiClkSrcValMap)
+                  102b74e4    0000001a                                                : soc_rcm.obj (.rodata.gSocRcmRtiClkSrcValMap)
+                  102b74fe    0000001a                                                : soc_rcm.obj (.rodata.gSocRcmSciClkSrcValMap)
+                  102b7518    0000001a                                                : soc_rcm.obj (.rodata.gSocRcmSpiClkSrcValMap)
+                  102b7532    0000001a                                                : soc_rcm.obj (.rodata.str1.16907879152045164286.1)
+                  102b754c    0000001a     nortos.awr294x.r5f.ti-arm-clang.debug.lib : ClockP_nortos_r5.obj (.rodata.str1.3810757863367538396.1)
+                  102b7566    0000001a     ipc_rpmsg_echo.o (.rodata.str1.8082142596123028862.1)
+                  102b7580    00000019     nortos.awr294x.r5f.ti-arm-clang.debug.lib : TimerP_rti.obj (.rodata.str1.12012997325668529457.1)
+                  102b7599    00000019     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_notify_v1.obj (.rodata.str1.12253177398743541182.1)
+                  102b75b2    00000018                                                : soc_rcm.obj (.rodata.str1.15698070000904087989.1)
+                  102b75ca    00000018                                                : ipc_rpmsg.obj (.rodata.str1.18348280632871041422.1)
+                  102b75e2    00000018     ti_drivers_config.o (.rodata.str1.2211846465855763212.1)
+                  102b75fa    00000018     nortos.awr294x.r5f.ti-arm-clang.debug.lib : TimerP_rti.obj (.rodata.str1.4081825994417204303.1)
+                  102b7612    00000018     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_notify_v1_cfg.obj (.rodata.str1.516174688186082407.1)
+                  102b762a    00000018                                                : soc_rcm.obj (.rodata.str1.5644146021439259721.1)
+                  102b7642    00000018     ipc_rpmsg_echo.o (.rodata.str1.5745074238323096032.1)
+                  102b765a    00000018     drivers.awr294x.r5f.ti-arm-clang.debug.lib : soc_rcm.obj (.rodata.str1.8734959275723459859.1)
+                  102b7672    00000017                                                : soc_rcm.obj (.rodata.str1.1263028196474875090.1)
+                  102b7689    00000017                                                : soc_rcm.obj (.rodata.str1.17538818475614418282.1)
+                  102b76a0    00000016                                                : soc_rcm.obj (.rodata.gSocRcmPllCoreOut2HSDivClkSrcValMap)
+                  102b76b6    00000016                                                : soc_rcm.obj (.rodata.gSocRcmPllDspOut1HSDivClkSrcValMap)
+                  102b76cc    00000016                                                : soc_rcm.obj (.rodata.gSocRcmPllDspOut2HSDivClkSrcValMap)
+                  102b76e2    00000016                                                : soc_rcm.obj (.rodata.gSocRcmPllPerOut1HSDivClkSrcValMap)
+                  102b76f8    00000016                                                : ipc_rpmsg.obj (.rodata.str1.16486853128403771656.1)
+                  102b770e    00000016                                                : soc_rcm.obj (.rodata.str1.18101715471844446405.1)
+                  102b7724    00000016                                                : soc_rcm.obj (.rodata.str1.503491203257075565.1)
+                  102b773a    00000016                                                : soc_rcm.obj (.rodata.str1.6958094397977218529.1)
+                  102b7750    00000015                                                : ipc_rpmsg_vring.obj (.rodata.str1.10951797515982497648.1)
+                  102b7765    00000015                                                : ipc_notify_v1.obj (.rodata.str1.2749849238461102323.1)
+                  102b777a    00000015     nortos.awr294x.r5f.ti-arm-clang.debug.lib : SemaphoreP_nortos.obj (.rodata.str1.7662662103702568143.1)
+                  102b778f    00000014     drivers.awr294x.r5f.ti-arm-clang.debug.lib : soc_rcm.obj (.rodata.str1.11890050604266936394.1)
+                  102b77a3    00000014     ipc_rpmsg_echo.o (.rodata.str1.16309018787525748144.1)
+                  102b77b7    00000014     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_rpmsg.obj (.rodata.str1.168554633486331424.1)
+                  102b77cb    00000014                                                : ipc_notify_v1.obj (.rodata.str1.17722115868992979254.1)
+                  102b77df    00000014                                                : ipc_notify_v1.obj (.rodata.str1.5235938544388580736.1)
+                  102b77f3    00000013     nortos.awr294x.r5f.ti-arm-clang.debug.lib : DebugP_shmLogWriter.obj (.rodata.str1.14017905436770086454.1)
+                  102b7806    00000013     drivers.awr294x.r5f.ti-arm-clang.debug.lib : soc_rcm.obj (.rodata.str1.1513614241493853460.1)
+                  102b7819    00000012                                                : soc_rcm.obj (.rodata.str1.11522297560260873926.1)
+                  102b782b    00000012                                                : ipc_notify_v1.obj (.rodata.str1.4922609433019995091.1)
+                  102b783d    00000012                                                : soc_rcm.obj (.rodata.str1.6089483996110695684.1)
+                  102b784f    00000011     libc.a : _printfi.c.obj (.rodata.str1.10348868589481759720.1)
+                  102b7860    00000011            : _printfi.c.obj (.rodata.str1.15363888844622738466.1)
+                  102b7871    00000011     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_notify_v1.obj (.rodata.str1.9036292169629118271.1)
+                  102b7882    00000011     nortos.awr294x.r5f.ti-arm-clang.debug.lib : ClockP_nortos.obj (.rodata.str1.9341864262286480583.1)
+                  102b7893    00000001     --HOLE-- [fill = 0]
+                  102b7894    00000010     drivers.awr294x.r5f.ti-arm-clang.debug.lib : soc_rcm.obj (.rodata.gSocRcmXTALInfo)
+                  102b78a4    00000010                                                : soc_rcm.obj (.rodata.str1.15837709475095375462.1)
+                  102b78b4    0000000f                                                : ipc_rpmsg.obj (.rodata.str1.16919392626257409996.1)
+                  102b78c3    0000000f                                                : ipc_rpmsg.obj (.rodata.str1.2349415626014672259.1)
+                  102b78d2    0000000f                                                : ipc_rpmsg.obj (.rodata.str1.356968843598523335.1)
+                  102b78e1    0000000f                                                : ipc_notify_v1.obj (.rodata.str1.4769539187903082080.1)
+                  102b78f0    0000000d                                                : soc_rcm.obj (.rodata.gSocRcmPeripheralClkSrcInfoMap)
+                  102b78fd    0000000d     nortos.awr294x.r5f.ti-arm-clang.debug.lib : TimerP_rti.obj (.rodata.str1.4652010957040956204.1)
+                  102b790a    0000000d                                               : TimerP_rti.obj (.rodata.str1.8647234761324387433.1)
+                  102b7917    0000000c                                               : ClockP_nortos_r5.obj (.rodata.str1.13463193513887205357.1)
+                  102b7923    0000000c     ti_drivers_config.o (.rodata.str1.3145245972279493797.1)
+                  102b792f    0000000b     drivers.awr294x.r5f.ti-arm-clang.debug.lib : soc_rcm.obj (.rodata.gSocRcmHsDivMuxClkSrcInfoMap)
+                  102b793a    0000000b                                                : ipc_notify_v1_cfg.obj (.rodata.str1.10405701647072130080.1)
+                  102b7945    00000001     --HOLE-- [fill = 0]
+                  102b7946    0000000a                                                : soc_rcm.obj (.rodata.gSocRcmR5ClkSrcValMap)
+                  102b7950    0000000a                                                : soc_rcm.obj (.rodata.str1.6320624314545346468.1)
+                  102b795a    0000000a                                                : ipc_notify_v1.obj (.rodata.str1.8751964444192423158.1)
+                  102b7964    00000008     nortos.awr294x.r5f.ti-arm-clang.debug.lib : DebugP_shmLogWriter.obj (.rodata.str1.11364348920754194803.1)
+                  102b796c    00000008     drivers.awr294x.r5f.ti-arm-clang.debug.lib : soc.obj (.rodata.str1.12179086363571468349.1)
+                  102b7974    00000007                                                : soc.obj (.rodata.str1.15593236263752157262.1)
+                  102b797b    00000007                                                : soc.obj (.rodata.str1.17262473269405332311.1)
+                  102b7982    00000007                                                : soc.obj (.rodata.str1.17795343983633703126.1)
+                  102b7989    00000006                                                : soc_rcm.obj (.rodata.str1.6883917863849351830.1)
+                  102b798f    00000005                                                : soc_rcm.obj (.rodata.gSocRcmR5ClkSrcInfoMap)
+                  102b7994    00000005     nortos.awr294x.r5f.ti-arm-clang.debug.lib : printf.obj (.rodata.str1.8544352122861784523.1)
+                  102b7999    00000005                                               : printf.obj (.rodata.str1.8812429412984920041.1)
+                  102b799e    00000002     --HOLE-- [fill = 0]
+                  102b79a0    00000004                                               : CacheP_armv7r.obj (.rodata.gCacheL1dCacheLineSize)
+                  102b79a4    00000004                                               : CacheP_armv7r.obj (.rodata.gCacheL1pCacheLineSize)
+                  102b79a8    00000004                                               : printf.obj (.rodata.str1.13278797451342649413.1)
+                  102b79ac    00000004                                               : printf.obj (.rodata.str1.17155598869870286803.1)
+
+.text.hwi 
+*          0    102b79b0    00000dd0     
+                  102b79b0    0000061e     nortos.awr294x.r5f.ti-arm-clang.debug.lib : HwiP_armv7r_handlers_nortos.obj (.text.hwi)
+                  102b7fce    00000002     --HOLE-- [fill = 0]
+                  102b7fd0    000005c6                                               : HwiP_armv7r_vim.obj (.text.hwi)
+                  102b8596    00000002     --HOLE-- [fill = 0]
+                  102b8598    00000178                                               : HwiP_armv7r_handlers_nortos_asm.obj (.text.hwi)
+                  102b8710    00000070                                               : HwiP_armv7r_asm.obj (.text.hwi)
+
+.text.cache 
+*          0    102b8780    000004a0     
+                  102b8780    00000340     nortos.awr294x.r5f.ti-arm-clang.debug.lib : CacheP_armv7r_asm.obj (.text.cache)
+                  102b8ac0    00000158                                               : CacheP_armv7r.obj (.text.cache)
+                  102b8c18    00000008     --HOLE-- [fill = 0]
+
+.text.mpu 
+*          0    102b8c20    000002c0     
+                  102b8c20    00000246     nortos.awr294x.r5f.ti-arm-clang.debug.lib : MpuP_armv7r.obj (.text.mpu)
+                  102b8e66    00000002     --HOLE-- [fill = 0]
+                  102b8e68    00000078                                               : MpuP_armv7r_asm.obj (.text.mpu)
+
+.text.boot 
+*          0    102b8ee0    00000170     
+                  102b8ee0    000000fc     nortos.awr294x.r5f.ti-arm-clang.debug.lib : boot_armv7r_asm.obj (.text.boot)
+                  102b8fdc    00000004     --HOLE-- [fill = 0]
+                  102b8fe0    0000002a                                               : DebugP_log.obj (.text.boot)
+                  102b900a    00000006     --HOLE-- [fill = 0]
+                  102b9010    00000024                                               : boot_armv7r.obj (.text.boot)
+                  102b9034    0000000c     --HOLE-- [fill = 0]
+                  102b9040    0000000c     ti_dpl_config.o (.text.boot)
+                  102b904c    00000004     --HOLE-- [fill = 0]
+
+.text:abort 
+*          0    102b9050    00000008     
+                  102b9050    00000008     libc.a : exit.c.obj (.text:abort)
+
+.data      0    102b9058    00000470     
+                  102b9058    000001c0     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_notify_v1_cfg.obj (.data.gIpcNotifyMailboxConfig)
+                  102b9218    000000fc                                                : ipc_notify_v1.obj (.data.gIpcNotifyCtrl)
+                  102b9314    00000080     ti_pinmux_config.o (.data.gPinMuxMainDomainCfg)
+                  102b9394    00000070     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_notify_v1_cfg.obj (.data.gIpcNotifyInterruptConfig_r5fss0_1)
+                  102b9404    00000038     ti_pinmux_config.o (.data.gPinMuxMainDomainCfg1)
+                  102b943c    00000018     ti_dpl_config.o (.data.gClockConfig)
+                  102b9454    00000014     drivers.awr294x.r5f.ti-arm-clang.debug.lib : soc.obj (.data.SOC_getCoreName.coreIdNames)
+                  102b9468    00000010                                                : ipc_notify_v1_cfg.obj (.data.gIpcNotifyCoreIntrBitPos)
+                  102b9478    0000000c     ipc_rpmsg_echo.o (.data.gRemoteCoreId)
+                  102b9484    0000000c     ti_power_clock_config.o (.data.gSocModulesClockFrequency)
+                  102b9490    00000008     nortos.awr294x.r5f.ti-arm-clang.debug.lib : PmuP_armv7r.obj (.data.pmu)
+                  102b9498    00000004                                               : DebugP_shmLogWriter.obj (.data.DebugP_shmLogWriterPutChar.lineBufIndex)
+                  102b949c    00000004     libc.a : aeabi_portable.c.obj (.data.__aeabi_errno)
+                  102b94a0    00000004     nortos.awr294x.r5f.ti-arm-clang.debug.lib : DebugP_log.obj (.data.gDebugLogZone)
+                  102b94a4    00000004                                               : DebugP_shmLogWriter.obj (.data.gDebugShmLogWriter)
+                  102b94a8    00000004                                               : DebugP_shmLogWriter.obj (.data.gDebugShmLogWriterSelfCoreName)
+                  102b94ac    00000004     ti_dpl_config.o (.data.gHwiConfig)
+                  102b94b0    00000004     drivers.awr294x.r5f.ti-arm-clang.debug.lib : ipc_notify_v1_cfg.obj (.data.gIpcNotifyInterruptConfigNum_r5fss0_1)
+                  102b94b4    00000004     ipc_rpmsg_echo.o (.data.gMainCoreId)
+                  102b94b8    00000004     ipc_rpmsg_echo.o (.data.gMsgEchoCount)
+                  102b94bc    00000004     ti_power_clock_config.o (.data.gSocModules)
+                  102b94c0    00000002     ipc_rpmsg_echo.o (.data.gRemoteServiceEndPt)
+                  102b94c2    00000006     --HOLE-- [fill = 0]
+
+.irqstack 
+*          0    102b94c8    00000100     UNINITIALIZED
+                  102b94c8    00000100     --HOLE--
+
+.fiqstack 
+*          0    102b95c8    00000100     UNINITIALIZED
+                  102b95c8    00000100     --HOLE--
+
+.svcstack 
+*          0    102b96c8    00001000     UNINITIALIZED
+                  102b96c8    00001000     --HOLE--
+
+.abortstack 
+*          0    102ba6c8    00000100     UNINITIALIZED
+                  102ba6c8    00000100     --HOLE--
+
+.undefinedstack 
+*          0    102ba7c8    00000100     UNINITIALIZED
+                  102ba7c8    00000100     --HOLE--
+
+.init_array 
+*          0    102a0000    00000000     UNINITIALIZED
+
+.bss.log_shared_mem 
+*          0    102ec000    00002000     NOLOAD SECTION
+                  102ec000    00002000     ti_dpl_config.o (.bss.log_shared_mem)
+
+.bss.ipc_vring_mem 
+*          0    c5000200    00001c80     NOLOAD SECTION
+                  c5000200    00001c80     ti_drivers_config.o (.bss.ipc_vring_mem)
+
+MODULE SUMMARY
+
+       Module                                code    ro data   rw data
+       ------                                ----    -------   -------
+    .\
+       ipc_rpmsg_echo.o                      1028    565       406    
+       main.o                                38      0         0      
+    +--+-------------------------------------+-------+---------+---------+
+       Total:                                1066    565       406    
+                                                                      
+    .\syscfg\
+       ti_dpl_config.o                       116     116       8220   
+       ti_drivers_config.o                   348     63        7296   
+       ti_power_clock_config.o               264     0         16     
+       ti_pinmux_config.o                    44      0         184    
+       ti_board_open_close.o                 14      0         0      
+       ti_board_config.o                     4       0         0      
+       ti_drivers_open_close.o               2       0         0      
+    +--+-------------------------------------+-------+---------+---------+
+       Total:                                792     179       15716  
+                                                                      
+    C:/ti/mmwave_mcuplus_sdk_04_07_01_04/mcu_plus_sdk_awr294x_10_01_00_04/source/drivers/lib/drivers.awr294x.r5f.ti-arm-clang.debug.lib
+       soc_rcm.obj                           4932    1461      0      
+       ipc_rpmsg.obj                         3426    957       1840   
+       ipc_notify_v1.obj                     4824    349       252    
+       ipc_rpmsg_vring.obj                   2060    80        0      
+       ipc_notify_v1_cfg.obj                 688     109       580    
+       soc.obj                               1108    29        20     
+       pinmux.obj                            98      0         0      
+    +--+-------------------------------------+-------+---------+---------+
+       Total:                                17136   2985      2692   
+                                                                      
+    C:/ti/mmwave_mcuplus_sdk_04_07_01_04/mcu_plus_sdk_awr294x_10_01_00_04/source/kernel/nortos/lib/nortos.awr294x.r5f.ti-arm-clang.debug.lib
+       printf.obj                            6780    98        0      
+       HwiP_armv7r_vim.obj                   1488    0         4108   
+       HwiP_armv7r_handlers_nortos.obj       1566    0         0      
+       ClockP_nortos.obj                     1290    90        56     
+       TimerP_rti.obj                        660     194       0      
+       DebugP_shmLogWriter.obj               672     27        134    
+       CacheP_armv7r_asm.obj                 832     0         0      
+       SemaphoreP_nortos.obj                 498     107       0      
+       MpuP_armv7r.obj                       582     0         0      
+       ClockP_nortos_r5.obj                  348     176       0      
+       HwiP_armv7r_handlers_nortos_asm.obj   376     0         0      
+       CacheP_armv7r.obj                     344     8         0      
+       DebugP_log.obj                        216     42        4      
+       boot_armv7r_asm.obj                   252     0         0      
+       PmuP_armv7r.obj                       168     0         8      
+       MpuP_armv7r_asm.obj                   120     0         0      
+       HwiP_armv7r_asm.obj                   112     0         0      
+       DebugP_nortos.obj                     68      0         0      
+       HwiP_armv7r_vectors_nortos_asm.obj    64      0         0      
+       PmuP_armv7r_asm.obj                   48      0         0      
+       boot_armv7r.obj                       36      0         0      
+    +--+-------------------------------------+-------+---------+---------+
+       Total:                                16520   742       4310   
+                                                                      
+    C:\ti\ccs2030\ccs\tools\compiler\ti-cgt-armllvm_4.0.3.LTS\lib\armv7r-ti-none-eabihf/c/libc.a
+       _printfi.c.obj                        3576    34        0      
+       aeabi_ctype.S.obj                     0       257       0      
+       snprintf.c.obj                        252     0         0      
+       atoi.c.obj                            104     0         0      
+       autoinit.c.obj                        84      0         0      
+       memccpy.c.obj                         76      0         0      
+       wcslen.c.obj                          32      0         0      
+       memcpy32.S.obj                        28      0         0      
+       strlen.c.obj                          28      0         0      
+       memset32.S.obj                        24      0         0      
+       aeabi_portable.c.obj                  12      0         4      
+       exit.c.obj                            8       0         0      
+    +--+-------------------------------------+-------+---------+---------+
+       Total:                                4224    291       4      
+                                                                      
+    C:\ti\ccs2030\ccs\tools\compiler\ti-cgt-armllvm_4.0.3.LTS\lib\armv7r-ti-none-eabihf/c/libsysbm.a
+       hostexit.c.obj                        8       0         0      
+    +--+-------------------------------------+-------+---------+---------+
+       Total:                                8       0         0      
+                                                                      
+    C:\ti\ccs2030\ccs\tools\compiler\ti-cgt-armllvm_4.0.3.LTS\lib\armv7r-ti-none-eabihf/libclang_rt.builtins.a
+       udivsi3.S.obj                         464     0         0      
+       udivmoddi4.S.obj                      280     0         0      
+       aeabi_uldivmod.S.obj                  36      0         0      
+       aeabi_memset.S.obj                    28      0         0      
+       aeabi_div0.c.obj                      8       0         0      
+       aeabi_memcpy.S.obj                    4       0         0      
+    +--+-------------------------------------+-------+---------+---------+
+       Total:                                820     0         0      
+                                                                      
+       Heap:                                 0       0         32768  
+       Stack:                                0       0         16384  
+    +--+-------------------------------------+-------+---------+---------+
+       Grand Total:                          40566   4762      72280  
+
+
+GLOBAL SYMBOLS: SORTED ALPHABETICALLY BY Name 
+
+address   name                                 
+-------   ----                                 
+102b66c1  Board_deinit                         
+102b66d1  Board_driversClose                   
+102b65f1  Board_driversOpen                    
+102b66e1  Board_init                           
+102afbc8  C$$EXIT                              
+102b8a90  CacheP_configForceWrThru             
+102b8b51  CacheP_disable                       
+102b8780  CacheP_disableL1d                    
+102b87a8  CacheP_disableL1p                    
+102b8ba1  CacheP_enable                        
+102b87c0  CacheP_enableL1d                     
+102b87d8  CacheP_enableL1p                     
+102b8a84  CacheP_getCacheLevelInfo             
+102b8a4c  CacheP_getEnabled                    
+102b8ac1  CacheP_init                          
+102b8be1  CacheP_inv                           
+102b87f0  CacheP_invL1d                        
+102b8864  CacheP_invL1dAll                     
+102b8828  CacheP_invL1p                        
+102b886c  CacheP_invL1pAll                     
+102b8ab0  CacheP_setDLFO                       
+102b8874  CacheP_wb                            
+102b88ec  CacheP_wbAll                         
+102b88b0  CacheP_wbInv                         
+102b8994  CacheP_wbInvAll                      
+102b89ac  CacheP_wbInvAllAsm                   
+102b6291  ClockP_Params_init                   
+102b4ca1  ClockP_construct                     
+102b3f01  ClockP_destruct                      
+102b6601  ClockP_getTicks                      
+102b45b1  ClockP_getTimeUsec                   
+102b6581  ClockP_getTimerCount                 
+102b22e1  ClockP_init                          
+102b6211  ClockP_isActive                      
+102b5731  ClockP_start                         
+102b3ab1  ClockP_stop                          
+102b6351  ClockP_ticksToUsec                   
+102b6591  ClockP_timerClearOverflowInt         
+102b39f1  ClockP_timerTickIsr                  
+102b4b21  ClockP_usleep                        
+102b5e60  CycleCounterP_getCount32             
+102b41c1  CycleCounterP_init                   
+102b4231  CycleCounterP_nsToTicks              
+102b41e1  CycleCounterP_reset                  
+102b5ef1  DebugP_logZoneEnable                 
+102b5781  DebugP_shmLogWriterInit              
+102b2191  DebugP_shmLogWriterPutChar           
+102b2901  DebugP_shmLogWriterPutLine           
+102b66f1  Dpl_deinit                           
+102b50f1  Dpl_init                             
+102b6701  Drivers_open                         
+102b86d0  GET_ADFSR                            
+102b86e8  GET_AIFSR                            
+102b86d8  GET_DFAR                             
+102b86c8  GET_DFSR                             
+102b86f0  GET_IFAR                             
+102b86e0  GET_IFSR                             
+102b86f8  GET_SPSR                             
+102afbc8  HOSTexit                             
+102b8121  HwiP_Params_init                     
+102b80a1  HwiP_clearInt                        
+102b8151  HwiP_construct                       
+102b860c  HwiP_data_abort_handler              
+102b7ef1  HwiP_data_abort_handler_c            
+102b8351  HwiP_destruct                        
+102b8710  HwiP_disable                         
+102b8720  HwiP_disableFIQ                      
+102b8011  HwiP_disableInt                      
+102b8768  HwiP_disableVIC                      
+102b8730  HwiP_enable                          
+102b8740  HwiP_enableFIQ                       
+102b7fd1  HwiP_enableInt                       
+102b8758  HwiP_enableVIC                       
+102b7af1  HwiP_fiq_handler                     
+102b8778  HwiP_getCPSR                         
+102b8571  HwiP_inISR                           
+102b83c1  HwiP_init                            
+102b8598  HwiP_irq_handler                     
+102b79b1  HwiP_irq_handler_c                   
+102b80e1  HwiP_post                            
+102b8650  HwiP_prefetch_abort_handler          
+102b7db1  HwiP_prefetch_abort_handler_c        
+102b7c51  HwiP_reserved_handler                
+102b8750  HwiP_restore                         
+102b8071  HwiP_restoreInt                      
+102b7d11  HwiP_svc_handler                     
+102b8680  HwiP_undefined_handler               
+102b7cd1  HwiP_undefined_handler_c             
+102b7e81  HwiP_user_data_abort_handler_c       
+102b7d51  HwiP_user_prefetch_abort_handler_c   
+102b7c91  HwiP_user_undefined_handler_c        
+102b4511  IpcNotify_Params_init                
+102b57d1  IpcNotify_allocSwQueue               
+102b4271  IpcNotify_deInit                     
+102b6161  IpcNotify_getConfig                  
+102b52d1  IpcNotify_getMemoryToRead            
+102b4fe1  IpcNotify_getMemoryToWrite           
+102b6611  IpcNotify_getSelfCoreId              
+102af6b1  IpcNotify_init                       
+102b6041  IpcNotify_isCoreEnabled              
+102b65e1  IpcNotify_isCustomIpcConfigEnabled   
+102b03c1  IpcNotify_isr                        
+102b3861  IpcNotify_readAckCallback            
+102b43d1  IpcNotify_registerClient             
+102b1d81  IpcNotify_sendMsg                    
+102b63e1  IpcNotify_sendSync                   
+102b4471  IpcNotify_syncAll                    
+102b5c01  IpcNotify_syncCallback               
+102b60a1  IpcNotify_syncCustomIpcConfig        
+102b2421  IpcNotify_trigInterrupt              
+102b1ee1  IpcNotify_trigInterrupt_ack          
+102b5371  IpcNotify_unregisterClient           
+102b6231  IpcNotify_wait                       
+102b3b71  IpcNotify_waitSync                   
+102b53c1  Module_clockDisable                  
+102b5411  Module_clockEnable                   
+102b4f21  Module_clockSetFrequency             
+102b8c21  MpuP_RegionAttrs_init                
+102b8d51  MpuP_disable                         
+102b8e68  MpuP_disableAsm                      
+102b8e80  MpuP_disableBRAsm                    
+102b8d91  MpuP_enable                          
+102b8e90  MpuP_enableAsm                       
+102b8ea8  MpuP_enableBRAsm                     
+102b8dd1  MpuP_init                            
+102b8d41  MpuP_isEnable                        
+102b8eb8  MpuP_isEnableAsm                     
+102b8c51  MpuP_setRegion                       
+102b8ecc  MpuP_setRegionAsm                    
+102b5151  Pinmux_config                        
+102b5f21  Pinmux_init                          
+102b5e88  PmuP_clearOverflowStatus             
+102b5e78  PmuP_disableCounters                 
+102b5e70  PmuP_enableCounters                  
+102b5e80  PmuP_getOverflowStatus               
+102b5e68  PmuP_setup                           
+102b6671  PowerClock_deinit                    
+102b6621  PowerClock_init                      
+102b6251  RPMessage_CreateParams_init          
+102b4651  RPMessage_Params_init                
+102b51b1  RPMessage_allocEndPtMsg              
+102b3501  RPMessage_construct                  
+102b64a1  RPMessage_controlEndPtDeInit         
+102b4d81  RPMessage_controlEndPtHandler        
+102b5c41  RPMessage_controlEndPtInit           
+102b5ac1  RPMessage_coreDeInit                 
+102b3791  RPMessage_coreInit                   
+102b5981  RPMessage_deInit                     
+102b4c21  RPMessage_destruct                   
+102b5501  RPMessage_freeEndPtMsg               
+102b46e1  RPMessage_getEndPtMsg                
+102b5901  RPMessage_getLocalEndPt              
+102b1731  RPMessage_init                       
+102b59c1  RPMessage_isLinuxCore                
+102b4771  RPMessage_notifyCallback             
+102b6071  RPMessage_putEndPtMsg                
+102b1581  RPMessage_recv                       
+102b1c01  RPMessage_recvHandler                
+102b0e11  RPMessage_send                       
+102b4e61  RPMessage_vringCheckEmptyTxBuf       
+102b36c1  RPMessage_vringGetEmptyTxBuf         
+102b3181  RPMessage_vringGetFullRxBuf          
+102b5a01  RPMessage_vringGetRxBufAddr          
+102b5551  RPMessage_vringGetSize               
+102b5a41  RPMessage_vringGetTxBufAddr          
+102b5a81  RPMessage_vringGetTxBufLen           
+102b4aa1  RPMessage_vringIsFullRxBuf           
+102b35e1  RPMessage_vringPutEmptyRxBuf         
+102b2f91  RPMessage_vringPutFullTxBuf          
+102b26a1  RPMessage_vringReset                 
+102b1a71  RPMessage_vringResetInternal         
+102b13c1  SOC_controlModuleLockMMR             
+102b0c01  SOC_controlModuleUnlockMMR           
+102b5bc1  SOC_getCoreName                      
+102b6421  SOC_getSelfCpuClk                    
+102b65b1  SOC_moduleClockEnable                
+102b62b1  SOC_moduleSetClockFrequency          
+102b5f81  SOC_rcmGetR5Clock                    
+102b5941  SOC_rcmIsPadDisableRequired          
+102b3cf1  SOC_rcmSetPeripheralClock            
+102b6391  SemaphoreP_Params_init               
+102b5271  SemaphoreP_construct                 
+102b5fb1  SemaphoreP_constructBinary           
+102b6681  SemaphoreP_destruct                  
+102b2e91  SemaphoreP_pend                      
+102b4ec1  SemaphoreP_post                      
+102b64e1  System_deinit                        
+102b3091  System_init                          
+102b6308  TI_memcpy_small                      
+102b63c8  TI_memset_small                      
+102b5d01  TimerP_Params_init                   
+102b6501  TimerP_clearOverflowInt              
+102b5dc1  TimerP_getCount                      
+102b63b1  TimerP_getReloadCount                
+102b1011  TimerP_setup                         
+102b6441  TimerP_start                         
+102b6461  TimerP_stop                          
+102b4891  _DebugP_assert                       
+102b8fe1  _DebugP_assertNoLog                  
+102b5691  _DebugP_logZone                      
+102ba7c8  __ABORT_STACK_END                    
+00000100  __ABORT_STACK_SIZE                   
+102ba6c8  __ABORT_STACK_START                  
+102a1970  __BSS_END                            
+102a0000  __BSS_START                          
+102b96c8  __FIQ_STACK_END                      
+00000100  __FIQ_STACK_SIZE                     
+102b95c8  __FIQ_STACK_START                    
+102b95c8  __IRQ_STACK_END                      
+00000100  __IRQ_STACK_SIZE                     
+102b94c8  __IRQ_STACK_START                    
+102ad970  __STACK_END                          
+00004000  __STACK_SIZE                         
+102ba6c8  __SVC_STACK_END                      
+00001000  __SVC_STACK_SIZE                     
+102b96c8  __SVC_STACK_START                    
+00008000  __SYSMEM_SIZE                        
+00000000  __TI_ATRegion0_region_sz             
+00000000  __TI_ATRegion0_src_addr              
+00000000  __TI_ATRegion0_trg_addr              
+00000000  __TI_ATRegion1_region_sz             
+00000000  __TI_ATRegion1_src_addr              
+00000000  __TI_ATRegion1_trg_addr              
+00000000  __TI_ATRegion2_region_sz             
+00000000  __TI_ATRegion2_src_addr              
+00000000  __TI_ATRegion2_trg_addr              
+UNDEFED   __TI_CINIT_Base                      
+UNDEFED   __TI_CINIT_Limit                     
+UNDEFED   __TI_Handler_Table_Base              
+UNDEFED   __TI_Handler_Table_Limit             
+102b5094  __TI_auto_init_nobinit_nopinit       
+ffffffff  __TI_pprof_out_hndl                  
+102ad970  __TI_printfi_nofloat                 
+ffffffff  __TI_prof_data_size                  
+ffffffff  __TI_prof_data_start                 
+00000000  __TI_static_base__                   
+102ba8c8  __UNDEFINED_STACK_END                
+00000100  __UNDEFINED_STACK_SIZE               
+102ba7c8  __UNDEFINED_STACK_START              
+102b68a0  __aeabi_ctype_table_                 
+102b68a0  __aeabi_ctype_table_C                
+102b949c  __aeabi_errno                        
+102af184  __aeabi_errno_addr                   
+102ae74c  __aeabi_idiv0                        
+102b0048  __aeabi_ldiv0                        
+102b09b4  __aeabi_memclr                       
+102b09b4  __aeabi_memclr4                      
+102b09b4  __aeabi_memclr8                      
+102b004c  __aeabi_memcpy                       
+102b004c  __aeabi_memcpy4                      
+102b004c  __aeabi_memcpy8                      
+102b65c0  __aeabi_memset                       
+102b65c0  __aeabi_memset4                      
+102b65c0  __aeabi_memset8                      
+102b11e8  __aeabi_uidiv                        
+102b6184  __aeabi_uldivmod                     
+ffffffff  __binit__                            
+102b9041  __mpu_init                           
+102a9970  __stack                              
+102b2b3c  __udivmoddi4                         
+102b11e8  __udivsi3                            
+102b8f04  _c_int00                             
+102b8ee0  _c_int00_sbl                         
+102a1970  _sys_memory                          
+UNDEFED   _system_post_cinit                   
+102b9011  _system_pre_init                     
+00000000  _vectors                             
+102b9050  abort                                
+102b4d10  atoi                                 
+ffffffff  binit                                
+102a17f8  gAckReplyMsgObject                   
+102b6b14  gCacheConfig                         
+102b79a0  gCacheL1dCacheLineSize               
+102b79a4  gCacheL1pCacheLineSize               
+102b943c  gClockConfig                         
+102a1938  gClockCtrl                           
+102b94a0  gDebugLogZone                        
+102ec000  gDebugShmLog                         
+102b94ac  gHwiConfig                           
+102a0000  gHwiCtrl                             
+102b9468  gIpcNotifyCoreIntrBitPos             
+102b9218  gIpcNotifyCtrl                       
+102b94b0  gIpcNotifyInterruptConfigNum_r5fss0_1
+102b9394  gIpcNotifyInterruptConfig_r5fss0_1   
+102b9058  gIpcNotifyMailboxConfig              
+102a1008  gIpcRpmsgCtrl                        
+c5000200  gIpcSharedMem                        
+102b94b4  gMainCoreId                          
+102b6b1c  gMpuConfig                           
+102b6b28  gMpuRegionConfig                     
+102b94b8  gMsgEchoCount                        
+102b9478  gRemoteCoreId                        
+102b94c0  gRemoteServiceEndPt                  
+102b94bc  gSocModules                          
+102b9484  gSocModulesClockFrequency            
+102b5cc1  ipc_rpmsg_echo_main                  
+102b0701  ipc_rpmsg_echo_main_core_start       
+102b2a21  ipc_rpmsg_echo_remote_core_start     
+102b6131  main                                 
+102b545c  memccpy                              
+102b6521  putchar_                             
+102b4a1c  snprintf                             
+102b5b41  snprintf_                            
+102b62ec  strlen                               
+102b60d1  vprintf_                             
+102b6270  wcslen                               
+
+
+GLOBAL SYMBOLS: SORTED BY Symbol Address 
+
+address   name                                 
+-------   ----                                 
+00000000  __TI_ATRegion0_region_sz             
+00000000  __TI_ATRegion0_src_addr              
+00000000  __TI_ATRegion0_trg_addr              
+00000000  __TI_ATRegion1_region_sz             
+00000000  __TI_ATRegion1_src_addr              
+00000000  __TI_ATRegion1_trg_addr              
+00000000  __TI_ATRegion2_region_sz             
+00000000  __TI_ATRegion2_src_addr              
+00000000  __TI_ATRegion2_trg_addr              
+00000000  __TI_static_base__                   
+00000000  _vectors                             
+00000100  __ABORT_STACK_SIZE                   
+00000100  __FIQ_STACK_SIZE                     
+00000100  __IRQ_STACK_SIZE                     
+00000100  __UNDEFINED_STACK_SIZE               
+00001000  __SVC_STACK_SIZE                     
+00004000  __STACK_SIZE                         
+00008000  __SYSMEM_SIZE                        
+102a0000  __BSS_START                          
+102a0000  gHwiCtrl                             
+102a1008  gIpcRpmsgCtrl                        
+102a17f8  gAckReplyMsgObject                   
+102a1938  gClockCtrl                           
+102a1970  __BSS_END                            
+102a1970  _sys_memory                          
+102a9970  __stack                              
+102ad970  __STACK_END                          
+102ad970  __TI_printfi_nofloat                 
+102ae74c  __aeabi_idiv0                        
+102af184  __aeabi_errno_addr                   
+102af6b1  IpcNotify_init                       
+102afbc8  C$$EXIT                              
+102afbc8  HOSTexit                             
+102b0048  __aeabi_ldiv0                        
+102b004c  __aeabi_memcpy                       
+102b004c  __aeabi_memcpy4                      
+102b004c  __aeabi_memcpy8                      
+102b03c1  IpcNotify_isr                        
+102b0701  ipc_rpmsg_echo_main_core_start       
+102b09b4  __aeabi_memclr                       
+102b09b4  __aeabi_memclr4                      
+102b09b4  __aeabi_memclr8                      
+102b0c01  SOC_controlModuleUnlockMMR           
+102b0e11  RPMessage_send                       
+102b1011  TimerP_setup                         
+102b11e8  __aeabi_uidiv                        
+102b11e8  __udivsi3                            
+102b13c1  SOC_controlModuleLockMMR             
+102b1581  RPMessage_recv                       
+102b1731  RPMessage_init                       
+102b1a71  RPMessage_vringResetInternal         
+102b1c01  RPMessage_recvHandler                
+102b1d81  IpcNotify_sendMsg                    
+102b1ee1  IpcNotify_trigInterrupt_ack          
+102b2191  DebugP_shmLogWriterPutChar           
+102b22e1  ClockP_init                          
+102b2421  IpcNotify_trigInterrupt              
+102b26a1  RPMessage_vringReset                 
+102b2901  DebugP_shmLogWriterPutLine           
+102b2a21  ipc_rpmsg_echo_remote_core_start     
+102b2b3c  __udivmoddi4                         
+102b2e91  SemaphoreP_pend                      
+102b2f91  RPMessage_vringPutFullTxBuf          
+102b3091  System_init                          
+102b3181  RPMessage_vringGetFullRxBuf          
+102b3501  RPMessage_construct                  
+102b35e1  RPMessage_vringPutEmptyRxBuf         
+102b36c1  RPMessage_vringGetEmptyTxBuf         
+102b3791  RPMessage_coreInit                   
+102b3861  IpcNotify_readAckCallback            
+102b39f1  ClockP_timerTickIsr                  
+102b3ab1  ClockP_stop                          
+102b3b71  IpcNotify_waitSync                   
+102b3cf1  SOC_rcmSetPeripheralClock            
+102b3f01  ClockP_destruct                      
+102b41c1  CycleCounterP_init                   
+102b41e1  CycleCounterP_reset                  
+102b4231  CycleCounterP_nsToTicks              
+102b4271  IpcNotify_deInit                     
+102b43d1  IpcNotify_registerClient             
+102b4471  IpcNotify_syncAll                    
+102b4511  IpcNotify_Params_init                
+102b45b1  ClockP_getTimeUsec                   
+102b4651  RPMessage_Params_init                
+102b46e1  RPMessage_getEndPtMsg                
+102b4771  RPMessage_notifyCallback             
+102b4891  _DebugP_assert                       
+102b4a1c  snprintf                             
+102b4aa1  RPMessage_vringIsFullRxBuf           
+102b4b21  ClockP_usleep                        
+102b4c21  RPMessage_destruct                   
+102b4ca1  ClockP_construct                     
+102b4d10  atoi                                 
+102b4d81  RPMessage_controlEndPtHandler        
+102b4e61  RPMessage_vringCheckEmptyTxBuf       
+102b4ec1  SemaphoreP_post                      
+102b4f21  Module_clockSetFrequency             
+102b4fe1  IpcNotify_getMemoryToWrite           
+102b5094  __TI_auto_init_nobinit_nopinit       
+102b50f1  Dpl_init                             
+102b5151  Pinmux_config                        
+102b51b1  RPMessage_allocEndPtMsg              
+102b5271  SemaphoreP_construct                 
+102b52d1  IpcNotify_getMemoryToRead            
+102b5371  IpcNotify_unregisterClient           
+102b53c1  Module_clockDisable                  
+102b5411  Module_clockEnable                   
+102b545c  memccpy                              
+102b5501  RPMessage_freeEndPtMsg               
+102b5551  RPMessage_vringGetSize               
+102b5691  _DebugP_logZone                      
+102b5731  ClockP_start                         
+102b5781  DebugP_shmLogWriterInit              
+102b57d1  IpcNotify_allocSwQueue               
+102b5901  RPMessage_getLocalEndPt              
+102b5941  SOC_rcmIsPadDisableRequired          
+102b5981  RPMessage_deInit                     
+102b59c1  RPMessage_isLinuxCore                
+102b5a01  RPMessage_vringGetRxBufAddr          
+102b5a41  RPMessage_vringGetTxBufAddr          
+102b5a81  RPMessage_vringGetTxBufLen           
+102b5ac1  RPMessage_coreDeInit                 
+102b5b41  snprintf_                            
+102b5bc1  SOC_getCoreName                      
+102b5c01  IpcNotify_syncCallback               
+102b5c41  RPMessage_controlEndPtInit           
+102b5cc1  ipc_rpmsg_echo_main                  
+102b5d01  TimerP_Params_init                   
+102b5dc1  TimerP_getCount                      
+102b5e60  CycleCounterP_getCount32             
+102b5e68  PmuP_setup                           
+102b5e70  PmuP_enableCounters                  
+102b5e78  PmuP_disableCounters                 
+102b5e80  PmuP_getOverflowStatus               
+102b5e88  PmuP_clearOverflowStatus             
+102b5ef1  DebugP_logZoneEnable                 
+102b5f21  Pinmux_init                          
+102b5f81  SOC_rcmGetR5Clock                    
+102b5fb1  SemaphoreP_constructBinary           
+102b6041  IpcNotify_isCoreEnabled              
+102b6071  RPMessage_putEndPtMsg                
+102b60a1  IpcNotify_syncCustomIpcConfig        
+102b60d1  vprintf_                             
+102b6131  main                                 
+102b6161  IpcNotify_getConfig                  
+102b6184  __aeabi_uldivmod                     
+102b6211  ClockP_isActive                      
+102b6231  IpcNotify_wait                       
+102b6251  RPMessage_CreateParams_init          
+102b6270  wcslen                               
+102b6291  ClockP_Params_init                   
+102b62b1  SOC_moduleSetClockFrequency          
+102b62ec  strlen                               
+102b6308  TI_memcpy_small                      
+102b6351  ClockP_ticksToUsec                   
+102b6391  SemaphoreP_Params_init               
+102b63b1  TimerP_getReloadCount                
+102b63c8  TI_memset_small                      
+102b63e1  IpcNotify_sendSync                   
+102b6421  SOC_getSelfCpuClk                    
+102b6441  TimerP_start                         
+102b6461  TimerP_stop                          
+102b64a1  RPMessage_controlEndPtDeInit         
+102b64e1  System_deinit                        
+102b6501  TimerP_clearOverflowInt              
+102b6521  putchar_                             
+102b6581  ClockP_getTimerCount                 
+102b6591  ClockP_timerClearOverflowInt         
+102b65b1  SOC_moduleClockEnable                
+102b65c0  __aeabi_memset                       
+102b65c0  __aeabi_memset4                      
+102b65c0  __aeabi_memset8                      
+102b65e1  IpcNotify_isCustomIpcConfigEnabled   
+102b65f1  Board_driversOpen                    
+102b6601  ClockP_getTicks                      
+102b6611  IpcNotify_getSelfCoreId              
+102b6621  PowerClock_init                      
+102b6671  PowerClock_deinit                    
+102b6681  SemaphoreP_destruct                  
+102b66c1  Board_deinit                         
+102b66d1  Board_driversClose                   
+102b66e1  Board_init                           
+102b66f1  Dpl_deinit                           
+102b6701  Drivers_open                         
+102b68a0  __aeabi_ctype_table_                 
+102b68a0  __aeabi_ctype_table_C                
+102b6b14  gCacheConfig                         
+102b6b1c  gMpuConfig                           
+102b6b28  gMpuRegionConfig                     
+102b79a0  gCacheL1dCacheLineSize               
+102b79a4  gCacheL1pCacheLineSize               
+102b79b1  HwiP_irq_handler_c                   
+102b7af1  HwiP_fiq_handler                     
+102b7c51  HwiP_reserved_handler                
+102b7c91  HwiP_user_undefined_handler_c        
+102b7cd1  HwiP_undefined_handler_c             
+102b7d11  HwiP_svc_handler                     
+102b7d51  HwiP_user_prefetch_abort_handler_c   
+102b7db1  HwiP_prefetch_abort_handler_c        
+102b7e81  HwiP_user_data_abort_handler_c       
+102b7ef1  HwiP_data_abort_handler_c            
+102b7fd1  HwiP_enableInt                       
+102b8011  HwiP_disableInt                      
+102b8071  HwiP_restoreInt                      
+102b80a1  HwiP_clearInt                        
+102b80e1  HwiP_post                            
+102b8121  HwiP_Params_init                     
+102b8151  HwiP_construct                       
+102b8351  HwiP_destruct                        
+102b83c1  HwiP_init                            
+102b8571  HwiP_inISR                           
+102b8598  HwiP_irq_handler                     
+102b860c  HwiP_data_abort_handler              
+102b8650  HwiP_prefetch_abort_handler          
+102b8680  HwiP_undefined_handler               
+102b86c8  GET_DFSR                             
+102b86d0  GET_ADFSR                            
+102b86d8  GET_DFAR                             
+102b86e0  GET_IFSR                             
+102b86e8  GET_AIFSR                            
+102b86f0  GET_IFAR                             
+102b86f8  GET_SPSR                             
+102b8710  HwiP_disable                         
+102b8720  HwiP_disableFIQ                      
+102b8730  HwiP_enable                          
+102b8740  HwiP_enableFIQ                       
+102b8750  HwiP_restore                         
+102b8758  HwiP_enableVIC                       
+102b8768  HwiP_disableVIC                      
+102b8778  HwiP_getCPSR                         
+102b8780  CacheP_disableL1d                    
+102b87a8  CacheP_disableL1p                    
+102b87c0  CacheP_enableL1d                     
+102b87d8  CacheP_enableL1p                     
+102b87f0  CacheP_invL1d                        
+102b8828  CacheP_invL1p                        
+102b8864  CacheP_invL1dAll                     
+102b886c  CacheP_invL1pAll                     
+102b8874  CacheP_wb                            
+102b88b0  CacheP_wbInv                         
+102b88ec  CacheP_wbAll                         
+102b8994  CacheP_wbInvAll                      
+102b89ac  CacheP_wbInvAllAsm                   
+102b8a4c  CacheP_getEnabled                    
+102b8a84  CacheP_getCacheLevelInfo             
+102b8a90  CacheP_configForceWrThru             
+102b8ab0  CacheP_setDLFO                       
+102b8ac1  CacheP_init                          
+102b8b51  CacheP_disable                       
+102b8ba1  CacheP_enable                        
+102b8be1  CacheP_inv                           
+102b8c21  MpuP_RegionAttrs_init                
+102b8c51  MpuP_setRegion                       
+102b8d41  MpuP_isEnable                        
+102b8d51  MpuP_disable                         
+102b8d91  MpuP_enable                          
+102b8dd1  MpuP_init                            
+102b8e68  MpuP_disableAsm                      
+102b8e80  MpuP_disableBRAsm                    
+102b8e90  MpuP_enableAsm                       
+102b8ea8  MpuP_enableBRAsm                     
+102b8eb8  MpuP_isEnableAsm                     
+102b8ecc  MpuP_setRegionAsm                    
+102b8ee0  _c_int00_sbl                         
+102b8f04  _c_int00                             
+102b8fe1  _DebugP_assertNoLog                  
+102b9011  _system_pre_init                     
+102b9041  __mpu_init                           
+102b9050  abort                                
+102b9058  gIpcNotifyMailboxConfig              
+102b9218  gIpcNotifyCtrl                       
+102b9394  gIpcNotifyInterruptConfig_r5fss0_1   
+102b943c  gClockConfig                         
+102b9468  gIpcNotifyCoreIntrBitPos             
+102b9478  gRemoteCoreId                        
+102b9484  gSocModulesClockFrequency            
+102b949c  __aeabi_errno                        
+102b94a0  gDebugLogZone                        
+102b94ac  gHwiConfig                           
+102b94b0  gIpcNotifyInterruptConfigNum_r5fss0_1
+102b94b4  gMainCoreId                          
+102b94b8  gMsgEchoCount                        
+102b94bc  gSocModules                          
+102b94c0  gRemoteServiceEndPt                  
+102b94c8  __IRQ_STACK_START                    
+102b95c8  __FIQ_STACK_START                    
+102b95c8  __IRQ_STACK_END                      
+102b96c8  __FIQ_STACK_END                      
+102b96c8  __SVC_STACK_START                    
+102ba6c8  __ABORT_STACK_START                  
+102ba6c8  __SVC_STACK_END                      
+102ba7c8  __ABORT_STACK_END                    
+102ba7c8  __UNDEFINED_STACK_START              
+102ba8c8  __UNDEFINED_STACK_END                
+102ec000  gDebugShmLog                         
+c5000200  gIpcSharedMem                        
+ffffffff  __TI_pprof_out_hndl                  
+ffffffff  __TI_prof_data_size                  
+ffffffff  __TI_prof_data_start                 
+ffffffff  __binit__                            
+ffffffff  binit                                
+UNDEFED   __TI_CINIT_Base                      
+UNDEFED   __TI_CINIT_Limit                     
+UNDEFED   __TI_Handler_Table_Base              
+UNDEFED   __TI_Handler_Table_Limit             
+UNDEFED   _system_post_cinit                   
+
+[306 symbols]

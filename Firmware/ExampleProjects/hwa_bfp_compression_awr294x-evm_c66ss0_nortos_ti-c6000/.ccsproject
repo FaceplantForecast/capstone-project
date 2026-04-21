@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?ccsproject version="1.0"?>
+<projectOptions>
+	<ccsVariant value="50:Theia-based"/>
+	<ccsVersion value="70.3.0"/>
+	<deviceFamily value="C6000"/>
+	<connection value="common/targetdb/connections/TIXDS110_Connection.xml"/>
+	<executableActions value=""/>
+	<createSlaveProjects value=""/>
+	<ignoreDefaultDeviceSettings value="true"/>
+	<ignoreDefaultCCSSettings value="true"/>
+	<activeTargetConfiguration value="targetConfigs/AWR2944.ccxml"/>
+	<templateProperties value="id=example.projectspec.hwa_bfp_compression_awr294x-evm_c66ss0_nortos_ti-c6000"/>
+	<isTargetConfigurationManual value="false"/>
+	<origin value="C:\ti\mmwave_mcuplus_sdk_04_07_01_04\mcu_plus_sdk_awr294x_10_01_00_04\examples\drivers\hwa\hwa_bfp_compression\awr294x-evm\c66ss0_nortos\ti-c6000\example.projectspec"/>
+	<filesToOpen value=""/>
+</projectOptions>

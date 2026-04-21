@@ -1,0 +1,7 @@
+# Generated for variable scope: Build-configuration 'Debug' of project 'out_of_box_2944_dss'
+
+[path] C66x_DSPLIB_INSTALL_PATH = C:/ti/dsplib_c66x_3_4_0_0
+[path] C66x_MATHLIB_INSTALL_PATH = C:/ti/mathlib_c66x_3_1_2_1
+[path] MCU_PLUS_SDK_PATH = ${COM_TI_MCU_PLUS_SDK_AWR294X_INSTALL_DIR}
+[path] MMWAVE_AWR294X_DFP_INSTALL_PATH = ${COM_TI_MMWAVE_MCUPLUS_SDK_INSTALL_DIR}/../mmwave_dfp_02_04_17_00
+[path] MMWAVE_SDK_INSTALL_PATH = ${COM_TI_MMWAVE_MCUPLUS_SDK_INSTALL_DIR}

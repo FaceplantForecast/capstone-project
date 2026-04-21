@@ -1,0 +1,168 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "empty_awr294x-evm_c66ss0_freertos_ti-c6000",
+            "type": "ccs-debug",
+            "request": "launch",
+            "projectInfo": {
+                "name": "empty_awr294x-evm_c66ss0_freertos_ti-c6000",
+                "resourceId": "/empty_awr294x-evm_c66ss0_freertos_ti-c6000"
+            },
+            "connections": [
+                {
+                    "name": "Texas Instruments XDS110 USB Debug Probe",
+                    "cores": [
+                        {
+                            "name": "C66xx_DSP",
+                            "debuggerSettings": {
+                                "data": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n<PropertyValues/>\n"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "empty_awr294x-evm_r5fss0-0_freertos_ti-arm-clang",
+            "type": "ccs-debug",
+            "request": "launch",
+            "projectInfo": {
+                "name": "empty_awr294x-evm_r5fss0-0_freertos_ti-arm-clang",
+                "resourceId": "/empty_awr294x-evm_r5fss0-0_freertos_ti-arm-clang"
+            },
+            "connections": [
+                {
+                    "name": "Texas Instruments XDS110 USB Debug Probe",
+                    "cores": [
+                        {
+                            "name": "Cortex_R5_0",
+                            "debuggerSettings": {
+                                "data": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n<PropertyValues>\n\n  <property id=\"ResetOnRestart\">\n    <curValue>0</curValue>\n  </property>\n\n</PropertyValues>\n"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "empty_awr294x-evm_r5fss0-1_freertos_ti-arm-clang",
+            "type": "ccs-debug",
+            "request": "launch",
+            "projectInfo": {
+                "name": "empty_awr294x-evm_r5fss0-1_freertos_ti-arm-clang",
+                "resourceId": "/empty_awr294x-evm_r5fss0-1_freertos_ti-arm-clang"
+            },
+            "connections": [
+                {
+                    "name": "Texas Instruments XDS110 USB Debug Probe",
+                    "cores": [
+                        {
+                            "name": "Cortex_R5_1",
+                            "debuggerSettings": {
+                                "data": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n<PropertyValues/>\n"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "empty_awr294x-evm_system_freertos",
+            "type": "ccs-debug",
+            "request": "launch",
+            "projectInfo": {
+                "name": "empty_awr294x-evm_system_freertos",
+                "resourceId": "/empty_awr294x-evm_system_freertos"
+            },
+            "connections": [
+                {
+                    "name": "Texas Instruments XDS110 USB Debug Probe",
+                    "cores": [
+                        {
+                            "name": "Cortex_R5_0",
+                            "debuggerSettings": {
+                                "data": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n<PropertyValues>\n\n  <property id=\"ResetOnRestart\">\n    <curValue>1</curValue>\n  </property>\n\n</PropertyValues>\n"
+                            }
+                        },
+                        {
+                            "name": "C66xx_DSP",
+                            "sourceMappings": [
+                                {
+                                    "module": "C:\\Users\\there\\Documents\\Capstone\\RadarFirmware\\TestProjects\\empty_awr294x-evm_c66ss0_freertos_ti-c6000\\Debug\\empty_awr294x-evm_c66ss0_freertos_ti-c6000.out",
+                                    "compilationDir": "E:\\cvs\\jenkins\\workspace\\buildandvalidate\\build\\c60\\product\\pc\\lib-internal\\src",
+                                    "sourceDir": "C:\\ti\\ccs2030\\ccs\\tools\\compiler\\ti-cgt-c6000_8.5.0.LTS\\lib\\src"
+                                }
+                            ],
+                            "sourceDirs": [
+                                "C:\\ti\\ccs2030\\ccs\\tools\\compiler\\ti-cgt-c6000_8.5.0.LTS\\lib\\src"
+                            ],
+                            "debuggerSettings": {
+                                "data": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n<PropertyValues>\n\n  <property id=\"ResetOnRestart\">\n    <curValue>0</curValue>\n  </property>\n\n</PropertyValues>\n"
+                            }
+                        },
+                        {
+                            "name": "Cortex_R5_1",
+                            "debuggerSettings": {
+                                "data": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n<PropertyValues>\n\n  <property id=\"ResetOnRestart\">\n    <curValue>1</curValue>\n  </property>\n\n</PropertyValues>\n"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "empty_awr294x-evm_r5fss0-0_freertos_ti-arm-clang (1)",
+            "type": "ccs-debug",
+            "request": "launch",
+            "projectInfo": {
+                "name": "empty_awr294x-evm_r5fss0-0_freertos_ti-arm-clang",
+                "resourceId": "/empty_awr294x-evm_system_freertos/__ccs_1_coreApplicationProjects/Cortex_R5_0"
+            },
+            "connections": [
+                {
+                    "name": "Texas Instruments XDS110 USB Debug Probe",
+                    "cores": [
+                        {
+                            "name": "Cortex_R5_0",
+                            "debuggerSettings": {
+                                "data": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n<PropertyValues>\n\n  <property id=\"ResetOnRestart\">\n    <curValue>0</curValue>\n  </property>\n\n</PropertyValues>\n"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "empty_awr294x-evm_c66ss0_freertos_ti-c6000 (1)",
+            "type": "ccs-debug",
+            "request": "launch",
+            "projectInfo": {
+                "name": "empty_awr294x-evm_c66ss0_freertos_ti-c6000",
+                "resourceId": "/empty_awr294x-evm_system_freertos/__ccs_1_coreApplicationProjects/C66xx_DSP"
+            }
+        },
+        {
+            "name": "empty_awr294x-evm_r5fss0-1_freertos_ti-arm-clang (1)",
+            "type": "ccs-debug",
+            "request": "launch",
+            "projectInfo": {
+                "name": "empty_awr294x-evm_r5fss0-1_freertos_ti-arm-clang",
+                "resourceId": "/empty_awr294x-evm_system_freertos/__ccs_1_coreApplicationProjects/Cortex_R5_1"
+            },
+            "connections": [
+                {
+                    "name": "Texas Instruments XDS110 USB Debug Probe",
+                    "cores": [
+                        {
+                            "name": "Cortex_R5_1",
+                            "debuggerSettings": {
+                                "data": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n<PropertyValues/>\n"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>out_of_box_2944_dss</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.cdt.managedbuilder.core.genmakebuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>com.ti.ccstudio.core.ccsNature</nature>
+		<nature>org.eclipse.cdt.core.cnature</nature>
+		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
+		<nature>org.eclipse.cdt.core.ccnature</nature>
+	</natures>
+	<variableList>
+		<variable>
+			<name>C66x_DSPLIB_INSTALL_PATH</name>
+			<value>file:/C:/ti/dsplib_c66x_3_4_0_0</value>
+		</variable>
+		<variable>
+			<name>C66x_MATHLIB_INSTALL_PATH</name>
+			<value>file:/C:/ti/mathlib_c66x_3_1_2_1</value>
+		</variable>
+		<variable>
+			<name>MCU_PLUS_SDK_PATH</name>
+			<value>$%7BCOM_TI_MCU_PLUS_SDK_AWR294X_INSTALL_DIR%7D</value>
+		</variable>
+		<variable>
+			<name>MMWAVE_AWR294X_DFP_INSTALL_PATH</name>
+			<value>$%7BPARENT-1-COM_TI_MMWAVE_MCUPLUS_SDK_INSTALL_DIR%7D/mmwave_dfp_02_04_17_00</value>
+		</variable>
+		<variable>
+			<name>MMWAVE_SDK_INSTALL_PATH</name>
+			<value>$%7BCOM_TI_MMWAVE_MCUPLUS_SDK_INSTALL_DIR%7D</value>
+		</variable>
+	</variableList>
+</projectDescription>

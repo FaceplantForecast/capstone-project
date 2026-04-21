@@ -1,0 +1,29 @@
+[C:/Users/there/Documents/Capstone/RadarFirmware/TestProjects/empty_awr294x-evm_c66ss0_freertos_ti-c6000/Debug/empty_awr294x-evm_c66ss0_freertos_ti-c6000.rprc_tmp] Parsing file ...
+Found section 0 with adddress 0x00800000, size 0x00037f80 bytes
+Found section 1 with adddress 0x0086eac0, size 0x00003b58 bytes
+Found section 2 with adddress 0x00872618, size 0x00000d78 bytes
+Found section 3 with adddress 0x00873810, size 0x000002d8 bytes
+Found section 4 with adddress 0x00873c08, size 0x00000008 bytes
+Found section 5 with adddress 0x00873c28, size 0x000000b0 bytes
+[C:/Users/there/Documents/Capstone/RadarFirmware/TestProjects/empty_awr294x-evm_c66ss0_freertos_ti-c6000/Debug/empty_awr294x-evm_c66ss0_freertos_ti-c6000.rprc_tmp] Found 6 sections. 6 are non-XIP sections, 0 are XIP sections, NON-XIP entryPoint = 0x00833200
+Merging section @ 0x00872618 of size 0x00000d78, with section @ 0x0086eac0 of size 0x00003b58
+Writing section header  #0, adddress 0x00800000, size 0x00037f80 bytes to file [C:/Users/there/Documents/Capstone/RadarFirmware/TestProjects/empty_awr294x-evm_c66ss0_freertos_ti-c6000/Debug/empty_awr294x-evm_c66ss0_freertos_ti-c6000.rprc]
+Writing section data with adddress 0x00800000, size 0x00037f80 bytes to file [C:/Users/there/Documents/Capstone/RadarFirmware/TestProjects/empty_awr294x-evm_c66ss0_freertos_ti-c6000/Debug/empty_awr294x-evm_c66ss0_freertos_ti-c6000.rprc]
+Writing section header  #1, adddress 0x0086eac0, size 0x000048d0 bytes to file [C:/Users/there/Documents/Capstone/RadarFirmware/TestProjects/empty_awr294x-evm_c66ss0_freertos_ti-c6000/Debug/empty_awr294x-evm_c66ss0_freertos_ti-c6000.rprc]
+Writing section data with adddress 0x0086eac0, size 0x00003b58 bytes to file [C:/Users/there/Documents/Capstone/RadarFirmware/TestProjects/empty_awr294x-evm_c66ss0_freertos_ti-c6000/Debug/empty_awr294x-evm_c66ss0_freertos_ti-c6000.rprc]
+Writing section data with adddress 0x00872618, size 0x00000d78 bytes to file [C:/Users/there/Documents/Capstone/RadarFirmware/TestProjects/empty_awr294x-evm_c66ss0_freertos_ti-c6000/Debug/empty_awr294x-evm_c66ss0_freertos_ti-c6000.rprc]
+Writing section header  #2, adddress 0x00873810, size 0x000002d8 bytes to file [C:/Users/there/Documents/Capstone/RadarFirmware/TestProjects/empty_awr294x-evm_c66ss0_freertos_ti-c6000/Debug/empty_awr294x-evm_c66ss0_freertos_ti-c6000.rprc]
+Writing section data with adddress 0x00873810, size 0x000002d8 bytes to file [C:/Users/there/Documents/Capstone/RadarFirmware/TestProjects/empty_awr294x-evm_c66ss0_freertos_ti-c6000/Debug/empty_awr294x-evm_c66ss0_freertos_ti-c6000.rprc]
+Writing section header  #3, adddress 0x00873c08, size 0x00000008 bytes to file [C:/Users/there/Documents/Capstone/RadarFirmware/TestProjects/empty_awr294x-evm_c66ss0_freertos_ti-c6000/Debug/empty_awr294x-evm_c66ss0_freertos_ti-c6000.rprc]
+Writing section data with adddress 0x00873c08, size 0x00000008 bytes to file [C:/Users/there/Documents/Capstone/RadarFirmware/TestProjects/empty_awr294x-evm_c66ss0_freertos_ti-c6000/Debug/empty_awr294x-evm_c66ss0_freertos_ti-c6000.rprc]
+Writing section header  #4, adddress 0x00873c28, size 0x000000b0 bytes to file [C:/Users/there/Documents/Capstone/RadarFirmware/TestProjects/empty_awr294x-evm_c66ss0_freertos_ti-c6000/Debug/empty_awr294x-evm_c66ss0_freertos_ti-c6000.rprc]
+Writing section data with adddress 0x00873c28, size 0x000000b0 bytes to file [C:/Users/there/Documents/Capstone/RadarFirmware/TestProjects/empty_awr294x-evm_c66ss0_freertos_ti-c6000/Debug/empty_awr294x-evm_c66ss0_freertos_ti-c6000.rprc]
+[C:/Users/there/Documents/Capstone/RadarFirmware/TestProjects/empty_awr294x-evm_c66ss0_freertos_ti-c6000/Debug/empty_awr294x-evm_c66ss0_freertos_ti-c6000.rprc] Parsing file ...
+Found section 0 with adddress 0x00800000, size 0x00037f80 bytes
+Found section 1 with adddress 0x0086eac0, size 0x000048d0 bytes
+Found section 2 with adddress 0x00873810, size 0x000002d8 bytes
+Found section 3 with adddress 0x00873c08, size 0x00000008 bytes
+Found section 4 with adddress 0x00873c28, size 0x000000b0 bytes
+[C:/Users/there/Documents/Capstone/RadarFirmware/TestProjects/empty_awr294x-evm_c66ss0_freertos_ti-c6000/Debug/empty_awr294x-evm_c66ss0_freertos_ti-c6000.rprc] Found 5 sections. 5 are non-XIP sections, 0 are XIP sections, NON-XIP entryPoint = 0x00833200
+[C:/Users/there/Documents/Capstone/RadarFirmware/TestProjects/empty_awr294x-evm_c66ss0_freertos_ti-c6000/Debug/empty_awr294x-evm_c66ss0_freertos_ti-c6000.rprc_xip] Parsing file ...
+[C:/Users/there/Documents/Capstone/RadarFirmware/TestProjects/empty_awr294x-evm_c66ss0_freertos_ti-c6000/Debug/empty_awr294x-evm_c66ss0_freertos_ti-c6000.rprc_xip] Found 0 sections. 0 are non-XIP sections, 0 are XIP sections, NON-XIP entryPoint = 0x00000000

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+    <storageModule moduleId="org.eclipse.cdt.core.settings">
+        <cconfiguration id="com.ti.ccstudio.buildDefinitions.TMS470.Debug.995004647">
+            <storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.ti.ccstudio.buildDefinitions.TMS470.Debug.995004647" moduleId="org.eclipse.cdt.core.settings" name="Debug">
+                <macros>
+                    <stringMacro name="MMWAVE_AWR294X_DFP_INSTALL_PATH" type="VALUE_PATH_ANY" value="${COM_TI_MMWAVE_MCUPLUS_SDK_INSTALL_DIR}/../mmwave_dfp_02_04_17_00"/>
+                    <stringMacro name="MMWAVE_SDK_INSTALL_PATH" type="VALUE_PATH_ANY" value="${COM_TI_MMWAVE_MCUPLUS_SDK_INSTALL_DIR}"/>
+                    <stringMacro name="MCU_PLUS_SDK_PATH" type="VALUE_PATH_ANY" value="${COM_TI_MCU_PLUS_SDK_AWR294X_INSTALL_DIR}"/>
+                    <stringMacro name="C66x_DSPLIB_INSTALL_PATH" type="VALUE_PATH_ANY" value="C:/ti/dsplib_c66x_3_4_0_0"/>
+                    <stringMacro name="C66x_MATHLIB_INSTALL_PATH" type="VALUE_PATH_ANY" value="C:/ti/mathlib_c66x_3_1_2_1"/>
+                </macros>
+                <externalSettings/>
+                <extensions>
+                    <extension id="com.ti.ccs.errorparser.SysConfigErrorParser" point="com.ti.ccs.project.ErrorParser"/>
+                </extensions>
+            </storageModule>
+            <storageModule moduleId="cdtBuildSystem" version="4.0.0">
+                <configuration artifactName="${ProjName}" buildProperties="" cleanCommand="${CG_CLEAN_CMD}" description="" id="com.ti.ccstudio.buildDefinitions.TMS470.Debug.995004647" name="Debug" parent="com.ti.ccstudio.buildDefinitions.TMS470.Debug">
+                    <folderInfo id="com.ti.ccstudio.buildDefinitions.TMS470.Debug.995004647." name="/" resourcePath="">
+                        <toolChain id="com.ti.ccstudio.buildDefinitions.TMS470_TICLANG_4.0.exe.DebugToolchain.362163757" name="TI Build Tools" superClass="com.ti.ccstudio.buildDefinitions.TMS470_TICLANG_4.0.exe.DebugToolchain" targetTool="com.ti.ccstudio.buildDefinitions.sysConfig.581952668">
+                            <option id="com.ti.ccstudio.buildDefinitions.core.OPT_TAGS.255017773" superClass="com.ti.ccstudio.buildDefinitions.core.OPT_TAGS" valueType="stringList">
+                                <listOptionValue value="DEVICE_CONFIGURATION_ID=Cortex R.AWR2944"/>
+                                <listOptionValue value="DEVICE_CORE_ID="/>
+                                <listOptionValue value="CCS_MBS_VERSION=70.0.0"/>
+                                <listOptionValue value="OUTPUT_TYPE=system"/>
+                                <listOptionValue value="PRODUCTS=sysconfig:1.25.0;com.ti.MMWAVE_MCUPLUS_SDK:4.7.1.04;ti.mathlib.c66x:3.1.2.1;ti.mas.dsplib.c66x:3.4.0.0;com.ti.MCU_PLUS_SDK_AWR294X:10.1.0.04;"/>
+                                <listOptionValue value="PRODUCT_MACRO_IMPORTS={&quot;com.ti.MCU_PLUS_SDK_AWR294X&quot;:[&quot;${COM_TI_MCU_PLUS_SDK_AWR294X_INCLUDE_PATH}&quot;,&quot;${COM_TI_MCU_PLUS_SDK_AWR294X_LIBRARY_PATH}&quot;,&quot;${COM_TI_MCU_PLUS_SDK_AWR294X_LIBRARIES}&quot;,&quot;${COM_TI_MCU_PLUS_SDK_AWR294X_SYMBOLS}&quot;,&quot;${COM_TI_MCU_PLUS_SDK_AWR294X_SYSCONFIG_MANIFEST}&quot;],&quot;ti.mas.dsplib.c66x&quot;:[&quot;${COM_TI_MAS_DSPLIB_C66X_INCLUDE_PATH}&quot;,&quot;${COM_TI_MAS_DSPLIB_C66X_LIBRARY_PATH}&quot;,&quot;${COM_TI_MAS_DSPLIB_C66X_LIBRARIES}&quot;,&quot;${COM_TI_MAS_DSPLIB_C66X_SYMBOLS}&quot;,&quot;${COM_TI_MAS_DSPLIB_C66X_SYSCONFIG_MANIFEST}&quot;],&quot;ti.mathlib.c66x&quot;:[&quot;${COM_TI_MATHLIB_C66X_INCLUDE_PATH}&quot;,&quot;${COM_TI_MATHLIB_C66X_LIBRARY_PATH}&quot;,&quot;${COM_TI_MATHLIB_C66X_LIBRARIES}&quot;,&quot;${COM_TI_MATHLIB_C66X_SYMBOLS}&quot;,&quot;${COM_TI_MATHLIB_C66X_SYSCONFIG_MANIFEST}&quot;],&quot;com.ti.MMWAVE_MCUPLUS_SDK&quot;:[&quot;${COM_TI_MMWAVE_MCUPLUS_SDK_INCLUDE_PATH}&quot;,&quot;${COM_TI_MMWAVE_MCUPLUS_SDK_LIBRARY_PATH}&quot;,&quot;${COM_TI_MMWAVE_MCUPLUS_SDK_LIBRARIES}&quot;,&quot;${COM_TI_MMWAVE_MCUPLUS_SDK_SYMBOLS}&quot;,&quot;${COM_TI_MMWAVE_MCUPLUS_SDK_SYSCONFIG_MANIFEST}&quot;],&quot;sysconfig&quot;:[&quot;${SYSCONFIG_TOOL_INCLUDE_PATH}&quot;,&quot;${SYSCONFIG_TOOL_LIBRARY_PATH}&quot;,&quot;${SYSCONFIG_TOOL_LIBRARIES}&quot;,&quot;${SYSCONFIG_TOOL_SYMBOLS}&quot;,&quot;${SYSCONFIG_TOOL_SYSCONFIG_MANIFEST}&quot;]}"/>
+                            </option>
+                            <option id="com.ti.ccstudio.buildDefinitions.core.OPT_CODEGEN_VERSION.126893507" superClass="com.ti.ccstudio.buildDefinitions.core.OPT_CODEGEN_VERSION" value="TICLANG_4.0.3.LTS" valueType="string"/>
+                            <targetPlatform id="com.ti.ccstudio.buildDefinitions.TMS470_TICLANG_4.0.exe.targetPlatformDebug.1040588245" name="Platform" superClass="com.ti.ccstudio.buildDefinitions.TMS470_TICLANG_4.0.exe.targetPlatformDebug"/>
+                            <builder buildPath="${BuildDirectory}" id="com.ti.ccstudio.buildDefinitions.TMS470_TICLANG_4.0.exe.builderDebug.2061234136" keepEnvironmentInBuildfile="false" name="GNU Make" superClass="com.ti.ccstudio.buildDefinitions.TMS470_TICLANG_4.0.exe.builderDebug"/>
+                            <tool id="com.ti.ccstudio.buildDefinitions.sysConfig.581952668" name="SysConfig" superClass="com.ti.ccstudio.buildDefinitions.sysConfig">
+                                <option id="com.ti.ccstudio.buildDefinitions.sysConfig.CONTEXT.1082800725" superClass="com.ti.ccstudio.buildDefinitions.sysConfig.CONTEXT" value="system" valueType="string"/>
+                                <option id="com.ti.ccstudio.buildDefinitions.sysConfig.PRODUCTS.2034433157" superClass="com.ti.ccstudio.buildDefinitions.sysConfig.PRODUCTS" valueType="stringList">
+                                    <listOptionValue value="${SYSCONFIG_TOOL_SYSCONFIG_MANIFEST}"/>
+                                    <listOptionValue value="${COM_TI_MMWAVE_MCUPLUS_SDK_SYSCONFIG_MANIFEST}"/>
+                                    <listOptionValue value="${COM_TI_MATHLIB_C66X_SYSCONFIG_MANIFEST}"/>
+                                    <listOptionValue value="${COM_TI_MAS_DSPLIB_C66X_SYSCONFIG_MANIFEST}"/>
+                                    <listOptionValue value="${COM_TI_MCU_PLUS_SDK_AWR294X_SYSCONFIG_MANIFEST}"/>
+                                </option>
+                            </tool>
+                            <tool id="com.ti.ccstudio.buildDefinitions.optiShare.869288336" name="OptiShare" superClass="com.ti.ccstudio.buildDefinitions.optiShare">
+                                <option id="com.ti.ccstudio.buildDefinitions.optiShare.OUTPUT_FILE.694926955" superClass="com.ti.ccstudio.buildDefinitions.optiShare.OUTPUT_FILE" value="${ProjName}.out" valueType="string"/>
+                                <option id="com.ti.ccstudio.buildDefinitions.optiShare.MAP_FILE.1360268012" superClass="com.ti.ccstudio.buildDefinitions.optiShare.MAP_FILE" value="${ProjName}.map" valueType="string"/>
+                                <option id="com.ti.ccstudio.buildDefinitions.optiShare.CMD_FILE.552220155" superClass="com.ti.ccstudio.buildDefinitions.optiShare.CMD_FILE" value="${ProjName}.cmd" valueType="string"/>
+                                <option id="com.ti.ccstudio.buildDefinitions.optiShare.INFO_TABLE.1065654446" superClass="com.ti.ccstudio.buildDefinitions.optiShare.INFO_TABLE" value="${ProjName}.info" valueType="string"/>
+                                <option id="com.ti.ccstudio.buildDefinitions.optiShare.OPTIMIZED_OUTPUT_FILE.63727914" superClass="com.ti.ccstudio.buildDefinitions.optiShare.OPTIMIZED_OUTPUT_FILE" value="${ProjName}_optishare.out" valueType="string"/>
+                                <option id="com.ti.ccstudio.buildDefinitions.optiShare.OPTIMIZED_LINK_INFO_FILE.1070673447" superClass="com.ti.ccstudio.buildDefinitions.optiShare.OPTIMIZED_LINK_INFO_FILE" value="${ProjName}_linkInfo_optishare.xml" valueType="string"/>
+                            </tool>
+                        </toolChain>
+                    </folderInfo>
+                </configuration>
+            </storageModule>
+            <storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+        </cconfiguration>
+        <cconfiguration id="com.ti.ccstudio.buildDefinitions.TMS470.Release.1036232589">
+            <storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.ti.ccstudio.buildDefinitions.TMS470.Release.1036232589" moduleId="org.eclipse.cdt.core.settings" name="Release">
+                <macros>
+                    <stringMacro name="MCU_PLUS_SDK_PATH" type="VALUE_PATH_ANY" value="${COM_TI_MCU_PLUS_SDK_AWR294X_INSTALL_DIR}"/>
+                </macros>
+                <externalSettings/>
+                <extensions>
+                    <extension id="com.ti.ccs.errorparser.SysConfigErrorParser" point="com.ti.ccs.project.ErrorParser"/>
+                </extensions>
+            </storageModule>
+            <storageModule moduleId="cdtBuildSystem" version="4.0.0">
+                <configuration artifactName="${ProjName}" buildProperties="" cleanCommand="${CG_CLEAN_CMD}" description="" id="com.ti.ccstudio.buildDefinitions.TMS470.Release.1036232589" name="Release" parent="com.ti.ccstudio.buildDefinitions.TMS470.Release">
+                    <folderInfo id="com.ti.ccstudio.buildDefinitions.TMS470.Release.1036232589." name="/" resourcePath="">
+                        <toolChain id="com.ti.ccstudio.buildDefinitions.TMS470_TICLANG_4.0.exe.ReleaseToolchain.1823389436" name="TI Build Tools" superClass="com.ti.ccstudio.buildDefinitions.TMS470_TICLANG_4.0.exe.ReleaseToolchain" targetTool="com.ti.ccstudio.buildDefinitions.sysConfig.654533980">
+                            <option id="com.ti.ccstudio.buildDefinitions.core.OPT_TAGS.294915978" superClass="com.ti.ccstudio.buildDefinitions.core.OPT_TAGS" valueType="stringList">
+                                <listOptionValue value="DEVICE_CONFIGURATION_ID=Cortex R.AWR2944"/>
+                                <listOptionValue value="DEVICE_CORE_ID="/>
+                                <listOptionValue value="CCS_MBS_VERSION=70.0.0"/>
+                                <listOptionValue value="OUTPUT_TYPE=system"/>
+                                <listOptionValue value="PRODUCTS=com.ti.MCU_PLUS_SDK_AWR294X:10.1.0.04;"/>
+                                <listOptionValue value="PRODUCT_MACRO_IMPORTS={&quot;com.ti.MCU_PLUS_SDK_AWR294X&quot;:[&quot;${COM_TI_MCU_PLUS_SDK_AWR294X_INCLUDE_PATH}&quot;,&quot;${COM_TI_MCU_PLUS_SDK_AWR294X_LIBRARY_PATH}&quot;,&quot;${COM_TI_MCU_PLUS_SDK_AWR294X_LIBRARIES}&quot;,&quot;${COM_TI_MCU_PLUS_SDK_AWR294X_SYMBOLS}&quot;,&quot;${COM_TI_MCU_PLUS_SDK_AWR294X_SYSCONFIG_MANIFEST}&quot;]}"/>
+                            </option>
+                            <option id="com.ti.ccstudio.buildDefinitions.core.OPT_CODEGEN_VERSION.452328923" superClass="com.ti.ccstudio.buildDefinitions.core.OPT_CODEGEN_VERSION" value="TICLANG_4.0.3.LTS" valueType="string"/>
+                            <targetPlatform id="com.ti.ccstudio.buildDefinitions.TMS470_TICLANG_4.0.exe.targetPlatformRelease.1790575509" name="Platform" superClass="com.ti.ccstudio.buildDefinitions.TMS470_TICLANG_4.0.exe.targetPlatformRelease"/>
+                            <builder buildPath="${BuildDirectory}" id="com.ti.ccstudio.buildDefinitions.TMS470_TICLANG_4.0.exe.builderRelease.364600271" name="GNU Make.Release" superClass="com.ti.ccstudio.buildDefinitions.TMS470_TICLANG_4.0.exe.builderRelease"/>
+                            <tool id="com.ti.ccstudio.buildDefinitions.sysConfig.654533980" name="SysConfig" superClass="com.ti.ccstudio.buildDefinitions.sysConfig">
+                                <option id="com.ti.ccstudio.buildDefinitions.sysConfig.CONTEXT.1425392531" superClass="com.ti.ccstudio.buildDefinitions.sysConfig.CONTEXT" value="system" valueType="string"/>
+                                <option id="com.ti.ccstudio.buildDefinitions.sysConfig.PRODUCTS.110910702" superClass="com.ti.ccstudio.buildDefinitions.sysConfig.PRODUCTS" valueType="stringList">
+                                    <listOptionValue value="${COM_TI_MCU_PLUS_SDK_AWR294X_SYSCONFIG_MANIFEST}"/>
+                                </option>
+                            </tool>
+                            <tool id="com.ti.ccstudio.buildDefinitions.optiShare.1911426046" name="OptiShare" superClass="com.ti.ccstudio.buildDefinitions.optiShare">
+                                <option id="com.ti.ccstudio.buildDefinitions.optiShare.OUTPUT_FILE.762392596" superClass="com.ti.ccstudio.buildDefinitions.optiShare.OUTPUT_FILE" value="${ProjName}.out" valueType="string"/>
+                                <option id="com.ti.ccstudio.buildDefinitions.optiShare.MAP_FILE.1375133921" superClass="com.ti.ccstudio.buildDefinitions.optiShare.MAP_FILE" value="${ProjName}.map" valueType="string"/>
+                                <option id="com.ti.ccstudio.buildDefinitions.optiShare.CMD_FILE.1553776363" superClass="com.ti.ccstudio.buildDefinitions.optiShare.CMD_FILE" value="${ProjName}.cmd" valueType="string"/>
+                                <option id="com.ti.ccstudio.buildDefinitions.optiShare.INFO_TABLE.1956118431" superClass="com.ti.ccstudio.buildDefinitions.optiShare.INFO_TABLE" value="${ProjName}.info" valueType="string"/>
+                                <option id="com.ti.ccstudio.buildDefinitions.optiShare.OPTIMIZED_OUTPUT_FILE.691279280" superClass="com.ti.ccstudio.buildDefinitions.optiShare.OPTIMIZED_OUTPUT_FILE" value="${ProjName}_optishare.out" valueType="string"/>
+                                <option id="com.ti.ccstudio.buildDefinitions.optiShare.OPTIMIZED_LINK_INFO_FILE.783117488" superClass="com.ti.ccstudio.buildDefinitions.optiShare.OPTIMIZED_LINK_INFO_FILE" value="${ProjName}_linkInfo_optishare.xml" valueType="string"/>
+                            </tool>
+                        </toolChain>
+                    </folderInfo>
+                </configuration>
+            </storageModule>
+            <storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+        </cconfiguration>
+    </storageModule>
+    <storageModule moduleId="cdtBuildSystem" version="4.0.0">
+        <project id="empty_awr294x-evm_system_freertos.com.ti.ccstudio.buildDefinitions.TMS470.ProjectType.2112170350" name="TMS470" projectType="com.ti.ccstudio.buildDefinitions.TMS470.ProjectType"/>
+    </storageModule>
+</cproject>

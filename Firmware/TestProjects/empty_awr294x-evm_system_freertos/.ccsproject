@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?ccsproject version="1.0"?>
+<projectOptions>
+	<ccsVariant value="50:Theia-based"/>
+	<ccsVersion value="70.3.0"/>
+	<deviceFamily value="TMS470"/>
+	<connection value="common/targetdb/connections/TIXDS110_Connection.xml"/>
+	<executableActions value=""/>
+	<createSlaveProjects value=""/>
+	<activeTargetConfiguration value="targetConfigs/AWR2944.ccxml"/>
+	<templateProperties value="id=system.projectspec.empty_awr294x-evm_system_freertos"/>
+	<isTargetConfigurationManual value="false"/>
+	<origin value="C:\ti\mmwave_mcuplus_sdk_04_07_01_04\mcu_plus_sdk_awr294x_10_01_00_04\examples\empty\awr294x-evm\system_freertos\system.projectspec"/>
+	<filesToOpen value="system.xml"/>
+</projectOptions>
