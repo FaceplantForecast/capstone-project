@@ -4,7 +4,7 @@
 
 **ECEN 403/404 | Team 20 | Texas A&M University | Fall 2025 – Spring 2026**
 
-This repository contains the Raspberry Pi software stack for the Faceplant Forecast Human Activity Detector. The FALLWATCH system uses a **TI AWR2944EVM millimeter-wave radar module** to continuously monitor a room, runs radar data through a custom-trained AI model to detect fall events, and automatically pushes notifications to a cloud backend when a fall is detected.
+This repository contains the Raspberry Pi software stack (RaspberryPi/) and user application software stack (Application/) for the Faceplant Forecast Human Activity Detector. The FALLWATCH system uses a **TI AWR2944EVM millimeter-wave radar module** to continuously monitor a room, runs radar data through a custom-trained AI model to detect fall events, and automatically pushes notifications to a cloud backend when a fall is detected.
 
 ---
 
@@ -43,7 +43,7 @@ The bootloader then enters a **supervisor loop** that monitors the health of all
 ## Repository Structure
 
 ```
-capstone-project/
+RaspberryPi/
 │
 ├── bootloader.py          # Entry point. Creates shared memory, launches and supervises all daemon processes.
 ├── server.py              # WebSocket client connecting to GCP. Sends fall events and system health events. Listens for app commands.

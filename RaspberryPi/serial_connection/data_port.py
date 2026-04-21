@@ -600,6 +600,8 @@ def compute_frame_features(frame, track: TrackState):
 # ----------------- Background Capture Phase -----------------
 #region Background Capture
 def build_background_from_stream(stream):
+    global cmd_data
+
     print(f"\n[BG] Please clear the room. Waiting {BACKGROUND_WAIT_SEC} seconds...")
     for i in range(BACKGROUND_WAIT_SEC, 0, -1):
         print(f"[BG] Starting background capture in {i:02d}s", end="\r", flush=True)
@@ -631,6 +633,7 @@ def build_background_from_stream(stream):
 
     BG_COMP.build_background()
     print("[BG] Background baseline built. Beginning live inference.\n")
+    cmd_data[CMD_INDEX.DAT_PORT_STATUS] = DAT_PORT_STATUS.RUNNING
 #endregion
 # ===============================================================
 #region Helpers
@@ -881,13 +884,19 @@ def live_loop(stream):
         total_frames += 1
         feat = compute_frame_features(frame, track)
 
+        """
+        DEPRECATED
         if feat is None:
             miss_count += 1
             if _DEBUG or (miss_count % MISS_PRINT_EVERY == 0):
                 print(f"        (no valid person cluster) misses={miss_count}")
         else:
             valid_frames += 1
+<<<<<<< HEAD
             miss_count = 0
+=======
+            miss_count = 0"""
+>>>>>>> d6b9de695a86fc0ad279df769f8425a76fe737de
 
         vec = np.array([feat[k] for k in FEATURE_KEYS], np.float32)
         window.append(vec)
@@ -895,7 +904,8 @@ def live_loop(stream):
         now = time.time()
         if now - last_health >= HEALTH_PRINT_EVERY_SEC:
             vr = 100.0 * (valid_frames / max(total_frames, 1))
-            print(f"[HEALTH] frames={total_frames} valid={valid_frames} ({vr:.1f}%) window={len(window)}/{WINDOW_SIZE}")
+            #UNCOMMENT BELOW FOR DEBUGGING
+            #print(f"[HEALTH] frames={total_frames} valid={valid_frames} ({vr:.1f}%) window={len(window)}/{WINDOW_SIZE}")
             last_health = now
 
         if len(window) < WINDOW_SIZE:
@@ -944,10 +954,12 @@ def live_loop(stream):
 
                 last_alert_ts = ts_now
                 FALL_DETECTED = 1
-            else:
-                print(f"[ALERT] (latched/cooldown) reason={reason} p={p:.3f}")
-        else:
-            print(f"[INFO] p_fall={p:.3f}")
+            #UNCOMMENT BELOW FOR DEBUGGING
+            #else:
+                #print(f"[ALERT] (latched/cooldown) reason={reason} p={p:.3f}")
+        #UNCOMMENT BELOW FOR DEBUGGING
+        #else:
+            #print(f"[INFO] p_fall={p:.3f}")
 #endregion
 #========================================================================
 #deprecated; for debug modes
@@ -1114,10 +1126,11 @@ def main():
                     except:
                         data_port = serial.Serial('/dev/ttyUSB1', 3125000, timeout=0.1)   # sometimes switches, I don't know why
 
-            cmd_data[CMD_INDEX.DAT_PORT_STATUS] = DAT_PORT_STATUS.RUNNING
+            cmd_data[CMD_INDEX.DAT_PORT_STATUS] = DAT_PORT_STATUS.SETTING_UP
         except:
             cmd_data[CMD_INDEX.DAT_PORT_STATUS] = DAT_PORT_STATUS.ERROR
             print("uh oh")
+            sys.exit()
 
         #stream the frames
         stream = uart_frame_stream(data_port)

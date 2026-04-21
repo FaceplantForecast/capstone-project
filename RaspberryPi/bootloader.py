@@ -17,7 +17,7 @@ import platform
 from signal import signal, SIGTERM
 
 #import enums
-from enums import BUFF_SIZES, CMD_INDEX, MAIN_STATUS, CMD_PORT_STATUS, AI_STATUS, BOOT_MODE, PLATFORM, APP_CMD
+from enums import BUFF_SIZES, CMD_INDEX, MAIN_STATUS, CMD_PORT_STATUS, AI_STATUS, BOOT_MODE, PLATFORM, APP_CMD, DAT_PORT_STATUS
 
 # Supervisory constants for daemon recovery behaviour.
 PROCESS_MAX_RESTARTS = 3
@@ -103,6 +103,7 @@ def _set_cmd_defaults():
     cmd_data[CMD_INDEX.MAIN_STATUS] = MAIN_STATUS.RUNNING
     cmd_data[CMD_INDEX.CMD_PORT_STATUS] = CMD_PORT_STATUS.OFFLINE
     cmd_data[CMD_INDEX.APP_CMD] = APP_CMD.NONE
+    cmd_data[CMD_INDEX.DAT_PORT_STATUS] = DAT_PORT_STATUS.OFFLINE
 
     #check for current platform to change serial port settings
     if platform.node() == "raspberrypi":
@@ -192,6 +193,8 @@ def _monitor_and_restart_processes():
 
             state["death_handled"] = True
             exit_code = proc.exitcode
+            if proc_key == "data_port":
+                cmd_data[CMD_INDEX.DAT_PORT_STATUS] = DAT_PORT_STATUS.ERROR
             state["restart_count"] += 1
 
             send_process_notification(
