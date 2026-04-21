@@ -17,7 +17,7 @@ import platform
 from signal import signal, SIGTERM
 
 #import enums
-from enums import BUFF_SIZES, CMD_INDEX, MAIN_STATUS, CMD_PORT_STATUS, AI_STATUS, BOOT_MODE, PLATFORM, APP_CMD
+from enums import BUFF_SIZES, CMD_INDEX, MAIN_STATUS, CMD_PORT_STATUS, AI_STATUS, BOOT_MODE, PLATFORM, APP_CMD, DAT_PORT_STATUS
 
 # Supervisory constants for daemon recovery behaviour.
 PROCESS_MAX_RESTARTS = 3
@@ -31,11 +31,33 @@ global cmd_data
 global radar_buffer
 global radar_data
 
+def _start_command_process():
+    """
+    Start the command-port process with a SIGTERM hook for clean radar shutdown.
+    """
+    signal(SIGTERM, CmdPrt.shutdown) #stops radar on process termination
+
+    CmdPrt.main()
+
+def _start_data_process():
+    """
+    Start the data process
+    """
+
+    DatPrt.main()
+
+def _start_server_process():
+    """
+    Start the server process
+    """
+
+    Server.main()
+
 # process table, keyed by logical process name
 PROCESS_SPECS = {
-    "server": {"target": lambda: Server.main(), "name": "ServerProc"},
-    "command_port": {"target": lambda: _start_command_process(), "name": "CommandProc"},
-    "data_port": {"target": lambda: DatPrt.main(), "name": "DataProc"},
+    "server": {"target": _start_server_process, "name": "ServerProc"},
+    "command_port": {"target": _start_command_process, "name": "CommandProc"},
+    "data_port": {"target": _start_data_process, "name": "DataProc"},
 }
 PROCESS_STATE = {}
 
@@ -81,6 +103,7 @@ def _set_cmd_defaults():
     cmd_data[CMD_INDEX.MAIN_STATUS] = MAIN_STATUS.RUNNING
     cmd_data[CMD_INDEX.CMD_PORT_STATUS] = CMD_PORT_STATUS.OFFLINE
     cmd_data[CMD_INDEX.APP_CMD] = APP_CMD.NONE
+    cmd_data[CMD_INDEX.DAT_PORT_STATUS] = DAT_PORT_STATUS.OFFLINE
 
     #check for current platform to change serial port settings
     if platform.node() == "raspberrypi":
@@ -89,15 +112,6 @@ def _set_cmd_defaults():
         cmd_data[CMD_INDEX.PLATFORM] = PLATFORM.FRITZ_LAPTOP
     elif platform.node() == "DESKTOP-A8R7298":
         cmd_data[CMD_INDEX.PLATFORM] = PLATFORM.FRITZ_DESKTOP
-
-
-def _start_command_process():
-    """
-    Start the command-port process with a SIGTERM hook for clean radar shutdown.
-    """
-    signal(SIGTERM, CmdPrt.shutdown) #stops radar on process termination
-
-    CmdPrt.main()
 
 def send_process_notification(event_type, process_name, message, **details):
     """
@@ -179,6 +193,8 @@ def _monitor_and_restart_processes():
 
             state["death_handled"] = True
             exit_code = proc.exitcode
+            if proc_key == "data_port":
+                cmd_data[CMD_INDEX.DAT_PORT_STATUS] = DAT_PORT_STATUS.ERROR
             state["restart_count"] += 1
 
             send_process_notification(
@@ -240,9 +256,6 @@ def _shutdown():
 def main():
     global cmd_buffer
     global cmd_data
-    global command_proc
-    global data_proc
-    global server_proc
 
     #optional arguments to allow for launching in specific modes
     parser = argparse.ArgumentParser(

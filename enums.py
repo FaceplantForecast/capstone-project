@@ -52,6 +52,7 @@ class DAT_PORT_STATUS(IntEnum):
     ERROR       = 1
     OFFLINE     = 2
     CONNECTING  = 3
+    SETTING_UP  = 4
 
 class APP_STATUS(IntEnum):
     RUNNING     = 0

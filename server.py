@@ -7,7 +7,7 @@
 import numpy as np
 import multiprocessing.shared_memory as sm
 import time
-from enums import APP_CMD, BUFF_SIZES, CMD_INDEX, RADAR_DATA
+from enums import APP_CMD, BUFF_SIZES, CMD_INDEX, RADAR_DATA, DAT_PORT_STATUS
 import websockets
 import asyncio
 import json
@@ -70,7 +70,7 @@ def _build_base_message(msg_type: str, payload: dict):
     return {
         "msg_type": msg_type,
         "ts_send": time.strftime("%m-%d-%Y %H:%M:%S", time.localtime()),
-        "device_id": "deployed-pi-01",
+        "device_id": "raspberry_pi",
         "account_id": "account-1",
         "payload": payload,
     }
@@ -96,7 +96,7 @@ def send_fall_flag(probability: float, frame_id: int, ts: float):
         "fall_detected": 1,
         "probability": float(probability),
         "frame_id": int(frame_id),
-        "ts_fall": time.strftime("%m-%d-%Y %H:%M:%S", time.localtime(ts)),
+        "ts_fall": time.strftime("%m-%d-%Y %H:%M:%S", time.localtime()),
     }
     msg = _build_base_message("fall_event", payload)
 
@@ -168,6 +168,7 @@ def _control_loop():
     global radar_data
 
     fall_latched = 0
+    bg_sub_latched = 0
 
     while True:
         if radar_data[RADAR_DATA.FALL_DETECTED] == 1:
@@ -177,9 +178,16 @@ def _control_loop():
                                frame_id=radar_data[RADAR_DATA.FRAME_ID],
                                ts=radar_data[RADAR_DATA.TIMESTAMP])
             fall_latched = 1
-            radar_data[RADAR_DATA.FALL_DETECTED] == 0 #reset buffer flag
+            radar_data[RADAR_DATA.FALL_DETECTED] = 0 #reset buffer flag
         else:
             fall_latched = 0
+
+        if cmd_data[CMD_INDEX.DAT_PORT_STATUS] == DAT_PORT_STATUS.ERROR:
+            bg_sub_latched = 0
+
+        if cmd_data[CMD_INDEX.DAT_PORT_STATUS] == DAT_PORT_STATUS.RUNNING and bg_sub_latched == 0:
+            send_system_event("status", "finished background subtraction")
+            bg_sub_latched = 1
 
         time.sleep(POLL_SLEEP_SEC)
 
@@ -187,3 +195,6 @@ def main():
     _bootstrapper()
     _start_command_listener_thread()
     _control_loop()
+
+if __name__ == "__main__":
+    main()
